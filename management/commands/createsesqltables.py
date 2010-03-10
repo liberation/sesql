@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Copyright (c) Pilot Systems and Libération, 2010
 
 # This file is part of SeSQL.
@@ -21,8 +20,70 @@ from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db import connection, transaction
 import settings
-import config
+from sesql import config, typemap
 
 class Command(BaseCommand):
-    pass
+    help = "Dump the commands to create SeSQL tables"
+    
+    def handle(self, *apps, **options):
+        """
+        Handle the command
+        """       
+        print "BEGIN;"
 
+        print """
+--
+-- Remember to create ascii_french.stop with :
+--  LC_ALL=fr_FR.UTF-8 iconv -f utf-8 -t ascii//TRANSLIT /usr/share/postgresql/8.4/tsearch_data/french.stop > /usr/share/postgresql/8.4/tsearch_data/ascii_french.stop
+--
+
+CREATE TEXT SEARCH CONFIGURATION public.simple_french (COPY = pg_catalog.simple);
+CREATE TEXT SEARCH DICTIONARY public.simple_french_dict (
+    TEMPLATE = pg_catalog.simple,
+    STOPWORDS = ascii_french
+);
+
+ALTER TEXT SEARCH CONFIGURATION simple_french
+    ALTER MAPPING FOR asciiword, asciihword, hword_asciipart WITH simple_french_dict;
+"""
+        
+        print """CREATE TABLE %s (
+""" % config.MASTER_TABLE_NAME
+
+        for field in config.FIELDS:
+            print "  " + field.schema()
+
+        print """
+  PRIMARY KEY (classname, id)
+);
+"""
+
+        for table in typemap.all_tables():
+            condition = typemap.get_class_names_for(table)
+            condition = ' OR '.join([ "classname = '%s'" % cls for cls in condition ])
+            print """
+CREATE TABLE %s (CHECK (%s), PRIMARY KEY (classname, id)) INHERITS (%s) ;
+""" % (table, condition, config.MASTER_TABLE_NAME) 
+            for field in config.FIELDS:
+                print field.index(table)
+
+            for cross in config.CROSS_INDEXES:
+                print """CREATE INDEX %s_%s_index ON %s (%s);
+""" % (table, "_".join(cross), table, ",".join(cross))
+                
+        # Add the reindex schedule table
+        print """
+CREATE SEQUENCE sesql_reindex_id_seq;
+CREATE TABLE sesql_reindex_schedule (
+  rowid integer NOT NULL,
+  classname character varying(250) NOT NULL,
+  objid integer NOT NULL,
+  scheduled_at timestamp NOT NULL DEFAULT NOW(),
+  reindexed_at timestamp,
+  PRIMARY KEY (rowid)
+  );
+CREATE INDEX sesql_reindex_schedule_new_index ON sesql_reindex_schedule (reindexed_at);
+CREATE INDEX sesql_reindex_schedule_update_index ON sesql_reindex_schedule (classname, rowid, reindexed_at);
+"""
+
+        print "COMMIT;"

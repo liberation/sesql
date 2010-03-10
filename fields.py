@@ -108,6 +108,19 @@ class StrField(Field):
         self.size = size
         self.sqltype = "varchar(%d)" % size
 
+class ClassField(Field):
+    """
+    This is a field storing the class of the object
+    """
+    sqltype = "varchar(255)"
+    
+    def __init__(self, name, source = None):
+        """
+        Constructor
+        """
+        super(ClassField, self).__init__(name, source)
+        self.source = source
+
 class IntArrayField(Field):
     """
     This is an array of integer
@@ -200,3 +213,16 @@ class DateField(Field):
             return value.strftime("%Y-%m-%d")
         return value and str(value) or None
 
+class DateTimeField(DateField):
+    """
+    This a date and time field
+    """
+    sqltype = "timestamp"
+
+    def marshall(self, value):
+        """
+        Marshall a date field
+        """
+        if hasattr(value, "strftime"):
+            return value.strftime("%Y-%m-%d %H:%M:%S %z")
+        return value and str(value) or None

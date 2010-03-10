@@ -22,4 +22,4 @@ import signals
 from index import index
 from shortquery import shortquery
 from longquery import longquery
-
+from typemap import typemap

@@ -19,35 +19,81 @@
 
 from datamodel import *
 from django.db.models import Q
-from libe import models
+from libe import models, constants
 
-FIELDS = (IntField("id"),
-          StrField("classname", size = 50),
-          DateField("modifiedAt"),
+NOT_DELETED = ~Q(workflow_state = constants.WORKFLOW_STATE.DELETED)
+
+FIELDS = (ClassField("classname"),
+          IntField("id"),          
+          DateTimeField('created_at'),
+          DateTimeField("modified_at"),
+          IntField('created_by', "created_by.id"),
+          IntField("modified_by", "modified_by.id"),
+          IntField('workflow_state'),
+          DateField('publication_date'),
+          FullTextField('suptitle'),
           FullTextField("title"),
-          FullTextField("description", "getDescription()"),
-          IntArrayField("authors", "authors.id"),
-          FullTextField("fulltextAuthors",
-                        [ 'authorsInformations',
-                          SubField("authors", [ "firstname", "lastname",
-                                                "defaultTitle" ],
-                                   condition = ~Q(workflowState = 'deleted'))
-                          ]
-                        ),
-          
+          FullTextField('subtitle',
+                        [ 'subtitle', 'call_subtitle' ]),
           FullTextField("fulltext",
-                        [ 'title', 'getDescription()',
-                          SubField("authors", [ "firstname", "lastname" ],
-                                   condition = ~Q(workflowState = 'deleted'))
+                        [ 'title', 'subtitle',
+                          'suptitle', 'authorsInformations', 'keywords',
+                          'call_title', 'call_subtitle',
+                          'first_name', 'last_name',
+                          'caption', 'original_caption',
+                          'description',
+                          'citation', 'answer',
+                          'content', 'work_infos',
+                          'pollchoice_set.content',
+                          SubField("authors", [ "first_name", "last_name" ],
+                                   condition = NOT_DELETED)
                           ],
                         primary = True,
                         ),
-          DateField('indexedAt', sql_default = 'NOW()'),
+          FullTextField("fulltext_authors",
+                        [ 'authorsInformations',
+                          SubField("authors", [ "first_name", "last_name",
+                                                "default_title" ],
+                                   condition = NOT_DELETED)
+                          ]
+                        ),
+          IntArrayField("authors", SubField("authors", "id",
+                                            condition = NOT_DELETED)),
+          IntArrayField('folders', SubField("folders", "id",
+                                            condition = NOT_DELETED)),
+          IntArrayField('sections', SubField("sections", "id",
+                                             condition = NOT_DELETED)),
+          FullTextField('keywords'),
+          FullTextField('work_infos'),
+          IntField('publication_number'),
+          IntField('page_number'),
+          StrField('source', size = 25),
+          IntField('paper_kind'),
+          IntField('paper_channel'),
+          StrField('thema', size = 100),
+          StrField('serie'),
+          StrField('event', size = 100),
+          IntField('typology'),
+          IntField('is_reviewed'),
+          IntField('is_archived'),
+          DateTimeField('indexed_at', sql_default = 'NOW()')
           )
 
 MASTER_TABLE_NAME = "sesql_index"
 
 TYPE_MAP = ((models.Photo, "sesql_photo"),
             (models.Comment, "sesql_comment"),
+            (models.Author, "sesql_author"),
+            (models.WhoSaid, "sesql_whosaid"),
+            (models.Blog, "sesql_blog"),
+            (models.PaperPage, "sesql_page"),
+            (models.Program, "sesql_program"),
             (models.BaseModel, "sesql_default"))
 
+CROSS_INDEXES = (("classname", "modified_at"),
+                 ("classname", "publication_date"),
+                 ("classname", "created_at"),
+                 ("classname", "publication_date", "page_number"),
+                 ("publication_date", "page_number"))
+
+                 
