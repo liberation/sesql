@@ -37,7 +37,10 @@ class Command(BaseCommand):
 --  LC_ALL=fr_FR.UTF-8 iconv -f utf-8 -t ascii//TRANSLIT /usr/share/postgresql/8.4/tsearch_data/french.stop > /usr/share/postgresql/8.4/tsearch_data/ascii_french.stop
 --
 
+DROP TEXT SEARCH CONFIGURATION IF EXISTS public.simple_french;
 CREATE TEXT SEARCH CONFIGURATION public.simple_french (COPY = pg_catalog.simple);
+
+DROP TEXT SEARCH DICTIONARY IF EXISTS public.simple_french_dict;
 CREATE TEXT SEARCH DICTIONARY public.simple_french_dict (
     TEMPLATE = pg_catalog.simple,
     STOPWORDS = ascii_french
@@ -47,8 +50,9 @@ ALTER TEXT SEARCH CONFIGURATION simple_french
     ALTER MAPPING FOR asciiword, asciihword, hword_asciipart WITH simple_french_dict;
 """
         
-        print """CREATE TABLE %s (
-""" % config.MASTER_TABLE_NAME
+        print """DROP TABLE IF EXISTS %s CASCADE;
+CREATE TABLE %s (
+""" % (config.MASTER_TABLE_NAME, config.MASTER_TABLE_NAME)
 
         for field in config.FIELDS:
             print "  " + field.schema()
@@ -73,7 +77,10 @@ CREATE TABLE %s (CHECK (%s), PRIMARY KEY (classname, id)) INHERITS (%s) ;
                 
         # Add the reindex schedule table
         print """
+DROP SEQUENCE IF EXISTS sesql_reindex_id_seq;
 CREATE SEQUENCE sesql_reindex_id_seq;
+
+DROP TABLE IF EXISTS sesql_reindex_schedule;
 CREATE TABLE sesql_reindex_schedule (
   rowid integer NOT NULL,
   classname character varying(250) NOT NULL,

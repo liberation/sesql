@@ -51,3 +51,19 @@ TYPE_MAP = ((models.Photo, "sesql_photo"),
             (models.Comment, "sesql_comment"),
             (models.BaseModel, "sesql_default"))
 
+CROSS_INDEXES = ()
+
+SKIP_CONDITION = None
+
+# Default sort order for queries 
+DEFAULT_ORDER = ('modifiedAt',)
+
+# Default LIMIT in short queries
+DEFAULT_LIMIT = 50
+
+# First we ask for the SMART_QUERY_INITIAL first sorted items
+SMART_QUERY_INITIAL = 2500
+# Then, if we have at least SMART_QUERY_THRESOLD of our limit, we go on
+SMART_QUERY_THRESOLD = 0.35
+# If we have a second query, we do * (wanted/result) * SMART_QUERY_RATIO 
+SMART_QUERY_RATIO = 3.0

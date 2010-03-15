@@ -21,6 +21,7 @@
 Handle the type map
 """
 
+from django.db import models
 import config
 
 class TypeMap(object):
@@ -33,6 +34,7 @@ class TypeMap(object):
         """
         self.tables = {}
         self.classes = {}
+        self.class_names = {}
 
         for klass, table in config.TYPE_MAP:
             # Ensure table exists in the map
@@ -43,6 +45,7 @@ class TypeMap(object):
             for sc in subclasses:
                 if not sc in self.classes:
                     self.classes[sc] = table
+                    self.class_names[sc.__name__] = sc
 
         # And now fill the reverse lookup, we can only do it now, because the
         # same class can be reachable twice
@@ -73,6 +76,12 @@ class TypeMap(object):
         """
         return self.tables.keys()
 
+    def all_classes(self):
+        """
+        List all classes
+        """
+        return self.classes.keys()
+
     def get_class_names_for(self, table):
         """
         Get the name of classes for this table
@@ -84,5 +93,19 @@ class TypeMap(object):
         Get the list of classes for this table
         """
         return self.tables.get(table, [])
+
+    def get_table_for(self, klass):
+        """
+        Get the table for this klass
+        """
+        return self.classes[self.get_class_by_name(klass)]
+
+    def get_class_by_name(self, klass):
+        """
+        Get the real Django class from its name
+        """
+        if isinstance(klass, (str, unicode)):
+            return self.class_names[klass]
+        return klass
 
 typemap = TypeMap()

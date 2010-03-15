@@ -18,11 +18,10 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 import config
+from query import SeSQLQuery
 
-def shortquery(query):
+def shortquery(query, order = None, limit = 50):
     """
-    Perform a short query and return Django objects
+    Perform a short query and return a lazy Django result set
     """
-    # FIXME
-
-    
+    return SeSQLQuery(query, order).shortquery(limit)

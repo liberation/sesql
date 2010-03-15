@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Copyright (c) Pilot Systems and Libération, 2010
 
 # This file is part of SeSQL.
@@ -17,11 +16,28 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-import config
-from query import SeSQLQuery
+from django.core.management.base import BaseCommand
+from django.core.management import call_command
+from django.db import connection, transaction
+from django.db.models import Q
+import settings
+from sesql.results import SeSQLResultSet
+from sesql.index import index
+import sys
 
-def longquery(query, order = None):
-    """
-    Perform a long query and return a lazy Django result set
-    """
-    return SeSQLQuery(query, order).longquery()
+class Command(BaseCommand):
+    help = "Index an object into SeSQL"
+    
+    def handle(self, *apps, **options):
+        """
+        Handle the command
+        """
+        if len(apps) != 2:
+            print "Syntax : sesqlindex <classname> <objid>"
+            sys.exit(1)
+        
+        obj = SeSQLResultSet.load(apps)
+        index(obj)
+        
+        
+        

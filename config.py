@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
+CHARSET = "utf-8"
+
 from datamodel import *
 from django.db.models import Q
 from libe import models, constants
@@ -96,4 +98,17 @@ CROSS_INDEXES = (("classname", "modified_at"),
                  ("classname", "publication_date", "page_number"),
                  ("publication_date", "page_number"))
 
-                 
+SKIP_CONDITION = lambda vals: vals['workflow_state'] == constants.WORKFLOW_STATE.DELETED
+
+# Default sort order for queries 
+DEFAULT_ORDER = ("publication_date",)
+
+# Default LIMIT in short queries
+DEFAULT_LIMIT = 50
+
+# First we ask for the SMART_QUERY_INITIAL first sorted items
+SMART_QUERY_INITIAL = 2500
+# Then, if we have at least SMART_QUERY_THRESOLD of our limit, we go on
+SMART_QUERY_THRESOLD = 0.35
+# If we have a second query, we do * (wanted/result) * SMART_QUERY_RATIO 
+SMART_QUERY_RATIO = 3.0

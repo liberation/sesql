@@ -22,8 +22,9 @@
 Contain the various kind of field aggregators/fetchers/...
 """
 
-# Automatic dispatcher
+import config
 
+# Automatic dispatcher
 def guess_source(what):
     """
     Guess what is this source
@@ -58,6 +59,20 @@ class AbstractSource(object):
         Load data from a Django object
         """
         raise NotImplementedError
+
+    def __call__(self, obj):
+        return self.load_data(obj)
+
+class ClassSource(AbstractSource):
+    """
+    Get the class of the object
+    """
+    def load_data(self, obj):
+        """
+        Load data from a Django object
+        """
+        return obj.__class__.__name__
+    
 
 class SimpleField(AbstractSource):
     """
@@ -106,19 +121,27 @@ class SubField(AbstractSource):
         Get the data from the sub-object(s)
         """
         what = self.child.load_data(obj)
-        if self.condition:
-            what = what.get(self.condition)
-        else:
-            what = what.all()
 
-        res = []
-        for w in what:
-            data = self.getter(w)
-            if isinstance(data, (list, tuple)):
-                res.extend(list(data))
-            else:
-                res.append(data)
-        return res
+        if callable(getattr(what, "all", None)):
+            # We have a "all" method ? Consider it's many ?        
+            try:
+                if self.condition:
+                    what = what.filter(self.condition)
+                what = what.all()
+            except Exception, e:
+                what = []                
+
+            res = []
+            for w in what:
+                data = self.getter(w)
+                if isinstance(data, (list, tuple)):
+                    res.extend(list(data))
+                else:
+                    res.append(data)
+            return res
+        else:
+            # One ?
+            return self.getter(what)
     
 # Aggregate
 
@@ -145,10 +168,12 @@ class TextAggregate(AbstractSource):
         Collapse recursively lists or tuples into string
         """
         if not values:
-            return ""
-        if not isinstance(values, (list, tuple)):
-            return str(values)
+            return u""
+        if isinstance(values, unicode):
+            return values
+        if not isinstance(values, (list, tuple)):        
+            return unicode(values, config.CHARSET)
         values = [ TextAggregate.collapse(v) for v in values ]
         values = [ v for v in values if v ]
-        return " ".join(values)
+        return u" ".join(values)
 
