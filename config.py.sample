@@ -17,10 +17,19 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-from datamodel import *
-from django.db.models import Q
-from libe import models
+# Global charset to use
+CHARSET = "utf-8"
 
+from fields import *
+from sources import *
+from django.db.models import Q
+from libe import models, constants
+
+#
+# Fields and tables configuration
+#
+
+# Configuration of SeSQL search fields
 FIELDS = (IntField("id"),
           StrField("classname", size = 50),
           DateField("modifiedAt"),
@@ -45,14 +54,32 @@ FIELDS = (IntField("id"),
           DateField('indexedAt', sql_default = 'NOW()'),
           )
 
+# Name of the global lookup table that should contain no real data
 MASTER_TABLE_NAME = "sesql_index"
 
+# Type map, associating Django classes to SeSQL tables
 TYPE_MAP = ((models.Photo, "sesql_photo"),
             (models.Comment, "sesql_comment"),
             (models.BaseModel, "sesql_default"))
 
+# Additional indexes to create
 CROSS_INDEXES = ()
 
+#
+# Full text search configuration
+#
+
+# Name of the PostgreSQL Text Search Configuration
+TS_CONFIG_NAME = "simple_french"
+
+# Name of the stopwards file, must be plain ASCII
+STOPWORDS_FILE = "ascii_french"
+
+#
+# Query configuration
+#
+
+# General condition to skip indexing content
 SKIP_CONDITION = None
 
 # Default sort order for queries 

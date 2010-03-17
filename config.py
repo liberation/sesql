@@ -9,7 +9,7 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# SeSQL is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -17,14 +17,21 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
+# Global charset to use
 CHARSET = "utf-8"
 
-from datamodel import *
+from fields import *
+from sources import *
 from django.db.models import Q
 from libe import models, constants
 
+#
+# Fields and tables configuration
+#
+
 NOT_DELETED = ~Q(workflow_state = constants.WORKFLOW_STATE.DELETED)
 
+# Configuration of SeSQL search fields
 FIELDS = (ClassField("classname"),
           IntField("id"),          
           DateTimeField('created_at'),
@@ -81,8 +88,10 @@ FIELDS = (ClassField("classname"),
           DateTimeField('indexed_at', sql_default = 'NOW()')
           )
 
+# Name of the global lookup table that should contain no real data
 MASTER_TABLE_NAME = "sesql_index"
 
+# Type map, associating Django classes to SeSQL tables
 TYPE_MAP = ((models.Photo, "sesql_photo"),
             (models.Comment, "sesql_comment"),
             (models.Author, "sesql_author"),
@@ -92,13 +101,29 @@ TYPE_MAP = ((models.Photo, "sesql_photo"),
             (models.Program, "sesql_program"),
             (models.BaseModel, "sesql_default"))
 
+# Additional indexes to create
 CROSS_INDEXES = (("classname", "modified_at"),
                  ("classname", "publication_date"),
                  ("classname", "created_at"),
                  ("classname", "publication_date", "page_number"),
                  ("publication_date", "page_number"))
 
+# General condition to skip indexing content
 SKIP_CONDITION = lambda vals: vals['workflow_state'] == constants.WORKFLOW_STATE.DELETED
+
+#
+# Full text search configuration
+#
+
+# Name of the PostgreSQL Text Search Configuration
+TS_CONFIG_NAME = "simple_french"
+
+# Name of the stopwards file, must be plain ASCII
+STOPWORDS_FILE = "ascii_french"
+
+#
+# Query configuration
+#
 
 # Default sort order for queries 
 DEFAULT_ORDER = ("publication_date",)
@@ -112,3 +137,4 @@ SMART_QUERY_INITIAL = 2500
 SMART_QUERY_THRESOLD = 0.35
 # If we have a second query, we do * (wanted/result) * SMART_QUERY_RATIO 
 SMART_QUERY_RATIO = 3.0
+

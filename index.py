@@ -9,7 +9,7 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# SeSQL is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -68,6 +68,6 @@ def index_cb(sender, instance, signal, *args, **kwargs):
     """
     index(instance)
 
-from django.db.models.signals import post_save
+from django.db.models import signals
 for klass in typemap.all_classes():
-    post_save.connect(index_cb, sender=klass)
+    signals.post_save.connect(index_cb, sender=klass)

@@ -9,7 +9,7 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# SeSQL is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -17,5 +17,128 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-from sources import *
-from fields import *
+import config
+from typemap import typemap
+from django.db import connection, transaction
+
+from utils import table_exists
+
+def sql_function(func):
+    """
+    Decorator to execute or print SQL statements
+    """
+    def sql_function_inner(execute = False, verbosity = True,
+                           include_drop = False,
+                           **kwargs):
+        sql = func(**kwargs)
+        if not include_drop:
+            sql = [ row for row in sql if not row.startswith('DROP ') ]
+        if verbosity:
+            print
+            for row in sql:
+                print row + ";"
+            print
+        if execute:
+            cursor = connection.cursor()
+            for row in sql:
+                cursor.execute(row)
+    return sql_function_inner
+
+@sql_function
+def create_dictionnary():
+    """
+    Create the dictionnary configuration
+    """
+    return [
+        "DROP TEXT SEARCH CONFIGURATION IF EXISTS public.%s" % config.TS_CONFIG_NAME,
+        "CREATE TEXT SEARCH CONFIGURATION public.%s (COPY = pg_catalog.simple)" % config.TS_CONFIG_NAME,
+        "DROP TEXT SEARCH DICTIONARY IF EXISTS public.%s_dict" % config.TS_CONFIG_NAME,
+        """CREATE TEXT SEARCH DICTIONARY public.%s_dict (
+        TEMPLATE = pg_catalog.simple,
+        STOPWORDS = %s
+)""" % (config.TS_CONFIG_NAME, config.STOPWORDS_FILE),
+        """ALTER TEXT SEARCH CONFIGURATION %s
+        ALTER MAPPING FOR asciiword, asciihword, hword_asciipart WITH %s_dict""" % (config.TS_CONFIG_NAME, config.TS_CONFIG_NAME)
+        ]
+
+@sql_function
+def create_master_table():
+    """
+    Create the master table, that is, the one from which the others
+    will inherit
+    """
+    schema = "\n  ".join([ field.schema() for field in config.FIELDS ])
+    
+    return [
+        "DROP TABLE IF EXISTS %s CASCADE" % config.MASTER_TABLE_NAME,
+        """CREATE TABLE %s (
+%s
+  PRIMARY KEY (classname, id)
+)""" % (config.MASTER_TABLE_NAME, schema)
+        ]
+
+@sql_function
+def create_table(table = None):
+    """
+    Create given table
+    """
+    condition = typemap.get_class_names_for(table)
+    condition = ' OR '.join([ "classname = '%s'" % cls for cls in condition ])
+    res = [ "CREATE TABLE %s (CHECK (%s), PRIMARY KEY (classname, id)) INHERITS (%s)" % (table, condition, config.MASTER_TABLE_NAME) ]
+
+    for field in config.FIELDS:
+        res.append(field.index(table))
+        
+    for cross in config.CROSS_INDEXES:
+        res.append("CREATE INDEX %s_%s_index ON %s (%s);" % (table, "_".join(cross), table, ",".join(cross)))
+
+    return res
+    
+@sql_function
+def create_schedule_table():
+    """
+    Create the table to insert the reindex schedule
+    """
+    return [
+        "DROP SEQUENCE IF EXISTS sesql_reindex_id_seq",
+        "CREATE SEQUENCE sesql_reindex_id_seq",
+
+        "DROP TABLE IF EXISTS sesql_reindex_schedule",
+        """CREATE TABLE sesql_reindex_schedule (
+        rowid integer NOT NULL,
+        classname character varying(250) NOT NULL,
+        objid integer NOT NULL,
+        scheduled_at timestamp NOT NULL DEFAULT NOW(),
+        reindexed_at timestamp,
+        PRIMARY KEY (rowid)
+        )""",
+        "CREATE INDEX sesql_reindex_schedule_new_index ON sesql_reindex_schedule (reindexed_at)",
+        "CREATE INDEX sesql_reindex_schedule_update_index ON sesql_reindex_schedule (classname, rowid, reindexed_at)"
+    ]
+
+
+def sync_db(verbosity = 0, interactive = False, signal = None, **kwargs):
+    if hasattr(signal, "_sesql_syncdb_done"):
+        return
+    signal._sesql_syncdb_done = True
+
+    if not table_exists(config.MASTER_TABLE_NAME):
+        create_dictionnary(execute = True, verbosity = verbosity)
+        create_master_table(execute = True, verbosity = verbosity)
+    elif verbosity:
+        print "SeSQL : Table %s already existed, skipped." % config.MASTER_TABLE_NAME
+        
+    for table in typemap.all_tables():
+        if not table_exists(table):
+            create_table(table = table, execute = True, verbosity = verbosity)
+        elif verbosity:
+            print "SeSQL : Table %s already existed, skipped." % table
+
+    if not table_exists("sesql_reindex_schedule"):
+        create_schedule_table(execute = True, verbosity = verbosity)
+    elif verbosity:
+        print "SeSQL : Table %s already existed, skipped." % 'sesql_reindex_schedule'
+    
+
+from django.db.models import signals
+signals.post_syncdb.connect(sync_db)
