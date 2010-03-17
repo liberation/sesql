@@ -201,6 +201,8 @@ class DateField(IntField):
         """
         Marshall a date field
         """
+        if not value:
+            return None
         if hasattr(value, "strftime"):
             return value.strftime("%Y-%m-%d")
         return value and str(value) or None
@@ -215,6 +217,8 @@ class DateTimeField(DateField):
         """
         Marshall a date field
         """
+        if not value:
+            return None
         if hasattr(value, "strftime"):
             return value.strftime("%Y-%m-%d %H:%M:%S %z")
         return value and str(value) or None
@@ -230,6 +234,8 @@ class IntArrayField(Field):
         """
         Marshall the values to SQL - input must be a list or tuple
         """
+        if not value:
+            return None
         if isinstance(value, (list, tuple)):
             return "{" + ",".join([ str(v) for v in value if v ]) + "}"
         else:
