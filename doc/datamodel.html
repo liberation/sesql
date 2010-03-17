@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>SeSQL data model guide</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 5196 2007-06-03 20:25:28Z wiemann $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left {
+  clear: left }
+
+img.align-right {
+  clear: right }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font-family: serif ;
+  font-size: 100% }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="sesql-data-model-guide">
+<h1 class="title">SeSQL data model guide</h1>
+
+<div class="section" id="general">
+<h1>General</h1>
+<p>SeSQL data model is described in a 'config.py' file.</p>
+<p>It should define three variables :</p>
+<dl class="docutils">
+<dt>FIELDS</dt>
+<dd>A list (or tuple) of fields.</dd>
+<dt>MASTER_TABLE_NAME</dt>
+<dd>The name of the master table to use.</dd>
+<dt>TYPE_MAP</dt>
+<dd>Association between Django types and tables.</dd>
+</dl>
+</div>
+<div class="section" id="concepts">
+<h1>Concepts</h1>
+<p>SeSQL  data model is  composed of  <em>fields</em>. A  field is  something on
+which you  can perform queries and  order the data, it's  similar to a
+Django field.</p>
+<p>Fields are computed from <em>sources</em>.  A source will fetch the values to
+compose a  field, taking  object attributes, concatenating  several of
+them, calling methods, or following relations.</p>
+</div>
+<div class="section" id="fields">
+<h1>Fields</h1>
+<p>Each  field has  a  type, a  name, a  source  and may  have some  type
+dependant options.</p>
+<p>Known types are :</p>
+<dl class="docutils">
+<dt>IntField</dt>
+<dd>Normal integer field.</dd>
+<dt>StrField</dt>
+<dd>Normal string field, up to 255 characters wide,``size`` can be specified.</dd>
+<dt>ClassField</dt>
+<dd>Handle the class of the object.</dd>
+<dt>DateField</dt>
+<dd>Date field, without time.</dd>
+<dt>DateTimeField</dt>
+<dd>Date field, with time.</dd>
+<dt>IntArrayField</dt>
+<dd>Field storing multi-valued integers.</dd>
+<dt>FullTextField</dt>
+<dd>The beast for which !SeSQL was designed, a full-text index, can be made <tt class="docutils literal"><span class="pre">primary</span></tt> to be used in rankings.</dd>
+</dl>
+<p>FIXME : give example and specify options</p>
+</div>
+<div class="section" id="sources">
+<h1>Sources</h1>
+<p>Each field requires a 'source'. The source can be one of the following classes :</p>
+<dl class="docutils">
+<dt>SimpleField</dt>
+<dd>Will just fetch an attribute from the Django object, can specify a condition (Q object) to filter on.</dd>
+<dt>MethodCaller</dt>
+<dd>Will call a method from the Django object.</dd>
+<dt>SubField</dt>
+<dd>Will walk accross one or several many-to-many mappings, fetching attributes of the related objects.</dd>
+<dt>TextAggregate</dt>
+<dd>Concatenate the result of other sources.</dd>
+</dl>
+</div>
+<div class="section" id="easy-writing-of-sources">
+<h1>Easy writing of sources</h1>
+<p>Source can also be given in a more friendly way :</p>
+<ul class="simple">
+<li>as a normal string for a <tt class="docutils literal"><span class="pre">SimpleField</span></tt> (ie, <tt class="docutils literal"><span class="pre">workflow_state</span></tt>) ;</li>
+<li>as a normal string terminated with <tt class="docutils literal"><span class="pre">()</span></tt> for a <tt class="docutils literal"><span class="pre">MethodCaller</span></tt> (ie, <tt class="docutils literal"><span class="pre">&quot;getFullName()&quot;</span></tt>) ;</li>
+<li>as a path separated by <tt class="docutils literal"><span class="pre">.</span></tt> for a <tt class="docutils literal"><span class="pre">SubField</span></tt> (ie, <tt class="docutils literal"><span class="pre">&quot;.authors.firstname&quot;</span></tt>) ;</li>
+<li>as a list or tuple for a <tt class="docutils literal"><span class="pre">TextAggregate</span></tt> (ie <tt class="docutils literal"><span class="pre">(</span> <span class="pre">&quot;firstname&quot;,</span> <span class="pre">&quot;lastname&quot;</span> <span class="pre">)</span></tt>).</li>
+</ul>
+<p>If the source is not specified, it'll be a <tt class="docutils literal"><span class="pre">SimpleField</span></tt> of the same name that the index.</p>
+</div>
+<div class="section" id="type-map">
+<h1>Type map</h1>
+<p>The  type map is  a list  (or tuple)  of <tt class="docutils literal"><span class="pre">(class,</span>&nbsp; <span class="pre">table_name)</span></tt>. All
+Django objects of this class will be indexed into the given table. All
+objects of a subclass too, unless the subclass has a specific entry in
+the mapping.</p>
+<p>Example</p>
+<pre class="literal-block">
+TYPE_MAP = ((models.Photo, &quot;sesql_photo&quot;),
+            (models.Comment, &quot;sesql_comment&quot;),
+            (models.BaseModel, &quot;sesql_default&quot;))
+</pre>
+</div>
+</div>
+</body>
+</html>

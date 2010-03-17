@@ -1,0 +1,86 @@
+SeSQL installation guide
+========================
+
+Prerequisite
+------------
+
+- Django 1.1
+
+- PostgreSQL 8.4
+
+FIXME
+
+Installation
+------------
+
+SeSQL is a standard Django application.  Just drop it in the ``apps/``
+directory, and add it into ``settings.py`` .
+
+Configuration
+-------------
+
+Before using SeSQL you **must** configure it. The configuration file
+is named ``config.py``.
+
+The details of the configuration are in the FIXME file.
+
+The options that are required to get SeSQL working are the following :
+
+TS_CONFIG_NAME
+  Name of the *text search configuration* to create and use in the
+  PostgreSQL database.
+
+STOPWORDS_FILE
+  Name of the stopwords file. This file **must** be where PostgreSQL
+  will look for (``/usr/share/postgresql/8.4/tsearch_data/``) and
+  **must** only contain plain ascii characters. An example command to
+  generate the file for the french language is :
+
+::
+
+   LC_ALL=fr_FR.UTF-8 iconv -f utf-8 -t ascii//TRANSLIT \
+   /usr/share/postgresql/8.4/tsearch_data/french.stop > \
+   /usr/share/postgresql/8.4/tsearch_data/ascii_french.stop
+
+CHARSET
+  Name of the charset to use. Note that SeSQL was only tested in utf-8.
+
+FIELDS
+  A list or tuple of fields (see ``datamodel.txt``), including at
+  least ``classname`` and ``id``.
+
+MASTER_TABLE_NAME
+  The name of the master table, from which all others will
+  inherit. This table should not contain any data, but a query done to
+  it will query all SeSQL tables.
+
+TYPE_MAP
+  This list of ``(class, table)`` couples describes the mapping of
+  Django classes to SeSQL tables. Django classes not present in the
+  list will not be indexed by SeSQL. Subclasses will, by default, be
+  sent to the same table of the superclass.
+
+CROSS_INDEXES
+  This list contains all additional indexes to create in the
+  database. Each index is just a list of column. Indexes that are
+  worth creating depend of the kind of queries you do frequently.
+
+SKIP_CONDITION
+  A function (or lambda) that is called on every object, is not
+  ``None``. If it returns a true value, the object will not be
+  indexed. Useful, for example, to filter on workflow state.
+
+DEFAULT_ORDER
+  Default sort order for queries, when sort order is not specified.
+
+
+Constraints
+-----------
+
+Current version of SeSQL has a few constraints :
+
+- it  requires to  have a  ``ClassField`` called  ``classname``  and a
+  ``IntField`` called ``id``, referring to the object class and id ;
+
+- FIXME .
+

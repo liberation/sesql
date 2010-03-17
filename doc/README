@@ -1,0 +1,6 @@
+Documentation for  SeSQL in  is restructured text.   You can  read the
+source text  file. If you  want PDF or  HTML exports, you can  use the
+included  Makefile.  The following  Debian  packages  are required  to
+compile it :
+
+python-docutils texlive-latex texlive-latex-extra texlive-lang-french make

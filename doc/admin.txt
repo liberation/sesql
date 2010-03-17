@@ -1,0 +1,67 @@
+SeSQL administration guide
+==========================
+
+Django administration commands
+------------------------------
+
+syncdb
+......
+
+Django ``syncdb`` command  will create the SeSQL tables  that were not
+created yet. SeSQL **must** be configured before running it.
+
+createsqltables
+...............
+
+This command  will output  the SQL code  to create the  various tables
+required by SeSQL, with ``DROP`` statements if needed.
+
+Since there  is no support  for upgrading schemas in  SeSQL currently,
+you may have  to use this command and manually edit  the output if you
+do changes in SeSQL configuration.
+
+If you have a lot of content to index into SeSQL at once, you may also
+try  to create  the tables  without the  ``CREATE  INDEX`` statements,
+insert the data, and then run the ``CREATE INDEX`` statements.
+
+sesqlindex
+..........
+
+This command  takes a  class name  and an id  as parameters,  and will
+reindex into SeSQL the given object.
+
+sesqlreindex
+............
+
+This command takes only a class name as parameter, and will index into
+SeSQL all  objects that exist  in Django tables  but that are  not yet
+into  SeSQL. It  is very  useful  if you  just installed  SeSQL on  an
+existing database.
+
+This command may  take a long time  and use a lot of  memory.  You can
+interrupt it and restart it  later on, it'll continue where it stopped
+(objects are reindexed by groups  of 1000, only the current group will
+be restarted).
+
+sesqlshortquery
+...............
+
+Perform  a short  query. The  first parameter  is a  Python expression
+describing  a  Q object,  the  second,  optional  parameter, a  Python
+expression specifying the sort order to use.
+
+Warning  :  this  command   uses  ``eval()``  to  process  the  Python
+expressions,  it is  therefore unsafe,  and  should only  be used  for
+testing purpose. Never expose this command to untrusted input.
+
+sesqllongquery
+..............
+
+Like the previous command, but performing a long query.
+
+
+SQL level administration
+------------------------
+
+FIXME
+

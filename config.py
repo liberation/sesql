@@ -17,6 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
+#
+# Full text search configuration - we must define that before the imports,
+# because those are used by the imports
+#
+
+# Name of the PostgreSQL Text Search Configuration
+TS_CONFIG_NAME = "simple_french"
+
+# Name of the stopwards file, must be plain ASCII
+STOPWORDS_FILE = "ascii_french"
+
 # Global charset to use
 CHARSET = "utf-8"
 
@@ -111,15 +122,6 @@ CROSS_INDEXES = (("classname", "modified_at"),
 # General condition to skip indexing content
 SKIP_CONDITION = lambda vals: vals['workflow_state'] == constants.WORKFLOW_STATE.DELETED
 
-#
-# Full text search configuration
-#
-
-# Name of the PostgreSQL Text Search Configuration
-TS_CONFIG_NAME = "simple_french"
-
-# Name of the stopwards file, must be plain ASCII
-STOPWORDS_FILE = "ascii_french"
 
 #
 # Query configuration

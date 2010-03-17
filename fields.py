@@ -285,7 +285,7 @@ class FullTextField(Field):
     This is a full text field
     """
     indexfunction = "GIN"
-    dictionnary = "public.simple_french"
+    dictionnary = "public.%s" % config.TS_CONFIG_NAME
 
     def __init__(self, name, source = None, primary = False):
         """
