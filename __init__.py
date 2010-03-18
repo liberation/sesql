@@ -18,7 +18,6 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 import config
-import signals
 from typemap import typemap
 from fieldmap import fieldmap
 from index import index
