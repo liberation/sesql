@@ -21,7 +21,7 @@ from django.core.management import call_command
 from django.db import connection, transaction
 from django.db.models import Q
 import settings
-from sesql import longquery
+from sesql.longquery import longquery
 import sys
 
 class Command(BaseCommand):

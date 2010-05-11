@@ -18,7 +18,7 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 from typemap import typemap
-import config
+import sesql_config as config
 
 import logging
 log = logging.getLogger('sesql')

@@ -22,7 +22,7 @@ Handle the type map
 """
 
 from django.db import models
-import config
+import sesql_config as config
 
 class TypeMap(object):
     """

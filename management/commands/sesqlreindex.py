@@ -23,7 +23,7 @@ import settings
 from sesql.results import SeSQLResultSet
 from sesql.index import index
 from sesql.typemap import typemap
-from sesql import config
+import sesql_config as config
 import sys, time
 
 STEP = 1000

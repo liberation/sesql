@@ -26,7 +26,7 @@ import unicodedata, locale
 from htmlentitydefs import name2codepoint
 from xml.sax import saxutils
 from sources import guess_source, ClassSource
-import config
+import sesql_config as config
 
 html_entities = dict([('&%s;' % k, unichr(v).encode(config.CHARSET)) for k,v in name2codepoint.items() ])
 

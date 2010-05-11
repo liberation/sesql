@@ -17,10 +17,5 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-import config
-from typemap import typemap
-from fieldmap import fieldmap
-from index import index
-from shortquery import shortquery
-from longquery import longquery
-import datamodel
+import signals
+

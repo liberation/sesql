@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-import config
-from query import SeSQLQuery
+import sesql_config as config
+from sesql.query import SeSQLQuery
 
 def longquery(query, order = None):
     """

@@ -19,7 +19,8 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 import settings
-from sesql import datamodel, typemap
+from sesql import datamodel
+from sesql.typemap import typemap
 
 class Command(BaseCommand):
     help = "Dump the commands to create SeSQL tables"

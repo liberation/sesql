@@ -4,7 +4,7 @@ SeSQL data model guide
 General
 -------
 
-SeSQL data model is described in a 'config.py' file.
+SeSQL data model is described in a 'sesql_config.py' file in the project.
 
 It should define three variables :
 

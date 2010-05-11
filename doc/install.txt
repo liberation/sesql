@@ -20,7 +20,7 @@ Configuration
 -------------
 
 Before using SeSQL you **must** configure it. The configuration file
-is named ``config.py``.
+must be named ``sesql_config.py`` in the python path (usually the project).
 
 The details of the configuration are in the FIXME file.
 

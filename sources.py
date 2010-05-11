@@ -22,7 +22,7 @@
 Contain the various kind of field aggregators/fetchers/...
 """
 
-import config
+import sesql_config as config
 
 # Automatic dispatcher
 def guess_source(what):

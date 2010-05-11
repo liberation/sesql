@@ -18,16 +18,16 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.db.models import Q
-from typemap import typemap
-from fieldmap import fieldmap
-import config
+from sesql.typemap import typemap
+from sesql.fieldmap import fieldmap
+import sesql_config as config
 
 from django.db import connection
 
 import logging
 log = logging.getLogger('sesql')
 
-from results import SeSQLResultSet
+from sesql.results import SeSQLResultSet
 
 def cached(method):
     """

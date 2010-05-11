@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-import config
-from typemap import typemap
+import sesql_config as config
+from sesql.typemap import typemap
 from django.db import connection, transaction
 
-from utils import table_exists
+from sesql.utils import table_exists
 
 def sql_function(func):
     """
@@ -123,8 +123,8 @@ def sync_db(verbosity = 0, interactive = False, signal = None, **kwargs):
     signal._sesql_syncdb_done = True
 
     if not table_exists(config.MASTER_TABLE_NAME):
-        create_dictionnary(execute = True, verbosity = verbosity)
-        create_master_table(execute = True, verbosity = verbosity)
+        create_dictionnary(execute = True, verbosity = verbosity, include_drop = True)
+        create_master_table(execute = True, verbosity = verbosity, include_drop = True)
     elif verbosity:
         print "SeSQL : Table %s already existed, skipped." % config.MASTER_TABLE_NAME
         
@@ -135,10 +135,7 @@ def sync_db(verbosity = 0, interactive = False, signal = None, **kwargs):
             print "SeSQL : Table %s already existed, skipped." % table
 
     if not table_exists("sesql_reindex_schedule"):
-        create_schedule_table(execute = True, verbosity = verbosity)
+        create_schedule_table(execute = True, verbosity = verbosity, include_drop = True)
     elif verbosity:
         print "SeSQL : Table %s already existed, skipped." % 'sesql_reindex_schedule'
     
-
-from django.db.models import signals
-signals.post_syncdb.connect(sync_db)

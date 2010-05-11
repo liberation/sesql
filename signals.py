@@ -17,11 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-import sesql_config as config
-from sesql.query import SeSQLQuery
 
-def shortquery(query, order = None, limit = 50):
-    """
-    Perform a short query and return a lazy Django result set
-    """
-    return SeSQLQuery(query, order).shortquery(limit)
+from django.db.models import signals
+
+def sync_db(*args, **kwargs):
+    # Trick to defer import
+    from sesql.datamodel import sync_db
+    return sync_db(*args, **kwargs)
+signals.post_syncdb.connect(sync_db)
+
+def index_cb(sender, instance, *args, **kwargs):
+    # Trick to defer import
+    from sesql.index import index
+    return index(instance)
+signals.post_save.connect(index_cb)

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-import config
-from typemap import typemap
+import sesql_config as config
+from sesql.typemap import typemap
 from django.db import connection
 
 import logging
@@ -28,12 +28,15 @@ def index(obj):
     """
     Index a Django object into SeSQL
     """
-    cursor = connection.cursor()
+    if not obj.__class__ in typemap.classes:
+        return
+    
+    cursor = connection.cursor()    
 
     values = {}
     for field in config.FIELDS:
         values[field.name] = field.get_value(obj)
-    table_name = typemap.get_table_for(obj.__class__)
+    table_name = typemap.get_table_for(obj.__class__)    
 
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
     cursor.execute(query, (values["id"], values["classname"]))
@@ -61,13 +64,3 @@ def index(obj):
                                                  ",".join(keys),
                                                  ",".join(placeholders))
     cursor.execute(query, results)
-
-def index_cb(sender, instance, signal, *args, **kwargs):
-    """
-    Callback for Django signal
-    """
-    index(instance)
-
-from django.db.models import signals
-for klass in typemap.all_classes():
-    signals.post_save.connect(index_cb, sender=klass)

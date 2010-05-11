@@ -31,8 +31,8 @@ STOPWORDS_FILE = "ascii_french"
 # Global charset to use
 CHARSET = "utf-8"
 
-from fields import *
-from sources import *
+from sesql.fields import *
+from sesql.sources import *
 from django.db.models import Q
 from libe import models, constants
 

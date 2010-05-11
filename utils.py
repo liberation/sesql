@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.db import connection
-from psycopg2 import ProgrammingError
+from django.db import connection, utils
 
 def try_sql(sql, *args, **kwargs):
     """
@@ -26,6 +25,7 @@ def try_sql(sql, *args, **kwargs):
     cursor, values or None, None
     """
     cursor = connection.cursor()
+    cursor.execute("COMMIT")
     cursor.execute("BEGIN")
     try:
         cursor.execute(sql, *args, **kwargs)
@@ -33,12 +33,14 @@ def try_sql(sql, *args, **kwargs):
         values = cursor.fetchall()
         cursor.execute("COMMIT")
         return cursor, values
-    except ProgrammingError:
+    except utils.DatabaseError:
         cursor.execute("ROLLBACK")
         return None, None
     except:
         cursor.execute("ROLLBACK")
         raise
+    finally:
+        cursor.execute("BEGIN")
 
 def table_exists(table):
     """
