@@ -19,6 +19,7 @@
 
 
 from django.db.models import signals
+from django.db import transaction
 
 def sync_db(*args, **kwargs):
     # Trick to defer import
@@ -26,8 +27,10 @@ def sync_db(*args, **kwargs):
     return sync_db(*args, **kwargs)
 signals.post_syncdb.connect(sync_db)
 
+@transaction.commit_on_success
 def index_cb(sender, instance, *args, **kwargs):
     # Trick to defer import
-    from sesql.index import index
+    from sesql.index import index    
     return index(instance)
+    
 signals.post_save.connect(index_cb)

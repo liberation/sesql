@@ -64,3 +64,4 @@ def index(obj):
                                                  ",".join(keys),
                                                  ",".join(placeholders))
     cursor.execute(query, results)
+
