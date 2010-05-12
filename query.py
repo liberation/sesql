@@ -91,6 +91,7 @@ ORDER BY %s""" % (table, pattern, o_pattern)
         if limit:
             query += """
 LIMIT %d""" % limit
+
         return self.execute(query, values + o_values)
 
     @cached

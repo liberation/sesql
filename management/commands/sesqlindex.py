@@ -27,7 +27,8 @@ import sys
 
 class Command(BaseCommand):
     help = "Index an object into SeSQL"
-    
+
+    @transaction.commit_manually
     def handle(self, *apps, **options):
         """
         Handle the command
@@ -39,5 +40,5 @@ class Command(BaseCommand):
         obj = SeSQLResultSet.load(apps)
         index(obj)
         
-        
+        transaction.commit()
         

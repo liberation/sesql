@@ -41,11 +41,11 @@ def guess_source(what):
         return TextAggregate(*what)
     if not isinstance(what, str):
         raise ValueError, "what is neither AbstractSource, list or string"
-    if what.endswith('()'):
-        return MethodCaller(what[:-2])
     if "." in what:
         what = what.strip(".")
         return SubField(*(what.split(".", 1)))
+    if what.endswith('()'):
+        return MethodCaller(what[:-2])
     return SimpleField(what)
 
 # Main classes
@@ -172,7 +172,7 @@ class TextAggregate(AbstractSource):
         if isinstance(values, unicode):
             return values
         if not isinstance(values, (list, tuple)):        
-            return unicode(values, config.CHARSET)
+            return unicode(str(values), config.CHARSET)
         values = [ TextAggregate.collapse(v) for v in values ]
         values = [ v for v in values if v ]
         return u" ".join(values)

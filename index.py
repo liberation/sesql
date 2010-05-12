@@ -44,7 +44,7 @@ def index(obj):
     entry = "%s:%s" % (values["classname"], values["id"])
     
     if config.SKIP_CONDITION and config.SKIP_CONDITION(values):
-        log.info("Deleting entry %s from table %s" % (entry, table_name))
+        log.info("Not indexing entry %s from table %s because of skip_condition" % (entry, table_name))
         return
     
     log.info("Indexing entry %s in table %s" % (entry, table_name))
