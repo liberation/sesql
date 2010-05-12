@@ -84,6 +84,8 @@ class Command(BaseCommand):
                                                                            elapsed_last,
                                                                            STEP / elapsed_last)
                 print "In total, %d / %d ( %04.1f %% ) in %.2f s, rate %.2f, ETA %.2f s" % (i + 1, nb, 100 * done, elapsed, i / elapsed, eta)
+
+        transaction.commit()               
         
     
     def handle(self, *apps, **options):
