@@ -25,23 +25,30 @@ from sesql.index import index
 from sesql.typemap import typemap
 import sesql_config as config
 import sys, time
+from optparse import make_option
 
 STEP = 1000
 
 class Command(BaseCommand):
     help = "Reindex missing objects into SeSQL"
 
-    @transaction.commit_manually
-    def handle(self, *apps, **options):
-        """
-        Handle the command
-        """
-        if len(apps) != 1:
-            print "Syntax : sesqlreindex <classname>"
-            sys.exit(1)
+    option_list = BaseCommand.option_list + (
+        make_option('--reindex',
+                    action='store_true',
+                    dest='reindex',
+                    default=False,
+                    help='Reindex already indexed content'),
+        )
 
-        classname = apps[0]
+    @transaction.commit_manually
+    def reindex(self, classname, reindex = False):
+        """
+        Reindex a single class
+        """
         klass = typemap.get_class_by_name(classname)
+        if not hasattr(klass, "objects"):
+            return
+        
         allids = set([ int(a['id']) for a in klass.objects.values('id') ])
 
         cursor = connection.cursor()
@@ -49,9 +56,12 @@ class Command(BaseCommand):
                        (classname,))
         already = set([ int(c[0]) for c in cursor ])
 
-        missing = allids - already
+        if not reindex:
+            missing = allids - already
+        else:
+            missing = allids
 
-        print "%d object(s), %d already indexed, reindexing %d" % (len(allids),
+        print "%s : %d object(s), %d already indexed, reindexing %d" % (classname, len(allids),
                                                                    len(already),
                                                                    len(missing))
 
@@ -74,6 +84,18 @@ class Command(BaseCommand):
                                                                            elapsed_last,
                                                                            STEP / elapsed_last)
                 print "In total, %d / %d ( %04.1f %% ) in %.2f s, rate %.2f, ETA %.2f s" % (i + 1, nb, 100 * done, elapsed, i / elapsed, eta)
+        
+    
+    def handle(self, *apps, **options):
+        """
+        Handle the command
+        """
+        if not apps:
+            apps = typemap.all_class_names()
+
+        for app in apps:
+            self.reindex(app, options['reindex'])            
+
         
         
         

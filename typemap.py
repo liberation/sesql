@@ -82,6 +82,12 @@ class TypeMap(object):
         """
         return self.classes.keys()
 
+    def all_class_names(self):
+        """
+        List all class names
+        """
+        return self.class_names.keys()
+
     def get_class_names_for(self, table):
         """
         Get the name of classes for this table
