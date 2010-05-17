@@ -31,6 +31,13 @@ signals.post_syncdb.connect(sync_db)
 def index_cb(sender, instance, *args, **kwargs):
     # Trick to defer import
     from sesql.index import index    
-    return index(instance)
-    
+    return index(instance)    
 signals.post_save.connect(index_cb)
+
+
+@transaction.commit_on_success
+def unindex_cb(sender, instance, *args, **kwargs):
+    # Trick to defer import
+    from sesql.index import unindex
+    return unindex(instance)
+signals.pre_delete.connect(unindex_cb)

@@ -24,7 +24,7 @@ from django.db import connection
 import logging
 log = logging.getLogger('sesql')
 
-def index(obj):
+def index(obj, noindex = False):
     """
     Index a Django object into SeSQL
     """
@@ -42,6 +42,9 @@ def index(obj):
     cursor.execute(query, (values["id"], values["classname"]))
 
     entry = "%s:%s" % (values["classname"], values["id"])
+
+    if noindex:
+        return
     
     if config.SKIP_CONDITION and config.SKIP_CONDITION(values):
         log.info("Not indexing entry %s from table %s because of skip_condition" % (entry, table_name))
@@ -65,3 +68,8 @@ def index(obj):
                                                  ",".join(placeholders))
     cursor.execute(query, results)
 
+def unindex(obj):
+    """
+    Unindex the object
+    """
+    return index(obj, noindex = True)
