@@ -19,6 +19,7 @@
 
 from typemap import typemap
 import sesql_config as config
+from django.core.exceptions import ObjectDoesNotExist
 
 import logging
 log = logging.getLogger('sesql')
@@ -48,7 +49,10 @@ class SeSQLResultSet(object):
         Iterate on self
         """
         for obj in self.objs:
-            yield self.load(obj)
+            try:
+                yield self.load(obj)
+            except ObjectDoesNotExist:
+                log.warning("Object %r does not exist ! Broken index ?" % (obj,))
     __iter__ = iterator
     
     def all(self):
