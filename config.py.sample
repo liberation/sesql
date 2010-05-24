@@ -95,3 +95,12 @@ SMART_QUERY_INITIAL = 2500
 SMART_QUERY_THRESOLD = 0.35
 # If we have a second query, we do * (wanted/result) * SMART_QUERY_RATIO 
 SMART_QUERY_RATIO = 3.0
+
+#
+# Long query cache configuration
+#
+
+# Maximal number of queries to store in the long query cache
+QUERY_CACHE_MAX_SIZE = 10000
+# Life time of a query in the query cache
+QUERY_CACHE_EXPIRY = 24 * 3600

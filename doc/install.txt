@@ -4,9 +4,13 @@ SeSQL installation guide
 Prerequisite
 ------------
 
-- Django 1.1
+- Python 2.5
+
+- Django 1.2
 
 - PostgreSQL 8.4
+
+- GenericCache from http://pypi.python.org/pypi/GenericCache/1.0.2
 
 FIXME
 
@@ -72,6 +76,13 @@ SKIP_CONDITION
 
 DEFAULT_ORDER
   Default sort order for queries, when sort order is not specified.
+
+QUERY_CACHE_MAX_SIZE
+  Maximal number of long query to store in the query cache. Older queries
+  will be discarded first.
+
+QUERY_CACHE_EXPIRY
+  Maximal time to store long queries in the cache.
 
 
 Constraints
