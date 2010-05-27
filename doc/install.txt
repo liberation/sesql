@@ -95,3 +95,13 @@ Current version of SeSQL has a few constraints :
 
 - FIXME .
 
+Upgrading
+---------
+
+If you need to rebuild all SeSQL indexes (because you changed them too
+heavily for example) you can do :
+
+::
+
+  ./manage.py createsesqltables | ./manage.py dbshell
+  ./manage.py sesqlreindex 
