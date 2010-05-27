@@ -65,9 +65,9 @@ IntArrayField
 
 - default is contains (``authors = 12`` for contains the author 12) ;
 
-- ``_all`` for contains all of a list (``authors__all = (12, 13)`` for contains both authors) ; 
+- ``__all`` for contains all of a list (``authors__all = (12, 13)`` for contains both authors) ; 
 
-- ``_any`` for contains any of a list (``authors__any = (12, 13)`` for contains at leats one of the two authors) ; 
+- ``__any`` for contains any of a list (``authors__any = (12, 13)`` for contains at leats one of the two authors) ; 
 
 FullTextField
 .............

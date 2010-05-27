@@ -247,7 +247,7 @@ class IntArrayField(Field):
         """
         pattern = "%s %s %%s" % (self.index_column, operator)
         values = self.marshall(values)
-        return pattern, values
+        return pattern, [ values ]
 
     def get_default(self, value):
         """
