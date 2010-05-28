@@ -181,3 +181,23 @@ class TextAggregate(AbstractSource):
         values = [ v for v in values if v ]
         return u" ".join(values)
 
+class FirstOf(AbstractSource):
+    """
+    Gets the first non-None field
+    """
+    def __init__(self, *sources):
+        """
+        Constructor
+        """
+        self.sources = [ guess_source(s) for s in sources ]
+    
+    def load_data(self, obj):
+        """
+        Get the data directly        
+        """
+        for source in self.sources:
+            data = source.load_data(obj)
+            if data is not None:
+                return data
+            
+    

@@ -76,6 +76,9 @@ SubField
 TextAggregate
   Concatenate the result of other sources.
 
+FirstOf
+  Gets the first non-None value of a list of other sources (useful for example to tracker the creation date which is called ``created_at`` on some models and ``created_on`` on others).
+
 Easy writing of sources
 -----------------------
 
