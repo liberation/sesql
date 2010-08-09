@@ -97,16 +97,23 @@ If the source is not specified, it'll be a ``SimpleField`` of the same name that
 Type map
 --------
 
-The  type map is  a list  (or tuple)  of ``(class,  table_name)``. All
-Django objects of this class will be indexed into the given table. All
-objects of a subclass too, unless the subclass has a specific entry in
-the mapping.
+The  type  map   is  a  list  (or  tuple)   of  ``(class,  table_name,
+recursive)``. All  Django objects of  this class will be  indexed into
+the given table.  All objects of a subclass  too, unless the recursive
+parameter is set to False (it defaults to True).
+
+If the same  class is reachable twice (due  to multiple inheritance or
+to specifying  both a  base class  and a derivative  in the  map), the
+first entry that matches is taken.
+
+You specify  None as  the table to  explicitly ban indexing  a content
+type even if a base class has to be indexed.
 
 Example 
 
 ::
 
-  TYPE_MAP = ((models.Photo, "sesql_photo"),
+  TYPE_MAP = ((models.Photo, "sesql_photo", False),
               (models.Comment, "sesql_comment"),
               (models.BaseModel, "sesql_default"))
 

@@ -28,7 +28,8 @@ def index(obj, noindex = False):
     """
     Index a Django object into SeSQL
     """
-    if not obj.__class__ in typemap.classes:
+    table_name = typemap.get_table_for(obj.__class__)
+    if not table_name:
         return
     
     cursor = connection.cursor()    
@@ -36,7 +37,6 @@ def index(obj, noindex = False):
     values = {}
     for field in config.FIELDS:
         values[field.name] = field.get_value(obj)
-    table_name = typemap.get_table_for(obj.__class__)    
 
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
     cursor.execute(query, (values["id"], values["classname"]))

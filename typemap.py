@@ -35,13 +35,20 @@ class TypeMap(object):
         self.tables = {}
         self.classes = {}
         self.class_names = {}
+        self.valid_classes = []
+        self.valid_class_names = []
 
-        for klass, table in config.TYPE_MAP:
+        type_map = [ len(t) == 3 and t or t + (True,) for t in config.TYPE_MAP ]
+
+        for klass, table, recurse in type_map:
             # Ensure table exists in the map
             self.tables[table] = []
 
             # Now, for each subclasses...
-            subclasses = self.all_subclasses(klass)
+            if recurse:
+                subclasses = self.all_subclasses(klass)
+            else:
+                subclasses = [ klass ]
             for sc in subclasses:
                 if not sc in self.classes:
                     self.classes[sc] = table
@@ -50,6 +57,9 @@ class TypeMap(object):
         # And now fill the reverse lookup, we can only do it now, because the
         # same class can be reachable twice
         for klass, table in self.classes.items():
+            if table:
+                self.valid_classes.append(klass)
+                self.valid_class_names.append(klass.__name__)
             self.tables[table].append(klass)
 
     @staticmethod
@@ -80,13 +90,13 @@ class TypeMap(object):
         """
         List all classes
         """
-        return self.classes.keys()
+        return self.valid_classes
 
     def all_class_names(self):
         """
         List all class names
         """
-        return self.class_names.keys()
+        return self.valid_class_names
 
     def get_class_names_for(self, table):
         """
@@ -104,7 +114,7 @@ class TypeMap(object):
         """
         Get the table for this klass
         """
-        return self.classes[self.get_class_by_name(klass)]
+        return self.classes.get(self.get_class_by_name(klass), None)
 
     def get_class_by_name(self, klass):
         """
