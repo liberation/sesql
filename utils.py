@@ -18,6 +18,44 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.db import connection, utils
+import time
+
+class Timer(object):
+    """
+    A timer object to be used with « with » statement
+    It as a local and global timer
+    """
+    def __init__(self):
+        self._local = self._global = 0.0
+        self._start = time.time()
+
+    def start(self):
+        self._start = time.time()
+
+    def stop(self):
+        delta = time.time() - self._start
+        self._local += delta
+        self._global += delta
+
+    def __enter__(self):
+        self.start()
+
+    def __exit__(self, *args, **kwargs):
+        self.stop()
+
+    def get_local(self):
+        return self._local
+
+    def get_global(self):
+        return self._global
+
+    def reset(self):
+        self._local = 0
+
+    def peek(self):
+        res = self.get_local()
+        self.reset()
+        return res
 
 def try_sql(sql, *args, **kwargs):
     """
