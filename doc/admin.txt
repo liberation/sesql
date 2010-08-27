@@ -43,6 +43,13 @@ interrupt it and restart it  later on, it'll continue where it stopped
 (objects are reindexed by groups  of 1000, only the current group will
 be restarted).
 
+sesqlupdate
+...........
+
+This  command  will  massively  reindex  a  single  (or  a  coupe  of)
+column. It  will not index any new  object. Typical use is  when a new
+column was added.
+
 sesqlshortquery
 ...............
 
