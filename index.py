@@ -19,24 +19,33 @@
 
 import sesql_config as config
 from sesql.typemap import typemap
+from sesql.fieldmap import fieldmap
 from django.db import connection
 
 import logging
 log = logging.getLogger('sesql')
 
-def index(obj, noindex = False):
+def load_values(obj):
+    """
+    Load all values of the object
+    """
+    values = {}
+    for field in config.FIELDS:
+        values[field.name] = field.get_value(obj)
+    return values
+
+def index(obj, noindex = False, values = None):
     """
     Index a Django object into SeSQL
     """
     table_name = typemap.get_table_for(obj.__class__)
     if not table_name:
         return
+
+    if not values:
+        values = load_values(obj)
     
     cursor = connection.cursor()    
-
-    values = {}
-    for field in config.FIELDS:
-        values[field.name] = field.get_value(obj)
 
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
     cursor.execute(query, (values["id"], values["classname"]))
@@ -52,9 +61,9 @@ def index(obj, noindex = False):
     
     log.info("Indexing entry %s in table %s" % (entry, table_name))
     
-    keys = [  ]
-    results = [  ]
-    placeholders = [  ]
+    keys = [ ]
+    results = [ ]
+    placeholders = [ ]
 
     for field in config.FIELDS:
         value = values.get(field.name, None)
@@ -67,9 +76,43 @@ def index(obj, noindex = False):
                                                  ",".join(keys),
                                                  ",".join(placeholders))
     cursor.execute(query, results)
+    cursor.close()
 
 def unindex(obj):
     """
     Unindex the object
     """
     return index(obj, noindex = True)
+
+def update(obj, fields, values = None):
+    """
+    Update only specific fields of given object
+    """
+    table_name = typemap.get_table_for(obj.__class__)
+    if not table_name:
+        return
+
+    if not values:
+        values = load_values(obj)
+    
+    pattern = [ ]
+    results = [ ]
+    for field in fields:
+        field = fieldmap.get_field(field)
+        value = values.get(field.name, None)
+        if value:
+            pattern.append('%s=%s' % (field.data_column, field.placeholder))
+            results.append(value)
+
+    if not pattern:
+        return
+
+    pattern = ",".join(pattern)
+
+    query = "UPDATE %s SET %s WHERE classname=%%s AND id=%%s" % (table_name,
+                                                                 pattern)
+    cursor = connection.cursor()    
+    cursor.execute(query, results + [ values['classname'], values['id'] ])
+    cursor.close()
+
+    

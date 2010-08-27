@@ -22,61 +22,48 @@ from __future__ import with_statement
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db import connection, transaction
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
+
 import settings
 from sesql.results import SeSQLResultSet
-from sesql.index import index, load_values
+from sesql.index import update
 from sesql.typemap import typemap
+from sesql.longquery import longquery
 from sesql import utils
 import sesql_config as config
+
 import sys, time
 from optparse import make_option
 
 STEP = 1000
 
 class Command(BaseCommand):
-    help = "Reindex missing objects into SeSQL"
+    help = "Update some columns of all already indexed objects in SeSQL"
 
     option_list = BaseCommand.option_list + (
-        make_option('--reindex',
-                    action='store_true',
-                    dest='reindex',
-                    default=False,
-                    help='Reindex already indexed content'),
+        make_option('--class',
+                    dest='class',
+                    default='',
+                    help='Limit to given classes (comma-separated)'),
         )
 
     @transaction.commit_manually
-    def reindex(self, classname, reindex = False):
+    def update(self, classnames, fields):
         """
         Reindex a single class
         """
-        klass = typemap.get_class_by_name(classname)
-        if not hasattr(klass, "objects"):
-            return
-
-        print "=> Starting reindexing for %s" % classname
-        sys.stdout.flush()
-        
-        allids = set([ int(a['id']) for a in klass.objects.values('id') ])
-
-        cursor = connection.cursor()
-        cursor.execute("SELECT id FROM %s WHERE classname=%%s" % config.MASTER_TABLE_NAME,
-                       (classname,))
-        already = set([ int(c[0]) for c in cursor ])
-
-        if not reindex:
-            missing = allids - already
-        else:
-            missing = allids
-
-        print "%s : %d object(s), %d already indexed, reindexing %d" % (classname, len(allids),
-                                                                   len(already),
-                                                                   len(missing))
+        print "=> Starting reindexing columns %s." % ','.join(fields)
+        result = longquery(Q(classname__in = classnames))
+        nb = len(result)
+        print "=> We got %d objects." % nb
         sys.stdout.flush()
 
-        nb = len(missing)
         full_tmr = utils.Timer()
         load_tmr = utils.Timer()
         index_tmr = utils.Timer()
+        broken = 0
+        
 
         def disp_stats():
             with index_tmr:
@@ -90,13 +77,13 @@ class Command(BaseCommand):
             elapsed_last = full_tmr.peek()
             done = float(i + 1) / float(nb)
             eta = elapsed / done * (1 - done)
-            print "**SeSQL reindex step stats**"
+            print "**SeSQL update step stats**"
             print " - %d objects in %.2f s, rate %.2f" % (STEP, elapsed_last,STEP / elapsed_last)
             lt = load_tmr.peek()
             it = index_tmr.peek()
             tt = (lt + it) / 100.0
             print " - loading: %.2f s (%04.1f %%), indexing: %.2f s (%04.1f %%)" % (lt, lt / tt, it, it / tt)
-            print "**SeSQL global reindex on %s stats**" % classname
+            print "**SeSQL global update stats**"
             print " - %d / %d ( %04.1f %% ) in %.2f s, rate %.2f, ETA %.2f s" % (i + 1, nb, 100 * done, elapsed, i / elapsed, eta)
             lt = load_tmr.get_global()
             it = index_tmr.get_global()
@@ -105,31 +92,40 @@ class Command(BaseCommand):
             sys.stdout.flush()
             full_tmr.start()
 
-        for i, oid in enumerate(missing):
-            with load_tmr:
-                obj = SeSQLResultSet.load((classname, oid))
-                values = load_values(obj)
-            with index_tmr:
-                index(obj, values = values)
 
-            del obj
+        for i, obj in enumerate(result.objs):
+            with load_tmr:
+                try:
+                    obj = result.load(obj)
+                except ObjectDoesNotExist:
+                    obj = None
+                    broken += 1
+                    log.warning("Object %r does not exist ! Broken index ?" % (obj,))
+            with index_tmr:
+                update(obj, fields)
 
             if i % STEP == STEP - 1:
                 disp_stats()
 
+            del obj
+
         disp_stats()
-        
     
-    def handle(self, *apps, **options):
+    def handle(self, *fields, **options):
         """
         Handle the command
         """
-        if not apps:
-            apps = typemap.all_class_names()
-
-        for app in apps:
-            self.reindex(app, options['reindex'])            
-
+        if not fields:
+            print "Syntax : manage.py sesqlupdate [--class <classes>] <columns>"
+            print "  - classes is a comma-separated list of object classes"
+            print "  - columns is a (space-seperated) list of columns to reindex"
         
+        if not options['class']:
+            classes = typemap.all_class_names()
+        else:
+            classes = options['class'].split(',')
+
+        self.update(classes, fields)            
+
         
         

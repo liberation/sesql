@@ -26,7 +26,7 @@ from sesql.index import index
 import sys
 
 class Command(BaseCommand):
-    help = "Index an object into SeSQL"
+    help = "Index a single object into SeSQL"
 
     @transaction.commit_manually
     def handle(self, *apps, **options):
