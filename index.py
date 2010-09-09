@@ -38,6 +38,19 @@ def index(obj, noindex = False, values = None):
     """
     Index a Django object into SeSQL
     """
+    cursor = connection.cursor()    
+
+    # Handle dependancies
+    gro = getattr(obj, "get_related_objects_for_indexation", None)
+    if gro:
+        related = gro()
+        for item in related:
+            if hasattr(item, "id"):
+                # Django object ? fecth class and id
+                item = (item.__class__.__name__, item.id)
+            cursor.execute("SELECT nextval('sesql_reindex_id_seq')")
+            cursor.execute("INSERT INTO sesql_reindex_schedule (rowid, classname, objid) SELECT currval('sesql_reindex_id_seq'), %s, %s", item)
+
     table_name = typemap.get_table_for(obj.__class__)
     if not table_name:
         return
@@ -45,8 +58,6 @@ def index(obj, noindex = False, values = None):
     if not values:
         values = load_values(obj)
     
-    cursor = connection.cursor()    
-
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
     cursor.execute(query, (values["id"], values["classname"]))
 

@@ -117,3 +117,12 @@ Example
               (models.Comment, "sesql_comment"),
               (models.BaseModel, "sesql_default"))
 
+
+Dependency tracking
+-------------------
+
+SeSQL provides semi-automatic dependency tracking. This works in two steps.
+
+1. By implementing a method ``get_related_objects_for_indexation`` on your models, which must return a lit of (classname, id) pairs (or of Django objects). This method will be called when an object is indexed. All "related objects" will then be inserted into a special table, called ``sesql_reindex_schedule``.
+
+2. Then, asynchronously, a daemon will fetch rows from this table, and reindex objects.
