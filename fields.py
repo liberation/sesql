@@ -406,8 +406,8 @@ tsvector_update_trigger(%s, '%s', %s);""" % (tablename, self.index_column, table
         """
         Get the pattern for __like operator - SLOW ! SLOW ! SLOW !
         """
-        pattern = "%s LIKE %%s" % (self.index_column)
-        values = [ self.marshall(what, extra_letters = '%') ]
+        pattern = "%s LIKE %%s" % (self.data_column)
+        values = [ self.marshall(value, extra_letters = '%') ]
         return pattern, values
 
     def rank_containswords(self, value):
