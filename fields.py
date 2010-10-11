@@ -287,7 +287,7 @@ class FullTextField(Field):
     indexfunction = "GIN"
     dictionnary = "public.%s" % config.TS_CONFIG_NAME
 
-    def __init__(self, name, source = None, primary = False):
+    def __init__(self, name, source = None, primary = False, dictionnary = None):
         """
         Constructor
         """
@@ -295,6 +295,9 @@ class FullTextField(Field):
         self.index_column = name + "_tsv"
         self.data_column = name + "_text"
         self.primary = primary
+        # If dictionnary is specified, overrides default
+        if dictionnary:
+            self.dictionnary = dictionnary
 
     def marshall(self, value, extra_letters = ""):
         """
