@@ -391,7 +391,7 @@ tsvector_update_trigger(%s, '%s', %s);""" % (tablename, self.index_column, table
         """
         Get the pattern for __containsexact operator - can be slow.
         """
-        pattern, values = self.get_containswords(what)
+        pattern, values = self.get_containswords(value)
         pattern = "(%s AND %s)" % (pattern, "%s LIKE %%s" % self.data_column)
         values = [ values[0], '%' + values[0]  + '%' ]
 
