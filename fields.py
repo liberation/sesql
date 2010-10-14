@@ -299,7 +299,8 @@ class FullTextField(Field):
         if dictionnary:
             self.dictionnary = dictionnary
 
-    def marshall(self, value, extra_letters = ""):
+    @staticmethod
+    def marshall(value, extra_letters = "", unescape = True):
         """
         Strip accents, escape html_entities, handle unicode, ...
         """
@@ -308,8 +309,9 @@ class FullTextField(Field):
 
         if isinstance(value, unicode):
             value = value.encode(config.CHARSET)
-            
-        value = saxutils.unescape(value, html_entities)
+
+        if unescape:            
+            value = saxutils.unescape(value, html_entities)
 
         if not isinstance(value, unicode):
             try:
