@@ -18,7 +18,7 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 
-SOURCES = install.txt datamodel.txt query.txt admin.txt
+SOURCES = install.txt datamodel.txt query.txt admin.txt bench.txt
 
 PDF = $(SOURCES:.txt=.pdf)
 HTML = $(SOURCES:.txt=.html)
