@@ -70,6 +70,15 @@ class Command(BaseCommand):
                     type='int',
                     default=0,
                     help='Number of long query threads (default 0)'),
+        make_option('--long-limit',
+                    dest='long-limit',
+                    type='int',
+                    default=None,
+                    help='Limit (maximum number of results) for long queries'),
+        make_option('--long-order',
+                    dest='long-order',
+                    default=None,
+                    help='Order to use for long queries'),
         make_option('--long-delay',
                     dest='long-delay',
                     type='float',
@@ -240,6 +249,7 @@ class Command(BaseCommand):
         Handle a long query
         """
         query = random.choice(self.queries)
-        res = longquery(query[1])
+        res = longquery(query[1], limit = self.options["long-limit"],
+                        order = self.options["long-order"])
         return query[0] + " : %d results" % len(res)
         

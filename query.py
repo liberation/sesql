@@ -74,7 +74,10 @@ class SeSQLQuery(object):
         """
         Perform a long query and return a lazy Django result set
         """
-        return SeSQLResultSet(list(self._do_longquery(limit)))
+        query = self._do_longquery(limit)
+        if limit:
+            query = query.fetchmany(limit)
+        return SeSQLResultSet(list(query))
 
     def _do_longquery(self, limit = None):
         """

@@ -28,6 +28,9 @@ from xml.sax import saxutils
 from sources import guess_source, ClassSource
 import sesql_config as config
 
+import logging
+log = logging.getLogger('sesql')
+
 html_entities = dict([('&%s;' % k, unichr(v).encode(config.CHARSET)) for k,v in name2codepoint.items() ])
 
 class Field(object):

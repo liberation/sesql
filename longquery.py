@@ -31,7 +31,7 @@ log = logging.getLogger('sesql')
 _query_cache = GenericCache(maxsize = config.QUERY_CACHE_MAX_SIZE,
                             expiry = config.QUERY_CACHE_EXPIRY)
 
-def longquery(query, order = None, queryid = None):
+def longquery(query, order = None, limit = None, queryid = None):
     """
     Perform a long query and return a lazy Django result set
 
@@ -47,7 +47,7 @@ def longquery(query, order = None, queryid = None):
                 return results
             log.warning('Cached query id %r expired, re-querying.' % queryid)
 
-    results = SeSQLQuery(query, order).longquery()
+    results = SeSQLQuery(query, order).longquery(limit)
         
     with _query_cache.lock:
         # Generate a new query id, ensuring it's unique
