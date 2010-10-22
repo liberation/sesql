@@ -24,6 +24,7 @@ from GenericCache import GenericCache
 
 import sesql_config as config
 from sesql.query import SeSQLQuery
+from sesql import utils
 
 import logging
 log = logging.getLogger('sesql')
@@ -31,6 +32,7 @@ log = logging.getLogger('sesql')
 _query_cache = GenericCache(maxsize = config.QUERY_CACHE_MAX_SIZE,
                             expiry = config.QUERY_CACHE_EXPIRY)
 
+@utils.log_time
 def longquery(query, order = None, limit = None, queryid = None):
     """
     Perform a long query and return a lazy Django result set

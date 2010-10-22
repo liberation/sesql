@@ -17,8 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
+# Allow "with" with python2.5
+from __future__ import with_statement
+
 from django.db import connection, utils
 import time
+import logging
+log = logging.getLogger('sesql')
+
 
 class Timer(object):
     """
@@ -89,3 +95,22 @@ def table_exists(table):
         return False
 
     return True
+
+def log_time(function):
+    """
+    Decorator to log function call and execution time
+    """
+    tmr = Timer()
+    def log_time_inner(*args, **kwargs):
+        with tmr:
+            res = function(*args, **kwargs)
+        args = ', '.join([ str(a) for a in args ])
+        kwargs = ', '.join([ "%s=%s" % (key, value) for key, value in kwargs.items() ])
+        log.info('%s (%s, %s) : %.2f second(s)' % (function.__name__,
+                                                   args, kwargs,
+                                                   tmr.peek()))
+        return res
+    log_time_inner.__name__ = function.__name__
+    return log_time_inner
+
+                 

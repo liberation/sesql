@@ -20,6 +20,7 @@
 import sesql_config as config
 from sesql.typemap import typemap
 from sesql.fieldmap import fieldmap
+from sesql import utils
 from django.db import connection
 
 import logging
@@ -34,6 +35,7 @@ def load_values(obj):
         values[field.name] = field.get_value(obj)
     return values
 
+@utils.log_time
 def index(obj, noindex = False, values = None):
     """
     Index a Django object into SeSQL

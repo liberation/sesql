@@ -19,7 +19,9 @@
 
 import sesql_config as config
 from sesql.query import SeSQLQuery
+from sesql import utils
 
+@utils.log_time
 def shortquery(query, order = None, limit = 50):
     """
     Perform a short query and return a lazy Django result set
