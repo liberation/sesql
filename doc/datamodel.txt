@@ -126,3 +126,21 @@ SeSQL provides semi-automatic dependency tracking. This works in two steps.
 1. By implementing a method ``get_related_objects_for_indexation`` on your models, which must return a lit of (classname, id) pairs (or of Django objects). This method will be called when an object is indexed. All "related objects" will then be inserted into a special table, called ``sesql_reindex_schedule``.
 
 2. Then, asynchronously, a daemon will fetch rows from this table, and reindex objects.
+
+
+Cleanup in text fields
+----------------------
+
+Before indexing text fields, cleanup has to be performed.  In SeSQL, the cleanup is a two-phase process.
+
+The first phase is user-configurable. It should strip the text of all meta-information (HTML tags, wiki syntax, ...) and gives plain text.
+
+The second phase is automatic, it consists in stripping all accents, converting upper-case letters to lower-case letters and replacing special characters with spaces.
+
+To configure the first phase, you have two options :
+
+1. Specify the ``ADDITIONAL_CLEANUP_FUNCTION`` in the configuration file. This should contain a function, which takes the text as parameter and returns the cleaned up text.
+
+2. Add a ``cleanup`` parameter to the ``FullTextField``, with a similar function.
+
+The ``ADDITIONAL_CLEANUP_FUNCTION`` will be used only if the ``cleanup`` parameter was not specified, or set to None.

@@ -18,7 +18,6 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 from sesql.fieldmap import fieldmap
-from sesql.fields import FullTextField
 from django.db import connection
 
 # Use GenericCache for now, but will probably be moved to memcached later
@@ -66,7 +65,7 @@ def lemmatize(words, index = None):
     if index is None:
         raise ValueError, "Not index given and no primary one"
 
-    words = [ FullTextField.marshall(word) for word in words ]
+    words = [ index.marshall(word) for word in words ]
 
     index = fieldmap.get_field(index)
     return lemmatize_for(words, index.dictionnary)

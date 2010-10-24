@@ -77,6 +77,16 @@ TYPE_MAP = ((models.Photo, "sesql_photo"),
 CROSS_INDEXES = ()
 
 #
+# Cleanup configuration
+#
+
+from htmlentitydefs import name2codepoint
+from xml.sax import saxutils
+
+html_entities = dict([('&%s;' % k, unichr(v).encode(config.CHARSET)) for k,v in name2codepoint.items() ])
+ADDITIONAL_CLEANUP_FUNCTION = lambda value: saxutils.unescape(value, html_entities)
+
+#
 # Query configuration
 #
 

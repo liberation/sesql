@@ -18,7 +18,7 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 from sesql.lemmatize import lemmatize
-from sesql.fields import FullTextField
+from sesql.fieldmap import fieldmap
 import string
 
 def highlight(text, words, index = None):
@@ -27,6 +27,12 @@ def highlight(text, words, index = None):
     That can be used to highlight the words, for example
     The index will be use to lemmatize, if none, it'll use the default one
     """
+    if index is None:
+        index = fieldmap.primary
+
+    if index is None:
+        raise ValueError, "Not index given and no primary one"
+
     size = len(text)
     letters = set(string.ascii_letters)
     
@@ -34,7 +40,7 @@ def highlight(text, words, index = None):
     lems = lemmatize(words, index)
 
     # Marshall everything
-    text = FullTextField.marshall(text, unescape = False)
+    text = index.marshall(text, use_cleanup = False)
 
     # Now find the lemmatized words inside the text
     found = []

@@ -23,15 +23,12 @@ We cannot reuse Django types because what we need is too specific
 """
 
 import unicodedata, locale
-from htmlentitydefs import name2codepoint
-from xml.sax import saxutils
 from sources import guess_source, ClassSource
 import sesql_config as config
 
 import logging
 log = logging.getLogger('sesql')
 
-html_entities = dict([('&%s;' % k, unichr(v).encode(config.CHARSET)) for k,v in name2codepoint.items() ])
 
 class Field(object):
     """
@@ -290,7 +287,8 @@ class FullTextField(Field):
     indexfunction = "GIN"
     dictionnary = "public.%s" % config.TS_CONFIG_NAME
 
-    def __init__(self, name, source = None, primary = False, dictionnary = None):
+    def __init__(self, name, source = None, primary = False,
+                 dictionnary = None, cleanup = None):
         """
         Constructor
         """
@@ -298,12 +296,13 @@ class FullTextField(Field):
         self.index_column = name + "_tsv"
         self.data_column = name + "_text"
         self.primary = primary
+        self.cleanup = cleanup
+        
         # If dictionnary is specified, overrides default
         if dictionnary:
             self.dictionnary = dictionnary
 
-    @staticmethod
-    def marshall(value, extra_letters = "", unescape = True):
+    def marshall(self, value, extra_letters = "", use_cleanup = True):
         """
         Strip accents, escape html_entities, handle unicode, ...
         """
@@ -313,8 +312,10 @@ class FullTextField(Field):
         if isinstance(value, unicode):
             value = value.encode(config.CHARSET)
 
-        if unescape:            
-            value = saxutils.unescape(value, html_entities)
+        if use_cleanup:
+            cleanup = self.cleanup or getattr(config, 'ADDITIONAL_CLEANUP_FUNCTION', None)
+            if cleanup:
+                value = cleanup(value)
 
         if not isinstance(value, unicode):
             try:

@@ -125,3 +125,21 @@ Default order
 
  The default search order is taken from the ``DEFAULT_ORDER`` varibale
  in ``config.py``.
+
+
+Text highlighting
+-----------------
+
+SeSQL supports basic text highlighting. There is a highlighting function, which takes two parameters : a text and a list of words. It'll return a list of matching positions, as a triplet (begin, end, word number).
+
+For example 
+
+::
+
+  >>> from sesql.highlight import highlight
+  >>> highlight('sesql : full text search, with text highlight', [ 'sesql', 'text' ])
+   [(0, 5, 0), (13, 17, 1), (31, 35, 1)]
+
+The text given to the highlight module must have been preprocessed first with the cleanup function.
+
+If you're using different cleanup or dictionaries for different indexes, you can specify which index configuration to use with the ``index`` parameter of the highlight function.
