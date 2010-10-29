@@ -20,24 +20,26 @@
 
 from django.db.models import signals
 from django.db import transaction
+from django.conf import settings
 
-def sync_db(*args, **kwargs):
-    # Trick to defer import
-    from sesql.datamodel import sync_db
-    return sync_db(*args, **kwargs)
-signals.post_syncdb.connect(sync_db)
+if 'sesql' in settings.INSTALLED_APPS:
+    def sync_db(*args, **kwargs):
+        # Trick to defer import
+        from sesql.datamodel import sync_db
+        return sync_db(*args, **kwargs)
+    signals.post_syncdb.connect(sync_db)
 
-@transaction.commit_on_success
-def index_cb(sender, instance, *args, **kwargs):
-    # Trick to defer import
-    from sesql.index import index    
-    return index(instance)    
-signals.post_save.connect(index_cb)
+    @transaction.commit_on_success
+    def index_cb(sender, instance, *args, **kwargs):
+        # Trick to defer import
+        from sesql.index import index    
+        return index(instance)    
+    signals.post_save.connect(index_cb)
 
 
-@transaction.commit_on_success
-def unindex_cb(sender, instance, *args, **kwargs):
-    # Trick to defer import
-    from sesql.index import unindex
-    return unindex(instance)
-signals.pre_delete.connect(unindex_cb)
+    @transaction.commit_on_success
+    def unindex_cb(sender, instance, *args, **kwargs):
+        # Trick to defer import
+        from sesql.index import unindex
+        return unindex(instance)
+    signals.pre_delete.connect(unindex_cb)
