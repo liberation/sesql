@@ -59,7 +59,7 @@ def create_dictionnary():
 )""" % (config.TS_CONFIG_NAME, config.STOPWORDS_FILE),
         """ALTER TEXT SEARCH CONFIGURATION %s
         ALTER MAPPING FOR asciiword, asciihword, hword_asciipart WITH %s_dict""" % (config.TS_CONFIG_NAME, config.TS_CONFIG_NAME)
-        ]
+        ] + getattr(config, "ADDITIONAL_TS_CONFIG", [])
 
 @sql_function
 def create_master_table():

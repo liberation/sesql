@@ -56,6 +56,7 @@ IntArrayField
 
 FullTextField
   The beast for which !SeSQL was designed, a full-text index, can be made ``primary`` to be used in rankings.
+  You can specify a different text search configuration than the default on a given FullTextField with the "dictionnary" parameter.
 
 FIXME : give example and specify options
 
@@ -144,3 +145,8 @@ To configure the first phase, you have two options :
 2. Add a ``cleanup`` parameter to the ``FullTextField``, with a similar function.
 
 The ``ADDITIONAL_CLEANUP_FUNCTION`` will be used only if the ``cleanup`` parameter was not specified, or set to None.
+
+Additional text search configurations
+-------------------------------------
+
+If you want additional text search configurations to be created when SeSQL tables are created, you can add the SQL lines in a ADDITIONAL_TS_CONFIG variable in the config file. Refer to PosgreSQL documentation for more details.
