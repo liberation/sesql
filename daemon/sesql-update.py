@@ -67,7 +67,7 @@ class UpdateDaemon(UnixDaemon):
         Process a chunk
         """
         cursor = connection.cursor()    
-        cursor.execute("SELECT classname, objid FROM sesql_reindex_schedule WHERE reindexed_at IS NULL ORDER BY scheduled_at ASC LIMIT %d" % self.chunk)
+        cursor.execute("SELECT classname, objid FROM sesql_reindex_schedule ORDER BY scheduled_at ASC LIMIT %d" % self.chunk)
         rows = cursor.fetchall()
         if not rows:
             return
@@ -82,8 +82,8 @@ class UpdateDaemon(UnixDaemon):
                 done.add(row)
                 obj = results.SeSQLResultSet.load(row)
                 index.index(obj)
-                cursor.execute("UPDATE sesql_reindex_schedule SET reindexed_at=NOW() WHERE classname=%s AND objid=%s AND reindexed_at IS NULL", row)
-                transaction.commit()
+                cursor.execute("DELETE FROM sesql_reindex_schedule WHERE classname=%s AND objid=%s", row)
+        transaction.commit()
 
 if __name__ == "__main__":
     cmd = CmdLine(sys.argv)

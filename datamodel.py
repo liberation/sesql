@@ -109,11 +109,10 @@ def create_schedule_table():
         classname character varying(250) NOT NULL,
         objid integer NOT NULL,
         scheduled_at timestamp NOT NULL DEFAULT NOW(),
-        reindexed_at timestamp,
         PRIMARY KEY (rowid)
         )""",
-        "CREATE INDEX sesql_reindex_schedule_new_index ON sesql_reindex_schedule (reindexed_at)",
-        "CREATE INDEX sesql_reindex_schedule_update_index ON sesql_reindex_schedule (classname, rowid, reindexed_at)"
+        "CREATE INDEX sesql_reindex_schedule_date_index ON sesql_reindex_schedule (scheduled_at)",
+        "CREATE INDEX sesql_reindex_schedule_content_index ON sesql_reindex_schedule (classname, rowid)"
     ]
 
 
