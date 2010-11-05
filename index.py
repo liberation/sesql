@@ -46,12 +46,15 @@ def index(obj, noindex = False, values = None):
     gro = getattr(obj, "get_related_objects_for_indexation", None)
     if gro:
         related = gro()
+        nbrelated = len(related)
         for item in related:
             if hasattr(item, "id"):
                 # Django object ? fecth class and id
                 item = (item.__class__.__name__, item.id)
             cursor.execute("SELECT nextval('sesql_reindex_id_seq')")
             cursor.execute("INSERT INTO sesql_reindex_schedule (rowid, classname, objid) SELECT currval('sesql_reindex_id_seq'), %s, %s", item)
+    else:
+        nbr = 0        
 
     table_name = typemap.get_table_for(obj.__class__)
     if not table_name:
@@ -72,7 +75,7 @@ def index(obj, noindex = False, values = None):
         log.info("Not indexing entry %s from table %s because of skip_condition" % (entry, table_name))
         return
     
-    log.info("Indexing entry %s in table %s" % (entry, table_name))
+    log.info("Indexing entry %s in table %s (%d dependancies)" % (entry, table_name, nbrelated))
     
     keys = [ ]
     results = [ ]
