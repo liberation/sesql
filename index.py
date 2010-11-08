@@ -54,7 +54,7 @@ def index(obj, noindex = False, values = None):
             cursor.execute("SELECT nextval('sesql_reindex_id_seq')")
             cursor.execute("INSERT INTO sesql_reindex_schedule (rowid, classname, objid) SELECT currval('sesql_reindex_id_seq'), %s, %s", item)
     else:
-        nbr = 0        
+        nbrelated = 0        
 
     table_name = typemap.get_table_for(obj.__class__)
     if not table_name:
