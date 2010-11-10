@@ -116,7 +116,7 @@ class IntField(Field):
         """
         Marshall the value to SQL
         """
-        if not value:
+        if value is None:
             return None
         return int(value)
 
