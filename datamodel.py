@@ -82,6 +82,9 @@ def create_table(table = None):
     """
     Create given table
     """
+    if table is None:
+        return []
+    
     condition = typemap.get_class_names_for(table)
     condition = ' OR '.join([ "classname = '%s'" % cls for cls in condition ])
     res = [ "CREATE TABLE %s (CHECK (%s), PRIMARY KEY (classname, id)) INHERITS (%s)" % (table, condition, config.MASTER_TABLE_NAME) ]
