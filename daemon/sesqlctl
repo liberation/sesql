@@ -1,0 +1,59 @@
+#!/bin/sh -e
+#
+# Startup script for SeSQL reindex daemon
+# You should copy it to /etc/init.d and edit it there.
+# It was only tested on Debian, you may need to adjust it.
+#
+
+# Configure that
+export DJANGO_SETTINGS_MODULE="settings"
+APPS_ROOT="/path/to/django/apps"
+PROJECT_ROOT="/path/to/django/project"
+USER="django"
+PIDFILE="/path/to/run/sesql-update.pid"
+DAEMON="/usr/bin/python"
+OPTIONS="-p $PIDFILE"
+
+
+export PYTHONPATH="$PROJECT_ROOT:$APPS_ROOT"
+OPTIONS="$APPS_ROOT/sesql/daemon/sesql-update.py $OPTIONS"
+export PATH=/usr/sbin:/sbin:$PATH
+
+test -f $DAEMON || exit 0
+
+do_start()
+{
+    echo -n "Starting SeSQL reindex daemon"
+    start-stop-daemon --start --quiet --pidfile $PIDFILE \
+        --exec $DAEMON -c $USER -o -- $OPTIONS
+    echo "."
+}
+
+do_stop()
+{
+    echo -n "Stopping SeSQL reindex daemon"
+    start-stop-daemon --stop --quiet --pidfile $PIDFILE \
+        -c $USER -o --exec $DAEMON
+    echo "."
+}
+
+case "$1" in
+  start) 
+        do_start
+        ;;
+  stop) 
+        do_stop
+        ;;
+  restart|force-reload)
+        do_stop
+        sleep 1
+        do_start
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart|force-reload}"
+        exit 1
+        ;;
+esac
+
+exit 0
+

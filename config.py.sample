@@ -114,3 +114,12 @@ SMART_QUERY_RATIO = 3.0
 QUERY_CACHE_MAX_SIZE = 10000
 # Life time of a query in the query cache
 QUERY_CACHE_EXPIRY = 24 * 3600
+
+#
+# Daemon configuration
+#
+
+DAEMON_DEFAULT_CHUNK=100
+DAEMON_DEFAULT_DELAY=120
+DAEMON_DEFAULT_PID='/var/run/sesql/update.pid'
+
