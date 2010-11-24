@@ -35,12 +35,12 @@ def load_values(obj):
         values[field.name] = field.get_value(obj)
     return values
 
-@utils.log_time
-def index(obj, noindex = False, values = None):
+def do_index(obj, message, noindex = False, values = None):
     """
-    Index a Django object into SeSQL
+    Index a Django object into SeSQL, do the real work
     """
     cursor = connection.cursor()    
+    log.info("%s : entering" % message)
 
     # Handle dependancies
     gro = getattr(obj, "get_related_objects_for_indexation", None)
@@ -56,9 +56,13 @@ def index(obj, noindex = False, values = None):
     else:
         nbrelated = 0        
 
+    log.info("%s : %d dependancies found" % (message, nbrelated))
+
     table_name = typemap.get_table_for(obj.__class__)
     if not table_name:
+        log.info("%s: no table found, skipping" % message)
         return
+
 
     if not values:
         values = load_values(obj)
@@ -66,16 +70,15 @@ def index(obj, noindex = False, values = None):
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
     cursor.execute(query, (values["id"], values["classname"]))
 
-    entry = "%s:%s" % (values["classname"], values["id"])
-
     if noindex:
+        log.info("%s : running in 'noindex' mode, only deleteing" % message)
         return
     
     if config.SKIP_CONDITION and config.SKIP_CONDITION(values):
-        log.info("Not indexing entry %s from table %s because of skip_condition" % (entry, table_name))
+        log.info("%s : not indexing because of skip_condition" % message)
         return
     
-    log.info("Indexing entry %s in table %s (%d dependancies)" % (entry, table_name, nbrelated))
+    log.info("%s : indexing entry in table %s" % (message, table_name))
     
     keys = [ ]
     results = [ ]
@@ -93,6 +96,14 @@ def index(obj, noindex = False, values = None):
                                                  ",".join(placeholders))
     cursor.execute(query, results)
     cursor.close()
+    
+
+def index(obj, noindex = False, values = None):
+    """
+    Index a Django object into SeSQL
+    """
+    message = "index(%s:%s)" % (obj.__class__.__name__, obj.id)
+    return utils.log_time(do_index, message)(obj, message, noindex, values)
 
 def unindex(obj):
     """

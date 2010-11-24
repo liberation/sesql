@@ -96,7 +96,7 @@ def table_exists(table):
 
     return True
 
-def log_time(function):
+def log_time(function, message = None):
     """
     Decorator to log function call and execution time
     """
@@ -106,9 +106,10 @@ def log_time(function):
             res = function(*args, **kwargs)
         args = ', '.join([ str(a) for a in args ])
         kwargs = ', '.join([ "%s=%s" % (key, value) for key, value in kwargs.items() ])
-        log.info('%s (%s, %s) : %.2f second(s)' % (function.__name__,
-                                                   args, kwargs,
-                                                   tmr.peek()))
+        m = message
+        if m is None:
+            m = '%s (%s, %s)' % (function.__name__, args, kwargs,)
+        log.info('%s : %.2f second(s)' % (m, tmr.peek()))
         return res
     log_time_inner.__name__ = function.__name__
     return log_time_inner
