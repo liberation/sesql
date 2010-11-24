@@ -53,11 +53,12 @@ def longquery(query, order = None, limit = None, queryid = None):
         
     with _query_cache.lock:
         # Generate a new query id, ensuring it's unique
-        while True:
-            letters = string.ascii_letters + string.digits
-            queryid = ''.join([ random.choice(letters) for i in range(32) ])
-            if queryid not in _query_cache:
-                break
+        if not queryid:
+            while True:
+                letters = string.ascii_letters + string.digits
+                queryid = ''.join([ random.choice(letters) for i in range(32) ])
+                if queryid not in _query_cache:
+                    break
         _query_cache[queryid] = results
         results.queryid = queryid
         
