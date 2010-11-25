@@ -54,6 +54,7 @@ class FieldMap(object):
         if isinstance(field, (str, unicode)):
             return self.fields_map[field]
         return field
+    __getitem__ = get_field
 
     def get_primary(self):
         """

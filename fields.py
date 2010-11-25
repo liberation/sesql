@@ -72,13 +72,6 @@ class Field(object):
         index = index + "(%s);" % self.index_column
         return index
 
-    def get_value(self, obj):
-        """
-        Get value from Django object
-        For normal types, we can only have one value
-        """
-        return self.marshall(self.source.load_data(obj))
-
     def marshall(self, value):
         """
         Marshall the value to SQL
@@ -105,6 +98,26 @@ class Field(object):
         value = [ self.marshall(val) for val in value ]
         patt = [ "%s" for val in value ]
         return self.index_column + " IN (" + ",".join(patt) + ")", value
+
+    @property
+    def index_columns(self):
+        """
+        Get the columns to populate at indexation time
+        """
+        return [ self.data_column ]
+
+    @property
+    def index_placeholders(self):
+        """
+        Get the placeholders to use at indexation time
+        """
+        return [ self.placeholder ]
+
+    def get_values(self, obj):
+        """
+        Get value(s) of this field for the object
+        """
+        return [ self.marshall(self.source.load_data(obj)) ]
 
 class IntField(Field):
     """
@@ -307,7 +320,7 @@ class FullTextField(Field):
         Strip accents, escape html_entities, handle unicode, ...
         """
         if not value:
-            return
+            return u""
 
         if isinstance(value, unicode):
             value = value.encode(config.CHARSET)
@@ -347,10 +360,7 @@ class FullTextField(Field):
         """
         value = super(FullTextField, self).index(tablename)
         value += """
-ALTER TABLE %s ALTER COLUMN %s SET STATISTICS 10000;
-CREATE TRIGGER %s_%s_update BEFORE INSERT OR UPDATE
-ON %s FOR EACH ROW EXECUTE PROCEDURE
-tsvector_update_trigger(%s, '%s', %s);""" % (tablename, self.index_column, tablename, self.name, tablename, self.index_column, self.dictionnary, self.data_column)
+ALTER TABLE %s ALTER COLUMN %s SET STATISTICS 10000;""" % (tablename, self.index_column)
         return value
 
     def get_default(self, value):
@@ -437,3 +447,39 @@ tsvector_update_trigger(%s, '%s', %s);""" % (tablename, self.index_column, table
         Get the ranking pattern for __matches operator
         """
         return self.pattern_matches(value)
+
+    @property
+    def index_columns(self):
+        """
+        Get the columns to populate at indexation time
+        """
+        return [ self.data_column, self.index_column ]
+
+    @property
+    def index_placeholders(self):
+        """
+        Get the placeholders to use at indexation time
+        """
+        if hasattr(self.source, "weights"):
+            weights = self.source.weights
+            vals = []
+            for weight in weights:
+                vals.append("setweight(to_tsvector('%s', %%s), '%s')" % (self.dictionnary, weight))
+            vals = '||'.join(vals)
+        else:
+            vals = "to_tsvector('%s', %%s)" % self.dictionnary
+        return [ self.placeholder, vals ]
+
+    def get_values(self, obj):
+        """
+        Get values for the object
+        """
+        vals = [ self.marshall(self.source.load_data(obj)) ]
+        if hasattr(self.source, "weights"):
+            weights = self.source.weights
+            for weight in weights:
+                vals.append(self.marshall(self.source.load_data(obj, weight)))
+        else:
+            vals.append(self.marshall(self.source.load_data(obj)))
+        return vals
+

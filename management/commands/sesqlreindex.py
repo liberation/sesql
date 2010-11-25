@@ -24,7 +24,7 @@ from django.core.management import call_command
 from django.db import connection, transaction
 import settings
 from sesql.results import SeSQLResultSet
-from sesql.index import index, load_values
+from sesql.index import index
 from sesql.typemap import typemap
 from sesql import utils
 import sesql_config as config
@@ -75,12 +75,9 @@ class Command(BaseCommand):
 
         nb = len(missing)
         full_tmr = utils.Timer()
-        load_tmr = utils.Timer()
-        index_tmr = utils.Timer()
 
         def disp_stats():
-            with index_tmr:
-                transaction.commit()
+            transaction.commit()
 
             if not nb:
                 return
@@ -92,26 +89,14 @@ class Command(BaseCommand):
             eta = elapsed / done * (1 - done)
             print "**SeSQL reindex step stats**"
             print " - %d objects in %.2f s, rate %.2f" % (STEP, elapsed_last,STEP / elapsed_last)
-            lt = load_tmr.peek()
-            it = index_tmr.peek()
-            tt = (lt + it) / 100.0
-            print " - loading: %.2f s (%04.1f %%), indexing: %.2f s (%04.1f %%)" % (lt, lt / tt, it, it / tt)
             print "**SeSQL global reindex on %s stats**" % classname
             print " - %d / %d ( %04.1f %% ) in %.2f s, rate %.2f, ETA %.2f s" % (i + 1, nb, 100 * done, elapsed, i / elapsed, eta)
-            lt = load_tmr.get_global()
-            it = index_tmr.get_global()
-            tt = (lt + it) / 100.0
-            print " - loading: %.2f s (%04.1f %%), indexing: %.2f s (%04.1f %%)" % (lt, lt / tt, it, it / tt)
             sys.stdout.flush()
             full_tmr.start()
 
         for i, oid in enumerate(missing):
-            with load_tmr:
-                obj = SeSQLResultSet.load((classname, oid))
-                values = load_values(obj)
-            with index_tmr:
-                index(obj, values = values)
-
+            obj = SeSQLResultSet.load((classname, oid))
+            index(obj)
             del obj
 
             if i % STEP == STEP - 1:

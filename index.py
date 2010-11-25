@@ -26,21 +26,46 @@ from django.db import connection
 import logging
 log = logging.getLogger('sesql')
 
-def load_values(obj):
+def index_log_wrap(function):
     """
-    Load all values of the object
+    Log wrap the method, giving it a name and logging its time
     """
-    values = {}
-    for field in config.FIELDS:
-        values[field.name] = field.get_value(obj)
-    return values
+    def inner(obj, *args, **kwargs):
+        classname, objid = get_sesql_id(obj)
+        message = "%s (%s:%s)" % (function.__name__, classname, objid)
+        return utils.log_time(function, message)(obj, message, *args, **kwargs)
+    inner.__name__ = function.__name__
+    return inner
 
-def do_index(obj, message, noindex = False, values = None):
+def get_values(obj, fields):
+    """
+    Get SQL keys, placeholders and results for this object and those fields
+    """
+    keys = [ ]
+    placeholders = [ ]
+    results = [ ]
+
+    for field in config.FIELDS:
+        keys.extend(field.index_columns)
+        placeholders.extend(field.index_placeholders)
+        results.extend(field.get_values(obj))
+
+    return keys, placeholders, results
+
+def get_sesql_id(obj):
+    """
+    Get classname and id, the SeSQL identifiers
+    """
+    return (fieldmap['classname'].get_values(obj)[0], fieldmap['id'].get_values(obj)[0])
+
+@index_log_wrap
+def index(obj, message, noindex = False):
     """
     Index a Django object into SeSQL, do the real work
     """
-    cursor = connection.cursor()    
+    cursor = connection.cursor()
     log.info("%s : entering" % message)
+    classname, objid = get_sesql_id(obj)
 
     # Handle dependancies
     gro = getattr(obj, "get_related_objects_for_indexation", None)
@@ -50,7 +75,7 @@ def do_index(obj, message, noindex = False, values = None):
         for item in related:
             if hasattr(item, "id"):
                 # Django object ? fecth class and id
-                item = (item.__class__.__name__, item.id)
+                item = get_sesql_id(obj)
             cursor.execute("SELECT nextval('sesql_reindex_id_seq')")
             cursor.execute("INSERT INTO sesql_reindex_schedule (rowid, classname, objid) SELECT currval('sesql_reindex_id_seq'), %s, %s", item)
     else:
@@ -58,17 +83,13 @@ def do_index(obj, message, noindex = False, values = None):
 
     log.info("%s : %d dependancies found" % (message, nbrelated))
 
-    table_name = typemap.get_table_for(obj.__class__)
+    table_name = typemap.get_table_for(classname)
     if not table_name:
         log.info("%s: no table found, skipping" % message)
         return
 
-
-    if not values:
-        values = load_values(obj)
-    
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
-    cursor.execute(query, (values["id"], values["classname"]))
+    cursor.execute(query, (objid, classname))
 
     if noindex:
         log.info("%s : running in 'noindex' mode, only deleteing" % message)
@@ -79,59 +100,41 @@ def do_index(obj, message, noindex = False, values = None):
         return
     
     log.info("%s : indexing entry in table %s" % (message, table_name))
+
+    keys, placeholders, results = get_values(obj, config.FIELDS)
     
-    keys = [ ]
-    results = [ ]
-    placeholders = [ ]
-
-    for field in config.FIELDS:
-        value = values.get(field.name, None)
-        if value:
-            keys.append(field.data_column)
-            results.append(value)
-            placeholders.append(field.placeholder)
-
     query = "INSERT INTO %s (%s) VALUES (%s)" % (table_name,
                                                  ",".join(keys),
                                                  ",".join(placeholders))
     cursor.execute(query, results)
     cursor.close()
-    
 
-def index(obj, noindex = False, values = None):
-    """
-    Index a Django object into SeSQL
-    """
-    message = "index(%s:%s)" % (obj.__class__.__name__, obj.id)
-    return utils.log_time(do_index, message)(obj, message, noindex, values)
-
-def unindex(obj):
+@index_log_wrap
+def unindex(obj, message):
     """
     Unindex the object
     """
     return index(obj, noindex = True)
 
-def update(obj, fields, values = None):
+@index_log_wrap
+def update(obj, message, fields):
     """
     Update only specific fields of given object
     """
+    log.info("%s : entering for fields" % (message, ','.join(fields)))
+
     table_name = typemap.get_table_for(obj.__class__)
     if not table_name:
+        log.info("%s : not table, skipping" % message)
         return
 
-    if not values:
-        values = load_values(obj)
-    
-    pattern = [ ]
-    results = [ ]
-    for field in fields:
-        field = fieldmap.get_field(field)
-        value = values.get(field.name, None)
-        if value:
-            pattern.append('%s=%s' % (field.data_column, field.placeholder))
-            results.append(value)
+    fields = [ fieldmap.get_field(field) for field in fields ]
+    keys, placeholders, results = get_values(obj, fields)
+
+    pattern = [ '%s=%s' % (k,p) for k,p in zip(keys, placeholders) ]
 
     if not pattern:
+        log.info("%s : nothing to update, skipping" % message)
         return
 
     pattern = ",".join(pattern)

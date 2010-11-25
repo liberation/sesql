@@ -40,8 +40,10 @@ def guess_source(what):
         return what
     if isinstance(what, (list, tuple)):
         return TextAggregate(*what)
+    if isinstance(what, dict):
+        return WeightedAggregate(what)
     if not isinstance(what, str):
-        raise ValueError, "what is neither AbstractSource, list or string"
+        raise ValueError, "what is neither AbstractSource, list, dict nor string"
     if "." in what:
         what = what.strip(".")
         return SubField(*(what.split(".", 1)))
@@ -164,7 +166,7 @@ class TextAggregate(AbstractSource):
         Get the data directly
         """
         values = [ source.load_data(obj) for source in self.sources ]
-        return TextAggregate.collapse(values)
+        return self.collapse(values)
 
     @staticmethod
     def collapse(values):
@@ -180,6 +182,31 @@ class TextAggregate(AbstractSource):
         values = [ TextAggregate.collapse(v) for v in values ]
         values = [ v for v in values if v ]
         return u" ".join(values)
+
+class WeightedAggregate(TextAggregate):
+    """
+    Aggregate on several text indexes, but with weight
+    Input must be a dictionnary of { weight : field }
+    """
+    def __init__(self, sources):
+        """
+        Constructor
+        """
+        self.sources = dict([ (k, guess_source(v)) for k,v in sources.items() ])
+        self.weights = self.sources.keys()
+
+    def load_data(self, obj, weight = None):
+        """
+        Get the data directly but limiting to given weight if given
+        """
+        if not weight:
+            values = [ source.load_data(obj) for source in self.sources.values() ]
+            return self.collapse(values)
+            
+        source = self.sources.get(weight, None)
+        if source is None:
+            return u""
+        return source.load_data(obj)
 
 class FirstOf(AbstractSource):
     """
