@@ -27,6 +27,9 @@ def highlight(text, words, index = None):
     That can be used to highlight the words, for example
     The index will be use to lemmatize, if none, it'll use the default one
     """
+    if not text:
+        return []
+    
     if index is None:
         index = fieldmap.primary
 
