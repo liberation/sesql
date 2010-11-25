@@ -121,7 +121,7 @@ class TypeMap(object):
         Get the real Django class from its name
         """
         if isinstance(klass, (str, unicode)):
-            return self.class_names[klass]
+            return self.class_names.get(klass, None)
         return klass
 
 typemap = TypeMap()

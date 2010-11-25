@@ -95,7 +95,7 @@ def index(obj, message, noindex = False):
         log.info("%s : running in 'noindex' mode, only deleteing" % message)
         return
     
-    if config.SKIP_CONDITION and config.SKIP_CONDITION(values):
+    if config.SKIP_CONDITION and config.SKIP_CONDITION(obj):
         log.info("%s : not indexing because of skip_condition" % message)
         return
     
