@@ -63,7 +63,7 @@ class Command(BaseCommand):
         objs = klass.objects.values('id')
         if self.options["order"]:
             objs = objs.order_by(self.options["order"])
-        allids = set([ int(a['id']) for a in objs ])
+        allids = [ int(a['id']) for a in objs ]
 
         cursor = connection.cursor()
         cursor.execute("SELECT id FROM %s WHERE classname=%%s" % config.MASTER_TABLE_NAME,
@@ -71,7 +71,7 @@ class Command(BaseCommand):
         already = set([ int(c[0]) for c in cursor ])
 
         if not reindex:
-            missing = allids - already
+            missing = [ oid for oid in allids if not oid in already ]
         else:
             missing = allids
 
