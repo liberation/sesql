@@ -42,6 +42,10 @@ class Command(BaseCommand):
                     dest='reindex',
                     default=False,
                     help='Reindex already indexed content'),
+        make_option('-o', '--order',
+                    dest='order',
+                    default=None,
+                    help='Sort order of the content to process'),
         )
 
     @transaction.commit_manually
@@ -55,8 +59,11 @@ class Command(BaseCommand):
 
         print "=> Starting reindexing for %s" % classname
         sys.stdout.flush()
-        
-        allids = set([ int(a['id']) for a in klass.objects.values('id') ])
+
+        objs = klass.objects.values('id')
+        if self.options["order"]:
+            objs = objs.order_by(self.options["order"])
+        allids = set([ int(a['id']) for a in objs ])
 
         cursor = connection.cursor()
         cursor.execute("SELECT id FROM %s WHERE classname=%%s" % config.MASTER_TABLE_NAME,
@@ -109,6 +116,8 @@ class Command(BaseCommand):
         """
         Handle the command
         """
+        self.options = options
+        
         if not apps:
             apps = typemap.all_class_names()
 
