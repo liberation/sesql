@@ -106,7 +106,12 @@ def index(obj, message, noindex = False):
     query = "INSERT INTO %s (%s) VALUES (%s)" % (table_name,
                                                  ",".join(keys),
                                                  ",".join(placeholders))
-    cursor.execute(query, results)
+    try:
+        cursor.execute(query, results)
+    except:
+        log.error('Exception caught while inserting (%s,%s) into %s',
+                  (classname, objid, table_name))
+        raise
     cursor.close()
 
 @index_log_wrap

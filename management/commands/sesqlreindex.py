@@ -84,8 +84,6 @@ class Command(BaseCommand):
         full_tmr = utils.Timer()
 
         def disp_stats():
-            transaction.commit()
-
             if not nb:
                 return
 
@@ -103,7 +101,12 @@ class Command(BaseCommand):
 
         for i, oid in enumerate(missing):
             obj = SeSQLResultSet.load((classname, oid))
-            index(obj)
+            try:
+                index(obj)
+                transaction.commit()
+            except Exception, e:
+                print "Error indexing %s (%s,%s) : %s" % (obj, obj.__class__.__name__, obj.pk, e)
+                transaction.rollback()
             del obj
 
             if i % STEP == STEP - 1:
