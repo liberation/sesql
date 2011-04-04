@@ -101,8 +101,15 @@ class Command(BaseCommand):
                     obj = None
                     broken += 1
                     log.warning("Object %r does not exist ! Broken index ?" % (obj,))
+                except:
+                    transaction.rollback()
+                    raise
             with index_tmr:
-                update(obj, fields)
+                try:
+                    update(obj, fields)
+                except:
+                    transaction.rollback()
+                    raise                    
 
             if i % STEP == STEP - 1:
                 disp_stats()

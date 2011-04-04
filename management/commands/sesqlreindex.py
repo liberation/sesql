@@ -99,13 +99,13 @@ class Command(BaseCommand):
             sys.stdout.flush()
             full_tmr.start()
 
-        for i, oid in enumerate(missing):
-            obj = SeSQLResultSet.load((classname, oid))
+        for i, oid in enumerate(missing):            
             try:
+                obj = SeSQLResultSet.load((classname, oid))
                 index(obj)
                 transaction.commit()
             except Exception, e:
-                print "Error indexing %s (%s,%s) : %s" % (obj, obj.__class__.__name__, obj.pk, e)
+                print "Error indexing (%s,%s) : %s" % (classname, oid, e)
                 transaction.rollback()
             del obj
 
@@ -113,6 +113,7 @@ class Command(BaseCommand):
                 disp_stats()
 
         disp_stats()
+        transaction.commit()
         
     
     def handle(self, *apps, **options):

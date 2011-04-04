@@ -126,7 +126,7 @@ def update(obj, message, fields):
     """
     Update only specific fields of given object
     """
-    log.info("%s : entering for fields" % (message, ','.join(fields)))
+    log.info("%s : entering for fields %s" % (message, ','.join(fields)))
 
     table_name = typemap.get_table_for(obj.__class__)
     if not table_name:
@@ -147,7 +147,7 @@ def update(obj, message, fields):
     query = "UPDATE %s SET %s WHERE classname=%%s AND id=%%s" % (table_name,
                                                                  pattern)
     cursor = connection.cursor()    
-    cursor.execute(query, results + [ values['classname'], values['id'] ])
+    cursor.execute(query, results + [ obj.__class__.__name__, obj.id ])
     cursor.close()
 
     
