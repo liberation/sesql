@@ -7,7 +7,14 @@ class SearchHit(models.Model):
     query = models.CharField(max_length=255)
     nb_results = models.PositiveIntegerField()
     date = models.DateField(auto_now=True)
-    
+
+
+class SearchHitHistoric(models.Model):
+    """Same as SearchHit used as an archive"""
+    query = models.CharField(max_length=255)
+    nb_results = models.PositiveIntegerField()
+    date = models.DateField(auto_now=True, db_index=True)
+   
 
 class SearchQuery(models.Model):
     query = models.CharField(max_length=255)
