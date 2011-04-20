@@ -3,8 +3,9 @@
 def phonex(query):
     """soundex algorithm for french language"""
     # source: http://www-lium.univ-lemans.fr/~carlier/recherche/soundex.html#L4
-    print query
     # 1. replace all 'y' with 'i'
+    query = query.replace(' ', '')
+
     query = query.replace('y', 'i')
 
     # 2. replace all 'h' that are not preceded by 'c', 's' or 'p'
@@ -260,8 +261,6 @@ def phonex(query):
 
     value = 0
 
-    print query
-    
     for index in range(len(query)):
         v = REPLACE[query[index]]
         value += v*22**-(index+1)
