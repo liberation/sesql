@@ -32,6 +32,8 @@ log = logging.getLogger('sesql')
 _query_cache = GenericCache(maxsize = config.QUERY_CACHE_MAX_SIZE,
                             expiry = config.QUERY_CACHE_EXPIRY)
 
+from models import SearchHit
+
 @utils.log_time
 def longquery(query, order = None, limit = None, queryid = None):
     """
@@ -48,9 +50,10 @@ def longquery(query, order = None, limit = None, queryid = None):
             if results:
                 return results
             log.warning('Cached query id %r expired, re-querying.' % queryid)
-
-    results = SeSQLQuery(query, order).longquery(limit)
-        
+            
+    query = SeSQLQuery(query, order)
+    results = query.longquery(limit)
+    
     with _query_cache.lock:
         # Generate a new query id, ensuring it's unique
         if not queryid:
@@ -61,6 +64,15 @@ def longquery(query, order = None, limit = None, queryid = None):
                     break
         _query_cache[queryid] = results
         results.queryid = queryid
-        
+    
+    #FIXME: SUGGEST CODE
+    nb_results = results.count()
+    query_text = query.get_fulltext_query()[2][0]
+    classes = query.get_classes()
+
+    if 'Article' in classes:
+        SearchHit(query=query_text, nb_results=nb_results).save()
+    #END SUGGEST CODE
+
     return results
     
