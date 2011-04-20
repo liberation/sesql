@@ -26,4 +26,14 @@ def shortquery(query, order = None, limit = 50):
     """
     Perform a short query and return a lazy Django result set
     """
-    return SeSQLQuery(query, order).shortquery(limit)
+    query = SeSQLQuery(query, order)
+    result = query.shortquery(limit)
+
+    nb_results = results.count()
+    query_text = query.get_fulltext_query()[2][0]
+    classes = query.get_classes()
+
+    if 'Article' in classes: # FIXME: Hardcoded value
+        SearchHit(query=query_text, nb_results=nb_results).save()
+
+    return result

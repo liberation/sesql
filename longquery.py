@@ -65,14 +65,12 @@ def longquery(query, order = None, limit = None, queryid = None):
         _query_cache[queryid] = results
         results.queryid = queryid
     
-    #FIXME: SUGGEST CODE
     nb_results = results.count()
     query_text = query.get_fulltext_query()[2][0]
     classes = query.get_classes()
 
-    if 'Article' in classes:
+    if 'Article' in classes: # FIXME: Hardcoded value
         SearchHit(query=query_text, nb_results=nb_results).save()
-    #END SUGGEST CODE
 
     return results
     
