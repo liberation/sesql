@@ -13,9 +13,8 @@ from sesql.models import SearchQuery
 from sesql.models import SearchHitHistoric
 from sesql.suggest import is_blacklisted, phonex
 
-ALPHA = 0.95 #erode factor
-BETA = 1 #used to compute weight
-GAMMA = 1 #user to compute weight
+import sesql_config as config
+
 
 class Command(BaseCommand):
     help = """Perform a SearchQuery update based on last week searches"""
@@ -26,10 +25,10 @@ class Command(BaseCommand):
                     dest='erode',
                     help = 'tell if we must erode result or not'),
             
-        make_option('-f','--filter',
+        make_option('-f','--filter', #FIXME: not supported
                     dest ='filter',
                     type='int',
-                    default=5,
+                    default=config.DEFAULT_FILTER,
                     help = 'how many time a search must occur to be treated'))
     
     def handle(self, *apps, **options):
@@ -40,10 +39,10 @@ class Command(BaseCommand):
 
     def erode(self):
         for search_query in SearchQuery.objects.all():
-            search_query.pondered_search_nb = (ALPHA * search_query.pondered_search_nb 
-                                               + (1-ALPHA)* search_query.nb_recent_search)
+            search_query.pondered_search_nb = (config.ALPHA * search_query.pondered_search_nb 
+                                               + (1-config.ALPHA)* search_query.nb_recent_search)
         
-    def process_hits(self, filter_num):
+    def process_hits(self, filter_nb):
         last_hits = SearchHit.objects.all().order_by('-date')
         for hit in last_hits:
             query = hit.query
@@ -83,8 +82,8 @@ class Command(BaseCommand):
                 search_query.pondered_search_nb += 1
                 search_query.nb_recent_search += 1 
                     
-                search_query.weight = (search_query.pondered_search_nb * BETA + 
-                                       search_query.nb_results * GAMMA)
+                search_query.weight = (search_query.pondered_search_nb * config.BETA + 
+                                       search_query.nb_results * config.GAMMA)
                 search_query.save()
                 
                 # we can now create SearchHitHistoric 

@@ -1,9 +1,9 @@
 from phonex import phonex
 
-BLACKLIST = []
+import sesql_config as config
 
 def is_blacklisted(query):
-    return query in BLACKLIST
+    return query in config.BLACKLIST
 
 def levenshtein(a, b):
     if not a: return len(b)
