@@ -43,6 +43,8 @@ class Command(BaseCommand):
                                                * search_query.pondered_search_nb 
                                                + (1-config.ALPHA)
                                                * search_query.nb_recent_search)
+            search_query.nb_recent_search = 0
+            search_query.save()
         
     def process_hits(self, filter_nb):
         last_hits = SearchHit.objects.all().order_by('-date')
@@ -53,15 +55,18 @@ class Command(BaseCommand):
             query = hit.query
             
             # blacklist
-            if not query in config.BLACKLIST:
+            if query in config.BLACKLIST:
                 continue
 
             # filter
-            if (SearchHit.objects.all().filter(query=query).count() < filter_nb or
-                SearchQuery.objects.filter(query=query).count() == 0):
-                # "not enough hit" or "not already a QuerySearch"
-                continue 
-
+            # if there is not enought hit and 
+            # the query is not already in db
+            # we don't process it
+            if SearchHit.objects.all().filter(query=query).count() < filter_nb:
+                # not enough hit 
+                if SearchQuery.objects.filter(query=query).count() == 0:
+                     # not already in db
+                    continue 
             # get or create SearchQuery object based on query
             try:
                 search_query = SearchQuery.objects.get(query=query)
