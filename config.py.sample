@@ -133,4 +133,4 @@ ALPHA = 0.95 #erode factor
 BETA = 1 #used to compute weight
 GAMMA = 1 #user to compute weight
 
-BLACKLIST = [] 
+BLACKLIST = []

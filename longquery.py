@@ -33,9 +33,10 @@ _query_cache = GenericCache(maxsize = config.QUERY_CACHE_MAX_SIZE,
                             expiry = config.QUERY_CACHE_EXPIRY)
 
 from models import SearchHit
+import sesql_config as config
 
 @utils.log_time
-def longquery(query, order = None, limit = None, queryid = None):
+def longquery(query, order = None, limit = None, queryid = None, historize=False):
     """
     Perform a long query and return a lazy Django result set
 
@@ -65,11 +66,11 @@ def longquery(query, order = None, limit = None, queryid = None):
         _query_cache[queryid] = results
         results.queryid = queryid
     
-    nb_results = results.count()
-    query_text = query.get_fulltext_query()[2][0]
-    classes = query.get_classes()
+    if historize: # suggest feature hook
+        nb_results = results.count()
+        query_text = query.get_fulltext_query()[2][0]
+        classes = query.get_classes()
 
-    if 'Article' in classes: # FIXME: Hardcoded value
         SearchHit(query=query_text, nb_results=nb_results).save()
 
     return results
