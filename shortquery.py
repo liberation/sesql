@@ -27,13 +27,9 @@ def shortquery(query, order = None, limit = 50, historize=False):
     Perform a short query and return a lazy Django result set
     """
     query = SeSQLQuery(query, order)
-    result = query.shortquery(limit)
+    results = query.shortquery(limit)
 
     if historize: #suggest feature hook
-        nb_results = results.count()
-        query_text = query.get_fulltext_query()[2][0]
-        classes = query.get_classes()
+        results.historize(query)
 
-        SearchHit(query=query_text, nb_results=nb_results).save()
-
-    return result
+    return results
