@@ -23,23 +23,23 @@ from django.db import models
 
 class SearchHit(models.Model):
     """Used to store queries made to the search engine"""
-    query = models.CharField(max_length=255)
+    query = models.CharField(max_length=500)
     nb_results = models.PositiveIntegerField()
     date = models.DateField(auto_now=True)
 
 
 class SearchHitHistoric(models.Model):
     """Same as SearchHit used as an archive"""
-    query = models.CharField(max_length=255)
+    query = models.CharField(max_length=500)
     nb_results = models.PositiveIntegerField()
     date = models.DateField(auto_now=True, db_index=True)
    
 
 class SearchQuery(models.Model):
-    query = models.CharField(max_length=255)
+    query = models.CharField(max_length=500)
     phonex = models.FloatField()
-    clean_query = models.CharField(max_length=255)
-    clean_phonex = models.FloatField(max_length=255)
+    clean_query = models.CharField(max_length=500)
+    clean_phonex = models.FloatField()
     
     nb_results = models.PositiveIntegerField()
     
