@@ -19,9 +19,12 @@
 
 def phonex(query):
     """soundex algorithm for french language"""
+    # clean up the query
+    for char in u" -.+*/,:;_'":
+        query = query.replace(char, '')
+
     # source: http://www-lium.univ-lemans.fr/~carlier/recherche/soundex.html#L4
     # 1. replace all 'y' with 'i'
-    query = query.replace(' ', '')
 
     query = query.replace('y', 'i')
 
