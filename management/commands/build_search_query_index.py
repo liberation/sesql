@@ -35,7 +35,7 @@ import sesql_config as config
 
 
 class Command(BaseCommand):
-    help = """Perform a SearchQuery update based on last week searches"""
+    help = """Build SearchQuery index"""
     
     option_list = BaseCommand.option_list + (
         make_option('-e','--erode',
@@ -43,7 +43,7 @@ class Command(BaseCommand):
                     dest='erode',
                     help = 'tell if we must erode result or not'),
             
-        make_option('-f','--filter', #FIXME: not supported
+        make_option('-f','--filter',
                     dest ='filter',
                     type='int',
                     default=config.DEFAULT_FILTER,
@@ -65,7 +65,7 @@ class Command(BaseCommand):
             search_query.save()
         
     def process_hits(self, filter_nb):
-        last_hits = SearchHit.objects.all().order_by('-date')
+        last_hits = SearchHit.objects.all()
 
         processed_hits = []
 
@@ -76,20 +76,18 @@ class Command(BaseCommand):
             if query in config.BLACKLIST:
                 continue
 
-            # filter
-            # if there is not enought hit and 
-            # the query is not already in db
-            # we don't process it
-            if SearchHit.objects.all().filter(query=query).count() < filter_nb:
-                # not enough hit 
-                if SearchQuery.objects.filter(query=query).count() == 0:
-                     # not already in db
-                    continue 
-            # get or create SearchQuery object based on query
+            if hit.nb_results < filter_nb:
+                SearchHitHistoric(query=hit.query,
+                                  nb_results=hit.nb_results,
+                                  date=hit.date).save()
+                hit.delete()
+                continue
+            
+            # manual get_or_create
             try:
                 search_query = SearchQuery.objects.get(query=query)
                 created = False
-            except:
+            except SearchQuery.DoesNotExist:
                 search_query = SearchQuery(query=query)
                 created = True
 
@@ -97,14 +95,14 @@ class Command(BaseCommand):
             if created:
                 search_query.phonex = phonex(query)
 
-                lems = lemmatize(query.split())
-                clean_query = []
-                for lem in lems: # select only strings values 
-                                 # and not empty strings''
-                    if lem:
-                        clean_query.append(lem)
+                # clean the query, the '_' char cause bugy clean_query
+                query = query.replace('_', '')  
 
+                lems = lemmatize(query.split())
+
+                clean_query = [lem for lem in lems if lem]
                 clean_query = ' '.join(clean_query)
+
                 clean_phonex = phonex(clean_query)
 
                 search_query.clean_query = clean_query
@@ -128,7 +126,5 @@ class Command(BaseCommand):
             SearchHitHistoric(query=hit.query,
                               nb_results=hit.nb_results,
                               date=hit.date).save()
-            processed_hits.append(hit)
-    
-        for hit in processed_hits:
+
             hit.delete()
