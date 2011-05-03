@@ -4,3 +4,21 @@ included  Makefile.  The following  Debian  packages  are required  to
 compile it :
 
 python-docutils texlive-latex texlive-latex-extra texlive-lang-french make
+
+Here is a list of the contained documentations :
+
+- tutorial.txt : a tutorial on how to to setup and use SeSQL for basic
+  searches.
+
+- install.txt : a more complete installation/configuration guide.
+
+- datamodel.txt  : a  detailed  guide  of how  to  define indexes  and
+  fields.
+
+- query.txt : a guide on the two query methods (shortquery/longquery).
+
+- admin.txt : a guide on administration commands and tasks.
+
+- extra.txt :  a guide on  extra features like  sesql_admin, highlight,
+  benchmarking, dependency tracking and search history.
+

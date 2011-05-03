@@ -1,6 +1,9 @@
 SeSQL data model guide
 ======================
 
+.. contents:: :depth: 2
+.. sectnum:: :depth: 2
+
 General
 -------
 
@@ -55,30 +58,40 @@ IntArrayField
   Field storing multi-valued integers.
 
 FullTextField
-  The beast for which !SeSQL was designed, a full-text index, can be made ``primary`` to be used in rankings.
-  You can specify a different text search configuration than the default on a given FullTextField with the "dictionnary" parameter.
-
-FIXME : give example and specify options
+  The beast  for which SeSQL was  designed, a full-text index,  can be
+  made ``primary`` to be used in rankings.
+  You  can specify  a  different text  search  configuration than  the
+  default on a given FullTextField with the ``dictionnary`` parameter.
 
 Sources
 -------
 
-Each field requires a 'source'. The source can be one of the following classes :
+Each field requires a 'source'. The source can be one of the following
+classes :
 
 SimpleField
-  Will just fetch an attribute from the Django object, can specify a condition (Q object) to filter on.
+  Will just fetch  an attribute from the Django object,  can specify a
+  condition (Q object) to filter on.
 
 MethodCaller
   Will call a method from the Django object.
 
 SubField 
-  Will walk accross one or several many-to-many mappings, fetching attributes of the related objects.
+  Will  walk accross  one or  several many-to-many  mappings, fetching
+  attributes of the related objects.
 
 TextAggregate
   Concatenate the result of other sources.
 
+WeightedAggregate
+  Allow  to ponder  the result  of  different sources  for ranking  by
+  relevance. Weights  can go from A  (highest) to D (lowest).  Look at
+  PosgreSQL documentation for more information on weights.
+
 FirstOf
-  Gets the first non-None value of a list of other sources (useful for example to tracker the creation date which is called ``created_at`` on some models and ``created_on`` on others).
+  Gets the first non-None value of a list of other sources (useful for
+  example to track the creation date which is called ``created_at`` on
+  some models and ``created_on`` on others).
 
 Easy writing of sources
 -----------------------
@@ -87,13 +100,17 @@ Source can also be given in a more friendly way :
 
 - as a normal string for a ``SimpleField`` (ie, ``workflow_state``) ;
 
-- as a normal string terminated with ``()`` for a ``MethodCaller`` (ie, ``"getFullName()"``) ;
+- as a normal string terminated with ``()`` for a ``MethodCaller``
+  (ie, ``"getFullName()"``) ;
 
 - as a path separated by ``.`` for a ``SubField`` (ie, ``".authors.firstname"``) ;
 
-- as a list or tuple for a ``TextAggregate`` (ie ``( "firstname", "lastname" )``).
+- as a list or tuple for a ``TextAggregate`` (ie ``( "firstname", "lastname" )``) ;
 
-If the source is not specified, it'll be a ``SimpleField`` of the same name that the index.
+- a dictionary for a ``WeightedAggregate`` (ie ``{ 'A': ("firstname", "lastname"), 'B': ("nickname",) }``).
+
+If the source is not specified, it'll be a ``SimpleField`` of the same
+name that the index.
 
 Type map
 --------
@@ -122,31 +139,48 @@ Example
 Dependency tracking
 -------------------
 
-SeSQL provides semi-automatic dependency tracking. This works in two steps.
+SeSQL provides  semi-automatic dependency tracking. This  works in two
+steps.
 
-1. By implementing a method ``get_related_objects_for_indexation`` on your models, which must return a lit of (classname, id) pairs (or of Django objects). This method will be called when an object is indexed. All "related objects" will then be inserted into a special table, called ``sesql_reindex_schedule``.
+1. By implementing  a method ``get_related_objects_for_indexation`` on
+your models, which  must return a lit of (classname,  id) pairs (or of
+Django  objects).  This  method  will  be called  when  an  object  is
+indexed. All  "related objects" will  then be inserted into  a special
+table, called ``sesql_reindex_schedule``.
 
-2. Then, asynchronously, a daemon will fetch rows from this table, and reindex objects.
+2. Then, asynchronously, a daemon will fetch rows from this table, and
+reindex objects.
 
 
 Cleanup in text fields
 ----------------------
 
-Before indexing text fields, cleanup has to be performed.  In SeSQL, the cleanup is a two-phase process.
+Before indexing text  fields, cleanup has to be  performed.  In SeSQL,
+the cleanup is a two-phase process.
 
-The first phase is user-configurable. It should strip the text of all meta-information (HTML tags, wiki syntax, ...) and gives plain text.
+The first phase is user-configurable. It  should strip the text of all
+meta-information (HTML tags, wiki syntax, ...) and gives plain text.
 
-The second phase is automatic, it consists in stripping all accents, converting upper-case letters to lower-case letters and replacing special characters with spaces.
+The second phase  is automatic, it consists in  stripping all accents,
+converting  upper-case letters  to  lower-case  letters and  replacing
+special characters with spaces.
 
 To configure the first phase, you have two options :
 
-1. Specify the ``ADDITIONAL_CLEANUP_FUNCTION`` in the configuration file. This should contain a function, which takes the text as parameter and returns the cleaned up text.
+1.  Specify the  ``ADDITIONAL_CLEANUP_FUNCTION`` in  the configuration
+file.  This  should  contain  a  function, which  takes  the  text  as
+parameter and returns the cleaned up text.
 
-2. Add a ``cleanup`` parameter to the ``FullTextField``, with a similar function.
+2.  Add  a ``cleanup``  parameter  to  the ``FullTextField``,  with  a
+similar function.
 
-The ``ADDITIONAL_CLEANUP_FUNCTION`` will be used only if the ``cleanup`` parameter was not specified, or set to None.
+The  ``ADDITIONAL_CLEANUP_FUNCTION``   will  be   used  only   if  the
+``cleanup`` parameter was not specified, or set to None.
 
 Additional text search configurations
 -------------------------------------
 
-If you want additional text search configurations to be created when SeSQL tables are created, you can add the SQL lines in a ADDITIONAL_TS_CONFIG variable in the config file. Refer to PosgreSQL documentation for more details.
+If you want  additional text search configurations to  be created when
+SeSQL  tables   are  created,  you  can   add  the  SQL  lines   in  a
+ADDITIONAL_TS_CONFIG variable  in the config file.  Refer to PosgreSQL
+documentation for more details.

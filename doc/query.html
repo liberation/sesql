@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
 <title>Writing SeSQL queries</title>
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 5196 2007-06-03 20:25:28Z wiemann $
+:Id: $Id: html4css1.css 6253 2010-03-02 00:24:53Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -157,11 +157,38 @@ h2.subtitle {
 hr.docutils {
   width: 75% }
 
-img.align-left {
-  clear: left }
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
 
-img.align-right {
-  clear: right }
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: left }
+
+/* div.align-center * { */
+/*   text-align: left } */
 
 ol.simple, ul.simple {
   margin-bottom: 1em }
@@ -216,8 +243,7 @@ p.topic-title {
 pre.address {
   margin-bottom: 0 ;
   margin-top: 0 ;
-  font-family: serif ;
-  font-size: 100% }
+  font: inherit }
 
 pre.literal-block, pre.doctest-block {
   margin-left: 2em ;
@@ -287,84 +313,141 @@ ul.auto-toc {
 <div class="document" id="writing-sesql-queries">
 <h1 class="title">Writing SeSQL queries</h1>
 
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="auto-toc simple">
+<li><a class="reference internal" href="#short-queries-and-full-queries" id="id1">1&nbsp;&nbsp;&nbsp;Short queries and full queries</a><ul class="auto-toc">
+<li><a class="reference internal" href="#short-queries" id="id2">1.1&nbsp;&nbsp;&nbsp;Short queries</a></li>
+<li><a class="reference internal" href="#full-queries" id="id3">1.2&nbsp;&nbsp;&nbsp;Full queries</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#general-rules" id="id4">2&nbsp;&nbsp;&nbsp;General rules</a></li>
+<li><a class="reference internal" href="#queries-by-type" id="id5">3&nbsp;&nbsp;&nbsp;Queries by type</a><ul class="auto-toc">
+<li><a class="reference internal" href="#intfield" id="id6">3.1&nbsp;&nbsp;&nbsp;IntField</a></li>
+<li><a class="reference internal" href="#strfield" id="id7">3.2&nbsp;&nbsp;&nbsp;StrField</a></li>
+<li><a class="reference internal" href="#classfield" id="id8">3.3&nbsp;&nbsp;&nbsp;ClassField</a></li>
+<li><a class="reference internal" href="#datefield" id="id9">3.4&nbsp;&nbsp;&nbsp;DateField</a></li>
+<li><a class="reference internal" href="#datetimefield" id="id10">3.5&nbsp;&nbsp;&nbsp;DateTimeField</a></li>
+<li><a class="reference internal" href="#intarrayfield" id="id11">3.6&nbsp;&nbsp;&nbsp;IntArrayField</a></li>
+<li><a class="reference internal" href="#fulltextfield" id="id12">3.7&nbsp;&nbsp;&nbsp;FullTextField</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sorting-with-sesql" id="id13">4&nbsp;&nbsp;&nbsp;Sorting with SeSQL</a><ul class="auto-toc">
+<li><a class="reference internal" href="#problematics" id="id14">4.1&nbsp;&nbsp;&nbsp;Problematics</a></li>
+<li><a class="reference internal" href="#general-syntax" id="id15">4.2&nbsp;&nbsp;&nbsp;General syntax</a></li>
+<li><a class="reference internal" href="#special-ordering" id="id16">4.3&nbsp;&nbsp;&nbsp;Special ordering</a></li>
+<li><a class="reference internal" href="#default-order" id="id17">4.4&nbsp;&nbsp;&nbsp;Default order</a></li>
+</ul>
+</li>
+</ul>
+</div>
 <div class="section" id="short-queries-and-full-queries">
-<h1>Short queries and full queries</h1>
-<p>FIXME</p>
+<h1><a class="toc-backref" href="#id1">1&nbsp;&nbsp;&nbsp;Short queries and full queries</a></h1>
+<p>SeSQL can be queried in two modes : <em>short queries</em> and <em>full queries</em>.</p>
+<div class="section" id="short-queries">
+<h2><a class="toc-backref" href="#id2">1.1&nbsp;&nbsp;&nbsp;Short queries</a></h2>
+<p>Short queries are designed to retrieve a small amount (like 50) recent
+(according to  any date field  indexed by SeSQL) content  matching the
+given criteria in an extra-fast manner.</p>
+<p>It's typical used for a portlet, infobox or similar widget.</p>
+<p>It has several limitations :</p>
+<ul class="simple">
+<li>it doesn't count the total amount of content matching the query ;</li>
+<li>it must be used on a query sorted by a date field ;</li>
+<li>several optimizations will be disabled if the content types spawn on
+more than one SeSQL table (see the typemap).</li>
+</ul>
+</div>
+<div class="section" id="full-queries">
+<h2><a class="toc-backref" href="#id3">1.2&nbsp;&nbsp;&nbsp;Full queries</a></h2>
+<p>Full  queries  (sometimes  called  <em>long   queries</em>  in  the  code  or
+documentation) are a  more common search.  They are a  bit slower than
+short queries, especially  if there is a lot of  content matching, but
+propose additional features :</p>
+<ul class="simple">
+<li>exact count of matching items ;</li>
+<li>stable pagination support  (even if content is  inserted or modified
+between the  query and  when the page  is displayed,  the pagination
+will remain stable) ;</li>
+<li>support of sorting  by relevance, if the query  includes a full-text
+search.</li>
+</ul>
+</div>
 </div>
 <div class="section" id="general-rules">
-<h1>General rules</h1>
-<p>Making queries with SeSQL is made by calling the <tt class="docutils literal"><span class="pre">shortquery</span></tt> or
-<tt class="docutils literal"><span class="pre">longquery</span></tt> function with a Django Q object.</p>
+<h1><a class="toc-backref" href="#id4">2&nbsp;&nbsp;&nbsp;General rules</a></h1>
+<p>Making queries  with SeSQL  is made by  calling the  <tt class="docutils literal">shortquery</tt> or
+<tt class="docutils literal">longquery</tt> function with a Django Q object.</p>
 <p>All the  general rules of  Q objects  still work :  using ~ to  make a
 negation, | to make OR queries, &amp; to make AND queries.</p>
 <p>The kind of supported queries depend of the index types.</p>
 </div>
 <div class="section" id="queries-by-type">
-<h1>Queries by type</h1>
+<h1><a class="toc-backref" href="#id5">3&nbsp;&nbsp;&nbsp;Queries by type</a></h1>
 <div class="section" id="intfield">
-<h2>IntField</h2>
+<h2><a class="toc-backref" href="#id6">3.1&nbsp;&nbsp;&nbsp;IntField</a></h2>
 <ul class="simple">
-<li>default is = (<tt class="docutils literal"><span class="pre">id</span> <span class="pre">=</span> <span class="pre">12</span></tt> for <tt class="docutils literal"><span class="pre">id</span> <span class="pre">==</span> <span class="pre">12</span></tt>);</li>
-<li><tt class="docutils literal"><span class="pre">__lt</span></tt>, <tt class="docutils literal"><span class="pre">__gt</span></tt>, <tt class="docutils literal"><span class="pre">__gte</span></tt>, <tt class="docutils literal"><span class="pre">__lte</span></tt> for &lt;, &gt;, &lt;=, &gt;=  (<tt class="docutils literal"><span class="pre">id__lt</span> <span class="pre">=</span> <span class="pre">12</span></tt> for <tt class="docutils literal"><span class="pre">id</span> <span class="pre">&lt;</span> <span class="pre">12</span></tt>) ;</li>
-<li><tt class="docutils literal"><span class="pre">__in</span></tt> to test if it's inside a list (<tt class="docutils literal"><span class="pre">id__in</span> <span class="pre">=</span> <span class="pre">(12,</span> <span class="pre">13)</span></tt>) ;</li>
-<li><tt class="docutils literal"><span class="pre">__range=(min,max)</span></tt> to test if it's inside the range (<tt class="docutils literal"><span class="pre">id__range</span> <span class="pre">=</span> <span class="pre">(12,</span> <span class="pre">42)</span></tt>)</li>
+<li>default is = (<tt class="docutils literal">id = 12</tt> for <tt class="docutils literal">id == 12</tt>);</li>
+<li><tt class="docutils literal">__lt</tt>, <tt class="docutils literal">__gt</tt>, <tt class="docutils literal">__gte</tt>, <tt class="docutils literal">__lte</tt> for &lt;, &gt;, &lt;=, &gt;=  (<tt class="docutils literal">id__lt = 12</tt> for <tt class="docutils literal">id &lt; 12</tt>) ;</li>
+<li><tt class="docutils literal">__in</tt> to test if it's inside a list (<tt class="docutils literal">id__in = (12, 13)</tt>) ;</li>
+<li><tt class="docutils literal"><span class="pre">__range=(min,max)</span></tt> to test if it's inside the range (<tt class="docutils literal">id__range = (12, 42)</tt>)</li>
 </ul>
 </div>
 <div class="section" id="strfield">
-<h2>StrField</h2>
+<h2><a class="toc-backref" href="#id7">3.2&nbsp;&nbsp;&nbsp;StrField</a></h2>
 <ul class="simple">
-<li>default is = (<tt class="docutils literal"><span class="pre">workflow</span> <span class="pre">=</span> <span class="pre">&quot;published&quot;</span></tt>);</li>
-<li><tt class="docutils literal"><span class="pre">__in</span></tt> to test if it's inside a list (<tt class="docutils literal"><span class="pre">workflow__in</span> <span class="pre">==</span> <span class="pre">(&quot;published&quot;,</span> <span class="pre">&quot;pending&quot;)</span></tt>) ;</li>
+<li>default is = (<tt class="docutils literal">workflow = &quot;published&quot;</tt>);</li>
+<li><tt class="docutils literal">__in</tt> to test if it's inside a list (<tt class="docutils literal">workflow__in == (&quot;published&quot;, &quot;pending&quot;)</tt>) ;</li>
 </ul>
 </div>
 <div class="section" id="classfield">
-<h2>ClassField</h2>
+<h2><a class="toc-backref" href="#id8">3.3&nbsp;&nbsp;&nbsp;ClassField</a></h2>
 <ul class="simple">
-<li>default is = (<tt class="docutils literal"><span class="pre">objclass</span> <span class="pre">=</span> <span class="pre">Article</span></tt>);</li>
-<li><tt class="docutils literal"><span class="pre">__in</span></tt> to test if it's inside a list (<tt class="docutils literal"><span class="pre">objclass__in</span> <span class="pre">==</span> <span class="pre">(Article,</span> <span class="pre">Photo)</span></tt>) ;</li>
+<li>default is = (<tt class="docutils literal">objclass = Article</tt>);</li>
+<li><tt class="docutils literal">__in</tt> to test if it's inside a list (<tt class="docutils literal">objclass__in == (Article, Photo)</tt>) ;</li>
 </ul>
 </div>
 <div class="section" id="datefield">
-<h2>DateField</h2>
+<h2><a class="toc-backref" href="#id9">3.4&nbsp;&nbsp;&nbsp;DateField</a></h2>
 <ul class="simple">
-<li>default is = (<tt class="docutils literal"><span class="pre">date</span> <span class="pre">=</span> <span class="pre">now()</span></tt> for today);</li>
-<li><tt class="docutils literal"><span class="pre">__lt</span></tt>, <tt class="docutils literal"><span class="pre">__gt</span></tt>, <tt class="docutils literal"><span class="pre">__gte</span></tt>, <tt class="docutils literal"><span class="pre">__lte</span></tt> for &lt;, &gt;, &lt;=, &gt;=  (<tt class="docutils literal"><span class="pre">id__lt</span> <span class="pre">=</span> <span class="pre">now()</span></tt> for before today) ;</li>
+<li>default is = (<tt class="docutils literal">date = now()</tt> for today);</li>
+<li><tt class="docutils literal">__lt</tt>, <tt class="docutils literal">__gt</tt>, <tt class="docutils literal">__gte</tt>, <tt class="docutils literal">__lte</tt> for &lt;, &gt;, &lt;=, &gt;=  (<tt class="docutils literal">id__lt = now()</tt> for before today) ;</li>
 <li><tt class="docutils literal"><span class="pre">__range=(min,max)</span></tt> to test if it's inside the range.</li>
 </ul>
 </div>
 <div class="section" id="datetimefield">
-<h2>DateTimeField</h2>
+<h2><a class="toc-backref" href="#id10">3.5&nbsp;&nbsp;&nbsp;DateTimeField</a></h2>
 <ul class="simple">
 <li>like DateField, only different for ordering.</li>
 </ul>
 </div>
 <div class="section" id="intarrayfield">
-<h2>IntArrayField</h2>
+<h2><a class="toc-backref" href="#id11">3.6&nbsp;&nbsp;&nbsp;IntArrayField</a></h2>
 <ul class="simple">
-<li>default is contains (<tt class="docutils literal"><span class="pre">authors</span> <span class="pre">=</span> <span class="pre">12</span></tt> for contains the author 12) ;</li>
-<li><tt class="docutils literal"><span class="pre">_all</span></tt> for contains all of a list (<tt class="docutils literal"><span class="pre">authors__all</span> <span class="pre">=</span> <span class="pre">(12,</span> <span class="pre">13)</span></tt> for contains both authors) ;</li>
-<li><tt class="docutils literal"><span class="pre">_any</span></tt> for contains any of a list (<tt class="docutils literal"><span class="pre">authors__any</span> <span class="pre">=</span> <span class="pre">(12,</span> <span class="pre">13)</span></tt> for contains at leats one of the two authors) ;</li>
+<li>default is contains (<tt class="docutils literal">authors = 12</tt> for contains the author 12) ;</li>
+<li><tt class="docutils literal">__all</tt> for contains all of a list (<tt class="docutils literal">authors__all = (12, 13)</tt> for contains both authors) ;</li>
+<li><tt class="docutils literal">__any</tt> for contains any of a list (<tt class="docutils literal">authors__any = (12, 13)</tt> for contains at leats one of the two authors) ;</li>
 </ul>
 </div>
 <div class="section" id="fulltextfield">
-<h2>FullTextField</h2>
+<h2><a class="toc-backref" href="#id12">3.7&nbsp;&nbsp;&nbsp;FullTextField</a></h2>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">__containswords</span></tt> to test for inclusing of all the given words (<tt class="docutils literal"><span class="pre">fulltext__containswords</span> <span class="pre">=</span> <span class="pre">&quot;presidential</span> <span class="pre">elections</span> <span class="pre">in</span> <span class="pre">france&quot;</span></tt>) ;</li>
-<li><tt class="docutils literal"><span class="pre">__containsexact</span></tt> to test for a specific sentence (<tt class="docutils literal"><span class="pre">fulltext_containsexact</span> <span class="pre">=</span> <span class="pre">&quot;france</span> <span class="pre">2&quot;</span></tt>) ;</li>
-<li><tt class="docutils literal"><span class="pre">__matches</span></tt> to test with a !PostgreSQL full-text query string (which can contain &amp; for and, | for or, ...) (<tt class="docutils literal"><span class="pre">fulltext_matches</span> <span class="pre">=</span> <span class="pre">&quot;presidential</span> <span class="pre">|</span> <span class="pre">legislative</span> <span class="pre">&amp;</span> <span class="pre">elections&quot;</span></tt>) ;</li>
-<li><tt class="docutils literal"><span class="pre">__like</span></tt> to match with a SQL like (<tt class="docutils literal"><span class="pre">fulltext_like</span> <span class="pre">=</span> <span class="pre">&quot;fra%&quot;</span></tt>).</li>
+<li><tt class="docutils literal">__containswords</tt> to test for inclusing of all the given words (<tt class="docutils literal">fulltext__containswords = &quot;presidential elections in france&quot;</tt>) ;</li>
+<li><tt class="docutils literal">__containsexact</tt> to test for a specific sentence (<tt class="docutils literal">fulltext_containsexact = &quot;france 2&quot;</tt>) ;</li>
+<li><tt class="docutils literal">__matches</tt> to test with a !PostgreSQL full-text query string (which can contain &amp; for and, | for or, ...) (<tt class="docutils literal">fulltext_matches = &quot;presidential | legislative &amp; elections&quot;</tt>) ;</li>
+<li><tt class="docutils literal">__like</tt> to match with a SQL like (<tt class="docutils literal">fulltext_like = &quot;fra%&quot;</tt>).</li>
 </ul>
 </div>
 </div>
 <div class="section" id="sorting-with-sesql">
-<h1>Sorting with SeSQL</h1>
+<h1><a class="toc-backref" href="#id13">4&nbsp;&nbsp;&nbsp;Sorting with SeSQL</a></h1>
 <div class="section" id="problematics">
-<h2>Problematics</h2>
+<h2><a class="toc-backref" href="#id14">4.1&nbsp;&nbsp;&nbsp;Problematics</a></h2>
 <p>SeSQL needs the sort order to perform various optimization. It must be
 known early in the process of deciding which heuristics to use.</p>
 </div>
 <div class="section" id="general-syntax">
-<h2>General syntax</h2>
+<h2><a class="toc-backref" href="#id15">4.2&nbsp;&nbsp;&nbsp;General syntax</a></h2>
 <p>The sort order  must be given as a  second, optional, 'order' argument
 of the methods. For example</p>
 <pre class="literal-block">
@@ -372,28 +455,28 @@ shortquery(Q(classname__in = ('Article', 'PaperPage')) &amp;
            Q(fulltext__containswords = 'python postgresql'),
            order = ( '-publication_date', 'page' ))
 </pre>
-<p>The <tt class="docutils literal"><span class="pre">order</span></tt> argument must be a list of field names, on which sorting
+<p>The <tt class="docutils literal">order</tt> argument must be a list of field names, on which sorting
 makes sense  (you can't sort of  full text indexes for  example). If a
 field  is prefixed  by &quot;-&quot;  it'll use  a descending  order  (defaut is
 ascending order).</p>
 </div>
 <div class="section" id="special-ordering">
-<h2>Special ordering</h2>
-<p>SeSQL support special ordering modes, prefixed by <tt class="docutils literal"><span class="pre">sesql_</span></tt>. Only one
-is implemented in the first version :</p>
+<h2><a class="toc-backref" href="#id16">4.3&nbsp;&nbsp;&nbsp;Special ordering</a></h2>
+<p>SeSQL support special ordering modes, prefixed by <tt class="docutils literal">sesql_</tt>. Only one
+is implemented in this version :</p>
 <dl class="docutils">
 <dt>sesql_relevance</dt>
-<dd>will sort by relevance of the full text query on the primary full
-text index. Will only work if the query includes a filter on the
+<dd>will sort  by relevance of the  full text query on  the primary full
+text index.  Will only work  if the query  includes a filter  on the
 primary full text index. Will disable most heuristics, so be careful
 to not overuse it.</dd>
 </dl>
 </div>
 <div class="section" id="default-order">
-<h2>Default order</h2>
+<h2><a class="toc-backref" href="#id17">4.4&nbsp;&nbsp;&nbsp;Default order</a></h2>
 <blockquote>
-The default search order is taken from the <tt class="docutils literal"><span class="pre">DEFAULT_ORDER</span></tt> varibale
-in <tt class="docutils literal"><span class="pre">config.py</span></tt>.</blockquote>
+The default search order is taken from the <tt class="docutils literal">DEFAULT_ORDER</tt> varibale
+in <tt class="docutils literal">config.py</tt>.</blockquote>
 </div>
 </div>
 </div>

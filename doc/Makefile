@@ -18,7 +18,8 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 
-SOURCES = install.txt datamodel.txt query.txt admin.txt bench.txt
+SOURCES = tutorial.txt install.txt datamodel.txt query.txt admin.txt\
+	  extra.txt
 
 PDF = $(SOURCES:.txt=.pdf)
 HTML = $(SOURCES:.txt=.html)
@@ -46,7 +47,7 @@ fclean: clean
 .SUFFIXES: .tex .txt .pdf .html
 
 %.tex: %.txt
-	$(RST2LATEX) $< > $@
+	$(RST2LATEX) --section-numbering --use-latex-toc --generator $< > $@
 
 %.pdf: %.tex
 	$(LATEX) $<

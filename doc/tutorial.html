@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<title>How to install and configure SeSQL ?</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 6253 2010-03-02 00:24:53Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: left }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="how-to-install-and-configure-sesql">
+<h1 class="title">How to install and configure SeSQL ?</h1>
+
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="auto-toc simple">
+<li><a class="reference internal" href="#introduction" id="id1">1&nbsp;&nbsp;&nbsp;Introduction</a></li>
+<li><a class="reference internal" href="#first-step-install-prerequisite" id="id2">2&nbsp;&nbsp;&nbsp;First step : install prerequisite</a></li>
+<li><a class="reference internal" href="#second-step-install-sesql" id="id3">3&nbsp;&nbsp;&nbsp;Second step : install SeSQL</a></li>
+<li><a class="reference internal" href="#third-step-configure-sesql" id="id4">4&nbsp;&nbsp;&nbsp;Third step : configure SeSQL</a><ul class="auto-toc">
+<li><a class="reference internal" href="#create-a-configuration-file" id="id5">4.1&nbsp;&nbsp;&nbsp;Create a configuration file</a></li>
+<li><a class="reference internal" href="#adjust-the-text-search-configuration" id="id6">4.2&nbsp;&nbsp;&nbsp;Adjust the text search configuration</a></li>
+<li><a class="reference internal" href="#provide-a-stopwords-file" id="id7">4.3&nbsp;&nbsp;&nbsp;Provide a stopwords file</a></li>
+<li><a class="reference internal" href="#create-the-type-map" id="id8">4.4&nbsp;&nbsp;&nbsp;Create the type map</a></li>
+<li><a class="reference internal" href="#define-your-fields" id="id9">4.5&nbsp;&nbsp;&nbsp;Define your fields</a></li>
+<li><a class="reference internal" href="#fine-tune-configuration" id="id10">4.6&nbsp;&nbsp;&nbsp;Fine-tune configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#forth-step-reindex-your-content" id="id11">5&nbsp;&nbsp;&nbsp;Forth step : reindex your content</a></li>
+<li><a class="reference internal" href="#fifth-step-test-queries" id="id12">6&nbsp;&nbsp;&nbsp;Fifth step : test queries</a></li>
+<li><a class="reference internal" href="#sixth-step-integrate-sesql-with-your-code" id="id13">7&nbsp;&nbsp;&nbsp;Sixth step : integrate SeSQL with your code</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h1><a class="toc-backref" href="#id1">1&nbsp;&nbsp;&nbsp;Introduction</a></h1>
+<p>This small tutorial  should guide you to install SeSQL  on an existing
+Django project.</p>
+</div>
+<div class="section" id="first-step-install-prerequisite">
+<h1><a class="toc-backref" href="#id2">2&nbsp;&nbsp;&nbsp;First step : install prerequisite</a></h1>
+<p>If you  have a running  Django instance, you  should have most  of the
+prerequisite for SeSQL. You only have to do two things :</p>
+<p>1.   Ensure   that  you're   using  PostgreSQL   8.3  or   above  (8.4
+preferred). If  you are using  another RDMS,  SeSQL will not  work. It
+should be  possible to  use PostgreSQL for  SeSQL tables,  and another
+engine for the rest of data, but it is not supported by this tutorial.</p>
+<p>2.  Install  GenericCache   from  pypi  or  from   Debian  packages  :
+<a class="reference external" href="http://pypi.python.org/pypi/GenericCache/1.0.2">http://pypi.python.org/pypi/GenericCache/1.0.2</a> .</p>
+</div>
+<div class="section" id="second-step-install-sesql">
+<h1><a class="toc-backref" href="#id3">3&nbsp;&nbsp;&nbsp;Second step : install SeSQL</a></h1>
+<p>Installing SeSQL  is simple : it's  just a Django application.  Add it
+alongside with your others Django applications, and then add it to the
+<tt class="docutils literal">INSTALLED_APPS</tt> list in your <tt class="docutils literal">settings.py</tt> file.</p>
+</div>
+<div class="section" id="third-step-configure-sesql">
+<h1><a class="toc-backref" href="#id4">4&nbsp;&nbsp;&nbsp;Third step : configure SeSQL</a></h1>
+<p>This is the only slightly tricky part.</p>
+<div class="section" id="create-a-configuration-file">
+<h2><a class="toc-backref" href="#id5">4.1&nbsp;&nbsp;&nbsp;Create a configuration file</a></h2>
+<p>SeSQL will import its  configuration file with <tt class="docutils literal">import sesql_config</tt>
+statements. So it  should be somewhere in  your <tt class="docutils literal">PYTHONPATH</tt>, called
+<tt class="docutils literal">sesql_config.py</tt>. The best  place to put is  usually alongside with
+the <tt class="docutils literal">settings.py</tt> file.</p>
+<p>To create it, the best is to copy the <tt class="docutils literal">config.py.sample</tt> file (which
+is  provided  with  SeSQL)   as  <tt class="docutils literal">sesql_config.py</tt>  on  your  chosen
+location.</p>
+</div>
+<div class="section" id="adjust-the-text-search-configuration">
+<h2><a class="toc-backref" href="#id6">4.2&nbsp;&nbsp;&nbsp;Adjust the text search configuration</a></h2>
+<p>The sample configuration file is tuned for the french language. If you
+want to use another  language, replace french inside <tt class="docutils literal">simple_french</tt>
+and <tt class="docutils literal">ascii_french</tt> for  <tt class="docutils literal">TS_CONFIG_NAME</tt> and <tt class="docutils literal">STOPWORDS_FILE</tt> by
+the name of the language you want to use.</p>
+</div>
+<div class="section" id="provide-a-stopwords-file">
+<h2><a class="toc-backref" href="#id7">4.3&nbsp;&nbsp;&nbsp;Provide a stopwords file</a></h2>
+<p>PostgreSQL (and therefore SeSQL) requires a stopwords file. Stop words
+are words like &quot;the&quot;, &quot;a&quot;, &quot;of&quot;, ... in english, that should be ignore
+in searches because they are too frequent to have any value.</p>
+<p>You've two ways to generate this stopwords file :</p>
+<ol class="arabic simple">
+<li>Your language is among those  handled by PostgreSQL. Then, you have
+a file called <tt class="docutils literal"><span class="pre">&lt;language&gt;.stop</span></tt>  in your PostgreSQL installation;
+for     example     on     Debian    it     would     be     inside
+<tt class="docutils literal">/usr/share/postgresql/8.4/tsearch_data/</tt>. In that case, you just
+need to  create a plain ASCII  version of the file,  with a command
+line:</li>
+</ol>
+<blockquote>
+<pre class="literal-block">
+LC_ALL=fr_FR.UTF-8 iconv -f utf-8 -t ascii//TRANSLIT \
+/usr/share/postgresql/8.4/tsearch_data/french.stop &gt; \
+/usr/share/postgresql/8.4/tsearch_data/ascii_french.stop
+</pre>
+</blockquote>
+<ol class="arabic simple" start="2">
+<li>Your language  isn't supported by PostgreSQL. In  that case, you'll
+need to  write the stopwords file  yourself, just put one  word per
+line, in pure ascii.</li>
+</ol>
+</div>
+<div class="section" id="create-the-type-map">
+<h2><a class="toc-backref" href="#id8">4.4&nbsp;&nbsp;&nbsp;Create the type map</a></h2>
+<p>The type map has two purposes : select which models to index and which
+to ignore,  and to group  models that are  often searched at  the same
+time for better performances.</p>
+<p>If you're not  sure about it, you  can just index all  models into one
+big table. That should work very well unless you have several millions
+of rows in your  database. If you have such a  high volume, you should
+consider having a finer type map.</p>
+<p>The simplest type map possible would look like:</p>
+<pre class="literal-block">
+from django.db import models
+TYPE_MAP = ((models.Model, &quot;sesql_default&quot;),)
+</pre>
+</div>
+<div class="section" id="define-your-fields">
+<h2><a class="toc-backref" href="#id9">4.5&nbsp;&nbsp;&nbsp;Define your fields</a></h2>
+<p>Then you  need to define  your fields (that  is, the indexes  on which
+you'll  query and/or  sort SeSQL).  This is  done with  the <tt class="docutils literal">FIELDS</tt>
+variable.</p>
+<p>The  first   two  items   of  the   sample  configuration   file,  the
+<tt class="docutils literal">classname</tt> and <tt class="docutils literal">id</tt> ones, are required and should be kept as they
+are.</p>
+<p>For the rest, adjust the fields on  the example to match what you want
+to index. Refer to the datamodel documentation for details.</p>
+</div>
+<div class="section" id="fine-tune-configuration">
+<h2><a class="toc-backref" href="#id10">4.6&nbsp;&nbsp;&nbsp;Fine-tune configuration</a></h2>
+<p>Now, you can adjust other  parameters of the configuration file. Refer
+to the install  documentation for more details on  various options you
+can tweak.</p>
+</div>
+</div>
+<div class="section" id="forth-step-reindex-your-content">
+<h1><a class="toc-backref" href="#id11">5&nbsp;&nbsp;&nbsp;Forth step : reindex your content</a></h1>
+<p>Once everything is  ready, it is very  simple, and can be  done in two
+commands :</p>
+<ol class="arabic simple">
+<li><tt class="docutils literal">./manage.py syncdb</tt> to create all SeSQL tables ;</li>
+</ol>
+<p>2. <tt class="docutils literal">./manage.py sesqlreindex</tt> to reindex  the content. That step can
+take  a  long time  if  you  have lots  of  content,  but if  it  gets
+interrupted, it'll restart where it was.</p>
+</div>
+<div class="section" id="fifth-step-test-queries">
+<h1><a class="toc-backref" href="#id12">6&nbsp;&nbsp;&nbsp;Fifth step : test queries</a></h1>
+<p>Use <tt class="docutils literal">./manage.py shortquery</tt> and/or <tt class="docutils literal">./manage.py longquery</tt> to
+perform queries, like :</p>
+<pre class="literal-block">
+./manage.py shortquery 'Q(my_index__containswords=&quot;a small sentence&quot;)'
+</pre>
+</div>
+<div class="section" id="sixth-step-integrate-sesql-with-your-code">
+<h1><a class="toc-backref" href="#id13">7&nbsp;&nbsp;&nbsp;Sixth step : integrate SeSQL with your code</a></h1>
+<p>Now,  you  can  integrate  SeSQL in  your  code,  calling  shortquery,
+longquery or  any other  feature of  SeSQL. Refer to  the rest  of the
+documentation for additional information.</p>
+</div>
+</div>
+</body>
+</html>

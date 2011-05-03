@@ -1,43 +1,61 @@
 SeSQL installation guide
 ========================
 
+.. contents:: :depth: 2
+.. sectnum:: :depth: 2
+
 Prerequisite
 ------------
 
-- Python 2.5
+- Python 2.5 or 2.6
 
-- Django 1.2
+- Django 1.2 or 1.3
 
 - PostgreSQL 8.4
 
 - GenericCache from http://pypi.python.org/pypi/GenericCache/1.0.2
 
-FIXME
+SeSQL may  work with  later versions  of those  software, but  was not
+tested with them.
 
 Installation
 ------------
 
 SeSQL is a standard Django application.  Just drop it in the ``apps/``
-directory, and add it into ``settings.py`` .
+directory, and add it to enabled applications into ``settings.py`` .
 
 Configuration
 -------------
 
-Before using SeSQL you **must** configure it. The configuration file
-must be named ``sesql_config.py`` in the python path (usually the project).
+Before using SeSQL  you **must** configure it.  The configuration file
+must  be named  ``sesql_config.py`` in  the python  path (usually  the
+project).
 
-The details of the configuration are in the FIXME file.
+For a summary  of how to quickly configure SeSQL,  please refer to the
+tutorial.  This document  contain a  detailed list  of all  recognized
+options.
 
-The options that are required to get SeSQL working are the following :
+Text search configuration
+.........................
+
+PostgreSQL's full text search is based  on the concept of *text search
+configuration*  (TSC).   Those  configuration   are  detailed  on  the
+PostgreSQL manual, and  allow to control things  like stopwords. SeSQL
+requires a default TSC, and can  support additional TSCs to be used on
+specific indexes.
+
+SeSQL  recognizes  the  following   options  related  to  text  search
+configuration :
 
 TS_CONFIG_NAME
-  Name of the *text search configuration* to create and use in the
-  PostgreSQL database.
+  Name of  the primary  *text search configuration*  to create  in the
+  PostgreSQL database and use in full text fields where a specific TSC
+  is not specified.
 
 STOPWORDS_FILE
-  Name of the stopwords file. This file **must** be where PostgreSQL
-  will look for (``/usr/share/postgresql/8.4/tsearch_data/``) and
-  **must** only contain plain ascii characters. An example command to
+  Name of the  stopwords file. This file **must**  be where PostgreSQL
+  will  look   for  (``/usr/share/postgresql/8.4/tsearch_data/``)  and
+  **must** only contain plain ascii  characters. An example command to
   generate the file for the french language is :
 
 ::
@@ -46,43 +64,122 @@ STOPWORDS_FILE
    /usr/share/postgresql/8.4/tsearch_data/french.stop > \
    /usr/share/postgresql/8.4/tsearch_data/ascii_french.stop
 
+ADDITIONAL_TS_CONFIG
+
+  This should be  a list of SQL statements, to  define extra TSCs that
+  can be used in specific fields.
+
+Clean-up/filters
+................
+
 CHARSET
-  Name of the charset to use. Note that SeSQL was only tested in utf-8.
+  Name  of the  charset to  use. Note  that SeSQL  was only  tested in
+  utf-8. SeSQL will store all data in plain ASCII, the charset will be
+  used for preprocessing, cleanup and conversion.
 
-FIELDS
-  A list or tuple of fields (see ``datamodel.txt``), including at
-  least ``classname`` and ``id``.
-
-MASTER_TABLE_NAME
-  The name of the master table, from which all others will
-  inherit. This table should not contain any data, but a query done to
-  it will query all SeSQL tables.
-
-TYPE_MAP
-  This list of ``(class, table)`` couples describes the mapping of
-  Django classes to SeSQL tables. Django classes not present in the
-  list will not be indexed by SeSQL. Subclasses will, by default, be
-  sent to the same table of the superclass.
-
-CROSS_INDEXES
-  This list contains all additional indexes to create in the
-  database. Each index is just a list of column. Indexes that are
-  worth creating depend of the kind of queries you do frequently.
-
+ADDITIONAL_CLEANUP_FUNCTION
+  This function (usually a lambda, but not necessarily) will be called
+  to process text  both at indexation and search time.  It can be used
+  for example to  remove html tags or convert entities  back to normal
+  letters.
+  
 SKIP_CONDITION
   A function (or lambda) that is called on every object, is not
   ``None``. If it returns a true value, the object will not be
   indexed. Useful, for example, to filter on workflow state.
 
+Indexes and fields
+..................
+
+FIELDS
+  A  list or  tuple of  fields (see  ``datamodel.txt``), including  at
+  least ``classname`` and ``id``.
+
+CROSS_INDEXES
+  This  list  contains  all  additional   indexes  to  create  in  the
+  database. Each  index is  just a  list of  column. Indexes  that are
+  worth creating depend of the kind of queries you do frequently.
+
+Types and tables
+................
+
+MASTER_TABLE_NAME
+  The  name  of   the  master  table,  from  which   all  others  will
+  inherit. This table should not contain any data, but a query done to
+  it will query all SeSQL tables.
+
+TYPE_MAP
+  This list  of ``(class,  table)`` couples  describes the  mapping of
+  Django classes  to SeSQL tables.  Django classes not present  in the
+  list will not  be indexed by SeSQL. Subclasses will,  by default, be
+  sent to the same table of the superclass.
+
+Query parameters
+................
+
 DEFAULT_ORDER
-  Default sort order for queries, when sort order is not specified.
+  Default   sort  order   for  queries,   when  sort   order  is   not
+  specified. Should be  a tuple of index names, with  an optional - to
+  indicate reverse order.
+
+DEFAULT_LIMIT
+  The default number of items returned by a short query.
+
+SMART_QUERY_INITIAL, SMART_QUERY_THRESOLD, SMART_QUERY_RATIO
+  Control of the smart query heuristic.
 
 QUERY_CACHE_MAX_SIZE
-  Maximal number of long query to store in the query cache. Older queries
-  will be discarded first.
+  Maximal number  of long  query to  store in  the query  cache. Older
+  queries  will be  discarded  first.   The cache  is  used to  ensure
+  stability of paginated results, and avoid redoing the search on very
+  page.
 
 QUERY_CACHE_EXPIRY
   Maximal time to store long queries in the cache.
+
+Reindexing daemon
+.................
+DAEMON_DEFAULT_CHUNK
+  Number of elements to proceed on each iteration of the reindex daemon.
+
+DAEMON_DEFAULT_DELAY
+  Delay, in seconds, between two chunks.
+
+DAEMON_DEFAULT_PID
+  Pid file to use for the  reindex daemon. The user running the daemon
+  must have write permission to it, and the directory must exists.
+
+Search history and statistics
+.............................
+
+HISTORY_DEFAULT_FILTER
+  Queries giving less  than this amount of results will  be ignored in
+  history.
+  
+HISTORY_ALPHA = 0.95
+  Erode  factor for  time-based decay  of recent  searches score.  The
+  closer to 0,  the faster old searches will see  their score go down,
+  the closer to 1 the longer they'll remain with high scores.
+
+HISTORY_BETA
+  Weight of  the frequency at  which the  search was performed  in the
+  final score. This is on an  arbitrary scale, and is only meaningfull
+  compared to the HISTORY_GAMMA parameter.
+
+HISTORY_GAMMA
+  Weight of the number of results given by the query in the final score.
+
+HISTORY_BLACKLIST
+  A list of queries that will be ignore by the history feature.
+
+Additional features
+...................
+
+ENABLE_SESQL_ADMIN
+  If set to  yes, you'll be able to use  ``sesql:<fieldname>`` in your
+  admin  options classes  to  search on  SeSQL  indexes from  Django's
+  admin. Please note  that this feature reallies on  a monkey-patch of
+  core Django code, and is therefore disabled by default.
 
 
 Constraints
@@ -93,7 +190,9 @@ Current version of SeSQL has a few constraints :
 - it  requires to  have a  ``ClassField`` called  ``classname``  and a
   ``IntField`` called ``id``, referring to the object class and id ;
 
-- FIXME .
+- since all  data is  converted to plain  ASCII internally,  it'll not
+  work   out-of-the-box   with    languages   written   in   non-latin
+  script. Patches are welcomed to handle that.
 
 Upgrading
 ---------
@@ -105,3 +204,4 @@ heavily for example) you can do :
 
   ./manage.py createsesqltables | ./manage.py dbshell
   ./manage.py sesqlreindex 
+

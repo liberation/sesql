@@ -1,6 +1,9 @@
 SeSQL administration guide
 ==========================
 
+.. contents:: :depth: 2
+.. sectnum:: :depth: 2
+
 Django administration commands
 ------------------------------
 
@@ -57,7 +60,7 @@ Perform  a short  query. The  first parameter  is a  Python expression
 describing  a  Q object,  the  second,  optional  parameter, a  Python
 expression specifying the sort order to use.
 
-Warning  :  this  command   uses  ``eval()``  to  process  the  Python
+**Warning**  : this  command  uses ``eval()``  to  process the  Python
 expressions,  it is  therefore unsafe,  and  should only  be used  for
 testing purpose. Never expose this command to untrusted input.
 
@@ -70,5 +73,18 @@ Like the previous command, but performing a long query.
 SQL level administration
 ------------------------
 
-FIXME
+SeSQL contains three kinds of tables :
+
+- The *master table* : this  table doesn't contain any actual content,
+  but can be requested (with  regular ``SELECT``) to query all indexed
+  content. 
+
+- The *data  tables* : those tables  are defined in the  type map, and
+  contain  the  actual content;  they  all  inherit from  the  *master
+  table*.  Data  can be  inserted,  modified  and deleted  from  those
+  tables.
+
+- The  *utility tables*  :  they  are used  for  features like  search
+  history  or  dependency tracking.  Refer  to  each features  for  on
+  overview of its tables.
 

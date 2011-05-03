@@ -1,15 +1,54 @@
 Writing SeSQL queries
 =====================
 
+.. contents:: :depth: 2
+.. sectnum:: :depth: 2
+
 Short queries and full queries
 ------------------------------
 
-FIXME
+SeSQL can be queried in two modes : *short queries* and *full queries*.
+
+Short queries
+.............
+
+Short queries are designed to retrieve a small amount (like 50) recent
+(according to  any date field  indexed by SeSQL) content  matching the
+given criteria in an extra-fast manner.
+
+It's typical used for a portlet, infobox or similar widget.
+
+It has several limitations :
+
+- it doesn't count the total amount of content matching the query ;
+
+- it must be used on a query sorted by a date field ;
+
+- several optimizations will be disabled if the content types spawn on
+  more than one SeSQL table (see the typemap).
+
+Full queries
+............
+
+Full  queries  (sometimes  called  *long   queries*  in  the  code  or
+documentation) are a  more common search.  They are a  bit slower than
+short queries, especially  if there is a lot of  content matching, but
+propose additional features :
+
+- exact count of matching items ;
+
+- stable pagination support  (even if content is  inserted or modified
+  between the  query and  when the page  is displayed,  the pagination
+  will remain stable) ;
+
+- support of sorting  by relevance, if the query  includes a full-text
+  search.
+
 
 General rules
 -------------
 
-Making queries with SeSQL is made by calling the ``shortquery`` or
+Making queries  with SeSQL  is made by  calling the  ``shortquery`` or
 ``longquery`` function with a Django Q object.
 
 All the  general rules of  Q objects  still work :  using ~ to  make a
@@ -112,11 +151,11 @@ Special ordering
 ................
 
 SeSQL support special ordering modes, prefixed by ``sesql_``. Only one
-is implemented in the first version :
+is implemented in this version :
 
 sesql_relevance
-  will sort by relevance of the full text query on the primary full
-  text index. Will only work if the query includes a filter on the
+  will sort  by relevance of the  full text query on  the primary full
+  text index.  Will only work  if the query  includes a filter  on the
   primary full text index. Will disable most heuristics, so be careful
   to not overuse it.
 
@@ -126,20 +165,3 @@ Default order
  The default search order is taken from the ``DEFAULT_ORDER`` varibale
  in ``config.py``.
 
-
-Text highlighting
------------------
-
-SeSQL supports basic text highlighting. There is a highlighting function, which takes two parameters : a text and a list of words. It'll return a list of matching positions, as a triplet (begin, end, word number).
-
-For example 
-
-::
-
-  >>> from sesql.highlight import highlight
-  >>> highlight('sesql : full text search, with text highlight', [ 'sesql', 'text' ])
-   [(0, 5, 0), (13, 17, 1), (31, 35, 1)]
-
-The text given to the highlight module must have been preprocessed first with the cleanup function.
-
-If you're using different cleanup or dictionaries for different indexes, you can specify which index configuration to use with the ``index`` parameter of the highlight function.

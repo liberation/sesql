@@ -41,8 +41,8 @@ from libe import models, constants
 #
 
 # Configuration of SeSQL search fields
-FIELDS = (IntField("id"),
-          StrField("classname", size = 50),
+FIELDS = (ClassField("classname"),
+          IntField("id"),
           DateField("modifiedAt"),
           FullTextField("title"),
           FullTextField("description", "getDescription()"),
@@ -127,12 +127,17 @@ DAEMON_DEFAULT_PID='/var/run/sesql/update.pid'
 # Suggest/history configuration
 #
 
-HISTORY_DEFAULT_FILTER = 5 # default number of hit before including query in db
+# default number of hit before including query in db
+HISTORY_DEFAULT_FILTER = 5 
 
-HISTORY_ALPHA = 0.95 #erode factor
-HISTORY_BETA = 1.0 #used to compute weight
-HISTORY_GAMMA = 1.0 #user to compute weight
+# erode factor for time-based decay of recent searches score
+HISTORY_ALPHA = 0.95
+# weight of frequency of the search in the final score
+HISTORY_BETA = 1.0
+# weight of number of results in the final score
+HISTORY_GAMMA = 1.0 
 
+# queries to ignore in histroy
 HISTORY_BLACKLIST = []
 
 

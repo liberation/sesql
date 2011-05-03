@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
 <title>SeSQL installation guide</title>
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 5196 2007-06-03 20:25:28Z wiemann $
+:Id: $Id: html4css1.css 6253 2010-03-02 00:24:53Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -157,11 +157,38 @@ h2.subtitle {
 hr.docutils {
   width: 75% }
 
-img.align-left {
-  clear: left }
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
 
-img.align-right {
-  clear: right }
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: left }
+
+/* div.align-center * { */
+/*   text-align: left } */
 
 ol.simple, ul.simple {
   margin-bottom: 1em }
@@ -216,8 +243,7 @@ p.topic-title {
 pre.address {
   margin-bottom: 0 ;
   margin-top: 0 ;
-  font-family: serif ;
-  font-size: 100% }
+  font: inherit }
 
 pre.literal-block, pre.doctest-block {
   margin-left: 2em ;
@@ -287,33 +313,68 @@ ul.auto-toc {
 <div class="document" id="sesql-installation-guide">
 <h1 class="title">SeSQL installation guide</h1>
 
-<div class="section" id="prerequisite">
-<h1>Prerequisite</h1>
-<ul class="simple">
-<li>Django 1.1</li>
-<li>PostgreSQL 8.4</li>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="auto-toc simple">
+<li><a class="reference internal" href="#prerequisite" id="id1">1&nbsp;&nbsp;&nbsp;Prerequisite</a></li>
+<li><a class="reference internal" href="#installation" id="id2">2&nbsp;&nbsp;&nbsp;Installation</a></li>
+<li><a class="reference internal" href="#configuration" id="id3">3&nbsp;&nbsp;&nbsp;Configuration</a><ul class="auto-toc">
+<li><a class="reference internal" href="#text-search-configuration" id="id4">3.1&nbsp;&nbsp;&nbsp;Text search configuration</a></li>
+<li><a class="reference internal" href="#clean-up-filters" id="id5">3.2&nbsp;&nbsp;&nbsp;Clean-up/filters</a></li>
+<li><a class="reference internal" href="#indexes-and-fields" id="id6">3.3&nbsp;&nbsp;&nbsp;Indexes and fields</a></li>
+<li><a class="reference internal" href="#types-and-tables" id="id7">3.4&nbsp;&nbsp;&nbsp;Types and tables</a></li>
+<li><a class="reference internal" href="#query-parameters" id="id8">3.5&nbsp;&nbsp;&nbsp;Query parameters</a></li>
+<li><a class="reference internal" href="#reindexing-daemon" id="id9">3.6&nbsp;&nbsp;&nbsp;Reindexing daemon</a></li>
+<li><a class="reference internal" href="#search-history-and-statistics" id="id10">3.7&nbsp;&nbsp;&nbsp;Search history and statistics</a></li>
+<li><a class="reference internal" href="#additional-features" id="id11">3.8&nbsp;&nbsp;&nbsp;Additional features</a></li>
 </ul>
-<p>FIXME</p>
+</li>
+<li><a class="reference internal" href="#constraints" id="id12">4&nbsp;&nbsp;&nbsp;Constraints</a></li>
+<li><a class="reference internal" href="#upgrading" id="id13">5&nbsp;&nbsp;&nbsp;Upgrading</a></li>
+</ul>
+</div>
+<div class="section" id="prerequisite">
+<h1><a class="toc-backref" href="#id1">1&nbsp;&nbsp;&nbsp;Prerequisite</a></h1>
+<ul class="simple">
+<li>Python 2.5 or 2.6</li>
+<li>Django 1.2 or 1.3</li>
+<li>PostgreSQL 8.4</li>
+<li>GenericCache from <a class="reference external" href="http://pypi.python.org/pypi/GenericCache/1.0.2">http://pypi.python.org/pypi/GenericCache/1.0.2</a></li>
+</ul>
+<p>SeSQL may  work with  later versions  of those  software, but  was not
+tested with them.</p>
 </div>
 <div class="section" id="installation">
-<h1>Installation</h1>
-<p>SeSQL is a standard Django application.  Just drop it in the <tt class="docutils literal"><span class="pre">apps/</span></tt>
-directory, and add it into <tt class="docutils literal"><span class="pre">settings.py</span></tt> .</p>
+<h1><a class="toc-backref" href="#id2">2&nbsp;&nbsp;&nbsp;Installation</a></h1>
+<p>SeSQL is a standard Django application.  Just drop it in the <tt class="docutils literal">apps/</tt>
+directory, and add it to enabled applications into <tt class="docutils literal">settings.py</tt> .</p>
 </div>
 <div class="section" id="configuration">
-<h1>Configuration</h1>
-<p>Before using SeSQL you <strong>must</strong> configure it. The configuration file
-is named <tt class="docutils literal"><span class="pre">config.py</span></tt>.</p>
-<p>The details of the configuration are in the FIXME file.</p>
-<p>The options that are required to get SeSQL working are the following :</p>
+<h1><a class="toc-backref" href="#id3">3&nbsp;&nbsp;&nbsp;Configuration</a></h1>
+<p>Before using SeSQL  you <strong>must</strong> configure it.  The configuration file
+must  be named  <tt class="docutils literal">sesql_config.py</tt> in  the python  path (usually  the
+project).</p>
+<p>For a summary  of how to quickly configure SeSQL,  please refer to the
+tutorial.  This document  contain a  detailed list  of all  recognized
+options.</p>
+<div class="section" id="text-search-configuration">
+<h2><a class="toc-backref" href="#id4">3.1&nbsp;&nbsp;&nbsp;Text search configuration</a></h2>
+<p>PostgreSQL's full text search is based  on the concept of <em>text search
+configuration</em>  (TSC).   Those  configuration   are  detailed  on  the
+PostgreSQL manual, and  allow to control things  like stopwords. SeSQL
+requires a default TSC, and can  support additional TSCs to be used on
+specific indexes.</p>
+<p>SeSQL  recognizes  the  following   options  related  to  text  search
+configuration :</p>
 <dl class="docutils">
 <dt>TS_CONFIG_NAME</dt>
-<dd>Name of the <em>text search configuration</em> to create and use in the
-PostgreSQL database.</dd>
+<dd>Name of  the primary  <em>text search configuration</em>  to create  in the
+PostgreSQL database and use in full text fields where a specific TSC
+is not specified.</dd>
 <dt>STOPWORDS_FILE</dt>
-<dd>Name of the stopwords file. This file <strong>must</strong> be where PostgreSQL
-will look for (<tt class="docutils literal"><span class="pre">/usr/share/postgresql/8.4/tsearch_data/</span></tt>) and
-<strong>must</strong> only contain plain ascii characters. An example command to
+<dd>Name of the  stopwords file. This file <strong>must</strong>  be where PostgreSQL
+will  look   for  (<tt class="docutils literal">/usr/share/postgresql/8.4/tsearch_data/</tt>)  and
+<strong>must</strong> only contain plain ascii  characters. An example command to
 generate the file for the french language is :</dd>
 </dl>
 <pre class="literal-block">
@@ -321,41 +382,137 @@ LC_ALL=fr_FR.UTF-8 iconv -f utf-8 -t ascii//TRANSLIT \
 /usr/share/postgresql/8.4/tsearch_data/french.stop &gt; \
 /usr/share/postgresql/8.4/tsearch_data/ascii_french.stop
 </pre>
+<p>ADDITIONAL_TS_CONFIG</p>
+<blockquote>
+This should be  a list of SQL statements, to  define extra TSCs that
+can be used in specific fields.</blockquote>
+</div>
+<div class="section" id="clean-up-filters">
+<h2><a class="toc-backref" href="#id5">3.2&nbsp;&nbsp;&nbsp;Clean-up/filters</a></h2>
 <dl class="docutils">
 <dt>CHARSET</dt>
-<dd>Name of the charset to use. Note that SeSQL was only tested in utf-8.</dd>
+<dd>Name  of the  charset to  use. Note  that SeSQL  was only  tested in
+utf-8. SeSQL will store all data in plain ASCII, the charset will be
+used for preprocessing, cleanup and conversion.</dd>
+<dt>ADDITIONAL_CLEANUP_FUNCTION</dt>
+<dd>This function (usually a lambda, but not necessarily) will be called
+to process text  both at indexation and search time.  It can be used
+for example to  remove html tags or convert entities  back to normal
+letters.</dd>
+<dt>SKIP_CONDITION</dt>
+<dd>A function (or lambda) that is called on every object, is not
+<tt class="docutils literal">None</tt>. If it returns a true value, the object will not be
+indexed. Useful, for example, to filter on workflow state.</dd>
+</dl>
+</div>
+<div class="section" id="indexes-and-fields">
+<h2><a class="toc-backref" href="#id6">3.3&nbsp;&nbsp;&nbsp;Indexes and fields</a></h2>
+<dl class="docutils">
 <dt>FIELDS</dt>
-<dd>A list or tuple of fields (see <tt class="docutils literal"><span class="pre">datamodel.txt</span></tt>), including at
-least <tt class="docutils literal"><span class="pre">classname</span></tt> and <tt class="docutils literal"><span class="pre">id</span></tt>.</dd>
+<dd>A  list or  tuple of  fields (see  <tt class="docutils literal">datamodel.txt</tt>), including  at
+least <tt class="docutils literal">classname</tt> and <tt class="docutils literal">id</tt>.</dd>
+<dt>CROSS_INDEXES</dt>
+<dd>This  list  contains  all  additional   indexes  to  create  in  the
+database. Each  index is  just a  list of  column. Indexes  that are
+worth creating depend of the kind of queries you do frequently.</dd>
+</dl>
+</div>
+<div class="section" id="types-and-tables">
+<h2><a class="toc-backref" href="#id7">3.4&nbsp;&nbsp;&nbsp;Types and tables</a></h2>
+<dl class="docutils">
 <dt>MASTER_TABLE_NAME</dt>
-<dd>The name of the master table, from which all others will
+<dd>The  name  of   the  master  table,  from  which   all  others  will
 inherit. This table should not contain any data, but a query done to
 it will query all SeSQL tables.</dd>
 <dt>TYPE_MAP</dt>
-<dd>This list of <tt class="docutils literal"><span class="pre">(class,</span> <span class="pre">table)</span></tt> couples describes the mapping of
-Django classes to SeSQL tables. Django classes not present in the
-list will not be indexed by SeSQL. Subclasses will, by default, be
+<dd>This list  of <tt class="docutils literal">(class,&nbsp; table)</tt> couples  describes the  mapping of
+Django classes  to SeSQL tables.  Django classes not present  in the
+list will not  be indexed by SeSQL. Subclasses will,  by default, be
 sent to the same table of the superclass.</dd>
-<dt>CROSS_INDEXES</dt>
-<dd>This list contains all additional indexes to create in the
-database. Each index is just a list of column. Indexes that are
-worth creating depend of the kind of queries you do frequently.</dd>
-<dt>SKIP_CONDITION</dt>
-<dd>A function (or lambda) that is called on every object, is not
-<tt class="docutils literal"><span class="pre">None</span></tt>. If it returns a true value, the object will not be
-indexed. Useful, for example, to filter on workflow state.</dd>
-<dt>DEFAULT_ORDER</dt>
-<dd>Default sort order for queries, when sort order is not specified.</dd>
 </dl>
 </div>
+<div class="section" id="query-parameters">
+<h2><a class="toc-backref" href="#id8">3.5&nbsp;&nbsp;&nbsp;Query parameters</a></h2>
+<dl class="docutils">
+<dt>DEFAULT_ORDER</dt>
+<dd>Default   sort  order   for  queries,   when  sort   order  is   not
+specified. Should be  a tuple of index names, with  an optional - to
+indicate reverse order.</dd>
+<dt>DEFAULT_LIMIT</dt>
+<dd>The default number of items returned by a short query.</dd>
+<dt>SMART_QUERY_INITIAL, SMART_QUERY_THRESOLD, SMART_QUERY_RATIO</dt>
+<dd>Control of the smart query heuristic.</dd>
+<dt>QUERY_CACHE_MAX_SIZE</dt>
+<dd>Maximal number  of long  query to  store in  the query  cache. Older
+queries  will be  discarded  first.   The cache  is  used to  ensure
+stability of paginated results, and avoid redoing the search on very
+page.</dd>
+<dt>QUERY_CACHE_EXPIRY</dt>
+<dd>Maximal time to store long queries in the cache.</dd>
+</dl>
+</div>
+<div class="section" id="reindexing-daemon">
+<h2><a class="toc-backref" href="#id9">3.6&nbsp;&nbsp;&nbsp;Reindexing daemon</a></h2>
+<dl class="docutils">
+<dt>DAEMON_DEFAULT_CHUNK</dt>
+<dd>Number of elements to proceed on each iteration of the reindex daemon.</dd>
+<dt>DAEMON_DEFAULT_DELAY</dt>
+<dd>Delay, in seconds, between two chunks.</dd>
+<dt>DAEMON_DEFAULT_PID</dt>
+<dd>Pid file to use for the  reindex daemon. The user running the daemon
+must have write permission to it, and the directory must exists.</dd>
+</dl>
+</div>
+<div class="section" id="search-history-and-statistics">
+<h2><a class="toc-backref" href="#id10">3.7&nbsp;&nbsp;&nbsp;Search history and statistics</a></h2>
+<dl class="docutils">
+<dt>HISTORY_DEFAULT_FILTER</dt>
+<dd>Queries giving less  than this amount of results will  be ignored in
+history.</dd>
+<dt>HISTORY_ALPHA = 0.95</dt>
+<dd>Erode  factor for  time-based decay  of recent  searches score.  The
+closer to 0,  the faster old searches will see  their score go down,
+the closer to 1 the longer they'll remain with high scores.</dd>
+<dt>HISTORY_BETA</dt>
+<dd>Weight of  the frequency at  which the  search was performed  in the
+final score. This is on an  arbitrary scale, and is only meaningfull
+compared to the HISTORY_GAMMA parameter.</dd>
+<dt>HISTORY_GAMMA</dt>
+<dd>Weight of the number of results given by the query in the final score.</dd>
+<dt>HISTORY_BLACKLIST</dt>
+<dd>A list of queries that will be ignore by the history feature.</dd>
+</dl>
+</div>
+<div class="section" id="additional-features">
+<h2><a class="toc-backref" href="#id11">3.8&nbsp;&nbsp;&nbsp;Additional features</a></h2>
+<dl class="docutils">
+<dt>ENABLE_SESQL_ADMIN</dt>
+<dd>If set to  yes, you'll be able to use  <tt class="docutils literal"><span class="pre">sesql:&lt;fieldname&gt;</span></tt> in your
+admin  options classes  to  search on  SeSQL  indexes from  Django's
+admin. Please note  that this feature reallies on  a monkey-patch of
+core Django code, and is therefore disabled by default.</dd>
+</dl>
+</div>
+</div>
 <div class="section" id="constraints">
-<h1>Constraints</h1>
+<h1><a class="toc-backref" href="#id12">4&nbsp;&nbsp;&nbsp;Constraints</a></h1>
 <p>Current version of SeSQL has a few constraints :</p>
 <ul class="simple">
-<li>it  requires to  have a  <tt class="docutils literal"><span class="pre">ClassField</span></tt> called  <tt class="docutils literal"><span class="pre">classname</span></tt>  and a
-<tt class="docutils literal"><span class="pre">IntField</span></tt> called <tt class="docutils literal"><span class="pre">id</span></tt>, referring to the object class and id ;</li>
-<li>FIXME .</li>
+<li>it  requires to  have a  <tt class="docutils literal">ClassField</tt> called  <tt class="docutils literal">classname</tt>  and a
+<tt class="docutils literal">IntField</tt> called <tt class="docutils literal">id</tt>, referring to the object class and id ;</li>
+<li>since all  data is  converted to plain  ASCII internally,  it'll not
+work   out-of-the-box   with    languages   written   in   non-latin
+script. Patches are welcomed to handle that.</li>
 </ul>
+</div>
+<div class="section" id="upgrading">
+<h1><a class="toc-backref" href="#id13">5&nbsp;&nbsp;&nbsp;Upgrading</a></h1>
+<p>If you need to rebuild all SeSQL indexes (because you changed them too
+heavily for example) you can do :</p>
+<pre class="literal-block">
+./manage.py createsesqltables | ./manage.py dbshell
+./manage.py sesqlreindex
+</pre>
 </div>
 </div>
 </body>

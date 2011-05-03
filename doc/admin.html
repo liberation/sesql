@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
 <title>SeSQL administration guide</title>
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 5196 2007-06-03 20:25:28Z wiemann $
+:Id: $Id: html4css1.css 6253 2010-03-02 00:24:53Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -157,11 +157,38 @@ h2.subtitle {
 hr.docutils {
   width: 75% }
 
-img.align-left {
-  clear: left }
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
 
-img.align-right {
-  clear: right }
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: left }
+
+/* div.align-center * { */
+/*   text-align: left } */
 
 ol.simple, ul.simple {
   margin-bottom: 1em }
@@ -216,8 +243,7 @@ p.topic-title {
 pre.address {
   margin-bottom: 0 ;
   margin-top: 0 ;
-  font-family: serif ;
-  font-size: 100% }
+  font: inherit }
 
 pre.literal-block, pre.doctest-block {
   margin-left: 2em ;
@@ -287,31 +313,47 @@ ul.auto-toc {
 <div class="document" id="sesql-administration-guide">
 <h1 class="title">SeSQL administration guide</h1>
 
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="auto-toc simple">
+<li><a class="reference internal" href="#django-administration-commands" id="id1">1&nbsp;&nbsp;&nbsp;Django administration commands</a><ul class="auto-toc">
+<li><a class="reference internal" href="#syncdb" id="id2">1.1&nbsp;&nbsp;&nbsp;syncdb</a></li>
+<li><a class="reference internal" href="#createsqltables" id="id3">1.2&nbsp;&nbsp;&nbsp;createsqltables</a></li>
+<li><a class="reference internal" href="#sesqlindex" id="id4">1.3&nbsp;&nbsp;&nbsp;sesqlindex</a></li>
+<li><a class="reference internal" href="#sesqlreindex" id="id5">1.4&nbsp;&nbsp;&nbsp;sesqlreindex</a></li>
+<li><a class="reference internal" href="#sesqlupdate" id="id6">1.5&nbsp;&nbsp;&nbsp;sesqlupdate</a></li>
+<li><a class="reference internal" href="#sesqlshortquery" id="id7">1.6&nbsp;&nbsp;&nbsp;sesqlshortquery</a></li>
+<li><a class="reference internal" href="#sesqllongquery" id="id8">1.7&nbsp;&nbsp;&nbsp;sesqllongquery</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sql-level-administration" id="id9">2&nbsp;&nbsp;&nbsp;SQL level administration</a></li>
+</ul>
+</div>
 <div class="section" id="django-administration-commands">
-<h1>Django administration commands</h1>
+<h1><a class="toc-backref" href="#id1">1&nbsp;&nbsp;&nbsp;Django administration commands</a></h1>
 <div class="section" id="syncdb">
-<h2>syncdb</h2>
-<p>Django <tt class="docutils literal"><span class="pre">syncdb</span></tt> command  will create the SeSQL tables  that were not
+<h2><a class="toc-backref" href="#id2">1.1&nbsp;&nbsp;&nbsp;syncdb</a></h2>
+<p>Django <tt class="docutils literal">syncdb</tt> command  will create the SeSQL tables  that were not
 created yet. SeSQL <strong>must</strong> be configured before running it.</p>
 </div>
 <div class="section" id="createsqltables">
-<h2>createsqltables</h2>
+<h2><a class="toc-backref" href="#id3">1.2&nbsp;&nbsp;&nbsp;createsqltables</a></h2>
 <p>This command  will output  the SQL code  to create the  various tables
-required by SeSQL, with <tt class="docutils literal"><span class="pre">DROP</span></tt> statements if needed.</p>
+required by SeSQL, with <tt class="docutils literal">DROP</tt> statements if needed.</p>
 <p>Since there  is no support  for upgrading schemas in  SeSQL currently,
 you may have  to use this command and manually edit  the output if you
 do changes in SeSQL configuration.</p>
 <p>If you have a lot of content to index into SeSQL at once, you may also
-try  to create  the tables  without the  <tt class="docutils literal"><span class="pre">CREATE</span>&nbsp; <span class="pre">INDEX</span></tt> statements,
-insert the data, and then run the <tt class="docutils literal"><span class="pre">CREATE</span> <span class="pre">INDEX</span></tt> statements.</p>
+try  to create  the tables  without the  <tt class="docutils literal">CREATE&nbsp; INDEX</tt> statements,
+insert the data, and then run the <tt class="docutils literal">CREATE INDEX</tt> statements.</p>
 </div>
 <div class="section" id="sesqlindex">
-<h2>sesqlindex</h2>
+<h2><a class="toc-backref" href="#id4">1.3&nbsp;&nbsp;&nbsp;sesqlindex</a></h2>
 <p>This command  takes a  class name  and an id  as parameters,  and will
 reindex into SeSQL the given object.</p>
 </div>
 <div class="section" id="sesqlreindex">
-<h2>sesqlreindex</h2>
+<h2><a class="toc-backref" href="#id5">1.4&nbsp;&nbsp;&nbsp;sesqlreindex</a></h2>
 <p>This command takes only a class name as parameter, and will index into
 SeSQL all  objects that exist  in Django tables  but that are  not yet
 into  SeSQL. It  is very  useful  if you  just installed  SeSQL on  an
@@ -321,23 +363,41 @@ interrupt it and restart it  later on, it'll continue where it stopped
 (objects are reindexed by groups  of 1000, only the current group will
 be restarted).</p>
 </div>
+<div class="section" id="sesqlupdate">
+<h2><a class="toc-backref" href="#id6">1.5&nbsp;&nbsp;&nbsp;sesqlupdate</a></h2>
+<p>This  command  will  massively  reindex  a  single  (or  a  coupe  of)
+column. It  will not index any new  object. Typical use is  when a new
+column was added.</p>
+</div>
 <div class="section" id="sesqlshortquery">
-<h2>sesqlshortquery</h2>
+<h2><a class="toc-backref" href="#id7">1.6&nbsp;&nbsp;&nbsp;sesqlshortquery</a></h2>
 <p>Perform  a short  query. The  first parameter  is a  Python expression
 describing  a  Q object,  the  second,  optional  parameter, a  Python
 expression specifying the sort order to use.</p>
-<p>Warning  :  this  command   uses  <tt class="docutils literal"><span class="pre">eval()</span></tt>  to  process  the  Python
+<p><strong>Warning</strong>  : this  command  uses <tt class="docutils literal">eval()</tt>  to  process the  Python
 expressions,  it is  therefore unsafe,  and  should only  be used  for
 testing purpose. Never expose this command to untrusted input.</p>
 </div>
 <div class="section" id="sesqllongquery">
-<h2>sesqllongquery</h2>
+<h2><a class="toc-backref" href="#id8">1.7&nbsp;&nbsp;&nbsp;sesqllongquery</a></h2>
 <p>Like the previous command, but performing a long query.</p>
 </div>
 </div>
 <div class="section" id="sql-level-administration">
-<h1>SQL level administration</h1>
-<p>FIXME</p>
+<h1><a class="toc-backref" href="#id9">2&nbsp;&nbsp;&nbsp;SQL level administration</a></h1>
+<p>SeSQL contains three kinds of tables :</p>
+<ul class="simple">
+<li>The <em>master table</em> : this  table doesn't contain any actual content,
+but can be requested (with  regular <tt class="docutils literal">SELECT</tt>) to query all indexed
+content.</li>
+<li>The <em>data  tables</em> : those tables  are defined in the  type map, and
+contain  the  actual content;  they  all  inherit from  the  <em>master
+table</em>.  Data  can be  inserted,  modified  and deleted  from  those
+tables.</li>
+<li>The  <em>utility tables</em>  :  they  are used  for  features like  search
+history  or  dependency tracking.  Refer  to  each features  for  on
+overview of its tables.</li>
+</ul>
 </div>
 </div>
 </body>

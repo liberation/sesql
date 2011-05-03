@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<title>SeSQL extra features</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 6253 2010-03-02 00:24:53Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: left }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="sesql-extra-features">
+<h1 class="title">SeSQL extra features</h1>
+
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="auto-toc simple">
+<li><a class="reference internal" href="#text-highlighting" id="id1">1&nbsp;&nbsp;&nbsp;Text highlighting</a></li>
+<li><a class="reference internal" href="#dependency-tracking" id="id2">2&nbsp;&nbsp;&nbsp;Dependency tracking</a><ul class="auto-toc">
+<li><a class="reference internal" href="#the-problem" id="id3">2.1&nbsp;&nbsp;&nbsp;The problem</a></li>
+<li><a class="reference internal" href="#how-to-specify-dependencies" id="id4">2.2&nbsp;&nbsp;&nbsp;How to specify dependencies</a></li>
+<li><a class="reference internal" href="#the-daemon" id="id5">2.3&nbsp;&nbsp;&nbsp;The daemon</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sesql-admin" id="id6">3&nbsp;&nbsp;&nbsp;SeSQL admin</a></li>
+<li><a class="reference internal" href="#search-history" id="id7">4&nbsp;&nbsp;&nbsp;Search history</a><ul class="auto-toc">
+<li><a class="reference internal" href="#general-idea" id="id8">4.1&nbsp;&nbsp;&nbsp;General idea</a></li>
+<li><a class="reference internal" href="#the-process" id="id9">4.2&nbsp;&nbsp;&nbsp;The process</a></li>
+<li><a class="reference internal" href="#what-can-be-done-from-the-data" id="id10">4.3&nbsp;&nbsp;&nbsp;What can be done from the data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#benchmarking-tool" id="id11">5&nbsp;&nbsp;&nbsp;Benchmarking tool</a><ul class="auto-toc">
+<li><a class="reference internal" href="#summary" id="id12">5.1&nbsp;&nbsp;&nbsp;Summary</a></li>
+<li><a class="reference internal" href="#disclaimer" id="id13">5.2&nbsp;&nbsp;&nbsp;Disclaimer</a></li>
+<li><a class="reference internal" href="#concept-of-the-benchmark-tool" id="id14">5.3&nbsp;&nbsp;&nbsp;Concept of the benchmark tool</a></li>
+<li><a class="reference internal" href="#query-file" id="id15">5.4&nbsp;&nbsp;&nbsp;Query file</a></li>
+<li><a class="reference internal" href="#syntax-examples" id="id16">5.5&nbsp;&nbsp;&nbsp;Syntax examples</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="text-highlighting">
+<h1><a class="toc-backref" href="#id1">1&nbsp;&nbsp;&nbsp;Text highlighting</a></h1>
+<p>SeSQL  supports  basic  text  highlighting. There  is  a  highlighting
+function,  which  takes  two  parameters  :  a  text  and  a  list  of
+words. It'll return a list of matching positions, as a triplet (begin,
+end, word number).</p>
+<p>For example</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from sesql.highlight import highlight
+&gt;&gt;&gt; highlight('sesql : full text search, with text highlight',
+              [ 'sesql', 'text' ])
+ [(0, 5, 0), (13, 17, 1), (31, 35, 1)]
+</pre>
+<p>The text  given to  the highlight module  must have  been preprocessed
+first with the cleanup function.</p>
+<p>If  you're  using  different  cleanup or  dictionaries  for  different
+indexes, you  can specify  which index configuration  to use  with the
+<tt class="docutils literal">index</tt> parameter of the highlight function.</p>
+</div>
+<div class="section" id="dependency-tracking">
+<h1><a class="toc-backref" href="#id2">2&nbsp;&nbsp;&nbsp;Dependency tracking</a></h1>
+<div class="section" id="the-problem">
+<h2><a class="toc-backref" href="#id3">2.1&nbsp;&nbsp;&nbsp;The problem</a></h2>
+<p>SeSQL supports  composite indexes, for  example, indexing the  name of
+the section  of an  article within  the article,  the section  being a
+related model.</p>
+<p>Now, if  the name of the  section is changed, you'll  probably want to
+reindex all content within the section. That can be a lot of content.</p>
+</div>
+<div class="section" id="how-to-specify-dependencies">
+<h2><a class="toc-backref" href="#id4">2.2&nbsp;&nbsp;&nbsp;How to specify dependencies</a></h2>
+<p>On  each of  your  Django models,  you can  implement  a method  named</p>
+<pre class="literal-block">
+get_related_objects_for_indexation
+</pre>
+<p>This  method  doesn't take  any  parameter  (except the  <tt class="docutils literal">self</tt>,  of
+course), and  should return a lit  of related objects to  reindex when
+the <tt class="docutils literal">self</tt> changed.</p>
+<p>The list can either be a list of <tt class="docutils literal">(classname, id)</tt> tuples, or a list
+of Django objects.</p>
+</div>
+<div class="section" id="the-daemon">
+<h2><a class="toc-backref" href="#id5">2.3&nbsp;&nbsp;&nbsp;The daemon</a></h2>
+<p>Because there could be a lot of related objects to reindex, they won't
+be reindexed instantly. They'll be  inserted in a simple table, called
+<tt class="docutils literal">sesql_reindex_schedule</tt>, just as <tt class="docutils literal">(classname, id, date)</tt>.</p>
+<p>A daemon, available  in the <tt class="docutils literal">daemon/</tt> directory of  SeSQL, will then
+process  the reindexation,  chunk by  chunk (100  by 100  by default),
+waiting some time (2 minutes by default) between two chunks. This will
+allow the content to be up-to-date in a mater of minutes (or hours, if
+you really  have a lot of  content), without being a  too heavy burden
+for the live performance of the system.</p>
+<p>You can change the size of a chunk and the delay to compromise between
+the acceptable delay in reindexing and the system load.</p>
+</div>
+</div>
+<div class="section" id="sesql-admin">
+<h1><a class="toc-backref" href="#id6">3&nbsp;&nbsp;&nbsp;SeSQL admin</a></h1>
+<p>By  setting <tt class="docutils literal">ENABLE_SESQL_ADMIN</tt>  to <tt class="docutils literal">True</tt>  in the  configuration
+file,  you'll be  able  to use  <tt class="docutils literal"><span class="pre">sesql:&lt;index_name&gt;</span></tt>  in any  Django
+query, especially in  the search field to use in  the admin model. For
+example using :</p>
+<pre class="literal-block">
+search_fields = ['sesql:private_index']
+</pre>
+<p>In the  <tt class="docutils literal">ModelAdmin</tt> for a  model will  make Django admin  look into
+SeSQL field  called <em>private_index</em>  whenever the  users of  the admin
+uses the search feature.</p>
+<p>This feature is  functional and stable, but not  totally optimized and
+uses an  heavy monkey-patch  (susceptible to  break with  newer Django
+versions). It is therefore disabled by default.</p>
+</div>
+<div class="section" id="search-history">
+<h1><a class="toc-backref" href="#id7">4&nbsp;&nbsp;&nbsp;Search history</a></h1>
+<div class="section" id="general-idea">
+<h2><a class="toc-backref" href="#id8">4.1&nbsp;&nbsp;&nbsp;General idea</a></h2>
+<p>The  general idea  is to  collect information  about searches  done by
+users of the site, and to be able to later on suggest related searches
+to perform.</p>
+<p>Three factors are taken in consideration on each search :</p>
+<p>1.  The number  of the  results  the search  gave (a  small amount  is
+probably a typo or spelling mistake, for example).</p>
+<ol class="arabic simple" start="2">
+<li>The number of times the query was performed.</li>
+</ol>
+<p>3. The  freshness of  those queries  (SeSQL was  initially made  for a
+newspaper  site,  <a class="reference external" href="http://www.liberation.fr">http://www.liberation.fr</a>  ,  and  in  the  world  of
+newspapers, freshness is an important issue).</p>
+<p>From  those  three  factors,  a   weight  is  computed,  allowing  web
+developers to build additional features on top of that.
+n
+Please note that all the data are totally anonymized inside SeSQL search
+history tables.</p>
+</div>
+<div class="section" id="the-process">
+<h2><a class="toc-backref" href="#id9">4.2&nbsp;&nbsp;&nbsp;The process</a></h2>
+<p>The process works in three steps :</p>
+<p>1. When a query is performed, the  code making the query can ask SeSQL
+to historize the  search. It is inserted into a  temporary table, in a
+raw form.</p>
+<p>2. Regularly (typically, every day, but could be even more frequent) a
+cron  task (as  a <tt class="docutils literal">manage.py</tt>  command) is  executed to  process the
+information  from the  temporary table,  and  insert it  in two  other
+tables :</p>
+<blockquote>
+<p>1. A table of unprocessed searches, very similar to the initial one,
+which additional  indexes, that  can be used  for datamining  or any
+other purpose.</p>
+<p>2.  A  table  of  search  statistics,  where  similar  searches  are
+aggregated and given a score.</p>
+</blockquote>
+</div>
+<div class="section" id="what-can-be-done-from-the-data">
+<h2><a class="toc-backref" href="#id10">4.3&nbsp;&nbsp;&nbsp;What can be done from the data</a></h2>
+<p>The data can be used as you want to. You could make a portlet with the
+best scored searches  on the homepage of your site,  and just use them
+in the back office to understand how people use your site.</p>
+<p>One  feature  that  is  currently  under  development  is  to  suggest
+alternative  searches (typically  in  case of  mispelling) looking  at
+searches with  a high score  and similar  phonex. This code  is partly
+implemented for the french language only.</p>
+</div>
+</div>
+<div class="section" id="benchmarking-tool">
+<h1><a class="toc-backref" href="#id11">5&nbsp;&nbsp;&nbsp;Benchmarking tool</a></h1>
+<div class="section" id="summary">
+<h2><a class="toc-backref" href="#id12">5.1&nbsp;&nbsp;&nbsp;Summary</a></h2>
+<p>A small benchmarking tool is provided  with SeSQL to allow yourself to
+test your specific configuration and request patterns.</p>
+</div>
+<div class="section" id="disclaimer">
+<h2><a class="toc-backref" href="#id13">5.2&nbsp;&nbsp;&nbsp;Disclaimer</a></h2>
+<p>There are three types of lies  : lies, damn lies and benchmarks. Don't
+give any absolute  value to the results you obtain,  and be aware that
+reality may be significantly distinct from benchmarks.</p>
+</div>
+<div class="section" id="concept-of-the-benchmark-tool">
+<h2><a class="toc-backref" href="#id14">5.3&nbsp;&nbsp;&nbsp;Concept of the benchmark tool</a></h2>
+<p>The  SeSQL   benchmark  tool  works  by   running  threads  performing
+operations like  short queries, long  queries and indexation.  Each of
+those threads  has a tight loop  in which in a  perform one operation,
+and then wait a bit, before doing another one.</p>
+<p>You can configure how many threads of each kind are used, and how long
+they wait between each operation.</p>
+</div>
+<div class="section" id="query-file">
+<h2><a class="toc-backref" href="#id15">5.4&nbsp;&nbsp;&nbsp;Query file</a></h2>
+<p>For the  short queries and  long queries  threads, you must  provide a
+query file. A query  file is a file with a Q  expression on each line,
+for example something like :</p>
+<pre class="literal-block">
+Q(classname='Article') &amp; Q(fulltext__containswords=&quot;search engine sql&quot;)
+Q(classname__in=['Article', 'Blog']) &amp; \
+ Q(fulltext__containswords=&quot;search engine sql&quot;)
+</pre>
+</div>
+<div class="section" id="syntax-examples">
+<h2><a class="toc-backref" href="#id16">5.5&nbsp;&nbsp;&nbsp;Syntax examples</a></h2>
+<p>For a 10 minutes benchmark of a single thread doing continuous queries :</p>
+<pre class="literal-block">
+./manage.py sesqlbench --queryfile=queries.txt --duration=600
+</pre>
+<p>For a 10 minutes benchmark of 4 threads doing continuous queries :</p>
+<pre class="literal-block">
+./manage.py sesqlbench --queryfile=queries.txt --duration=600 \
+  --short-threads=4
+</pre>
+<p>For a 10 minutes benchmark of 2 threads doing continuous short queries
+and one doing long queries :</p>
+<pre class="literal-block">
+./manage.py sesqlbench --queryfile=queries.txt --duration=600 \
+  --short-threads=2 --long-threads=1
+</pre>
+<p>For a 10 minutes benchmark of 2 threads doing continuous short queries
+and 1 thread doing regular, but not continuous, reindexation :</p>
+<pre class="literal-block">
+./manage.py sesqlbench --queryfile=queries.txt --duration=600 \
+  --short-threads=2 --index-threads=1 --index-delay=0.5 \
+  --index-type=Article
+</pre>
+</div>
+</div>
+</div>
+</body>
+</html>
