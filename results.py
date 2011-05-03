@@ -21,6 +21,8 @@ from typemap import typemap
 import sesql_config as config
 from django.core.exceptions import ObjectDoesNotExist
 
+from models import SearchHit
+
 import logging
 log = logging.getLogger('sesql')
 
@@ -85,3 +87,11 @@ class SeSQLResultSet(object):
         entry = "%s:%s" % (objclass.__name__, objid)
         log.debug("Fetching %s" % entry)
         return objclass.objects.get(pk = objid)
+
+    def historize(self, query):
+        """save in the database the query for future processing"""
+        nb_results = self.count()
+        query_text = query.get_fulltext_query()[2][0]
+        SearchHit(query=query_text, nb_results=nb_results).save()
+        
+        

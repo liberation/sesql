@@ -32,9 +32,6 @@ log = logging.getLogger('sesql')
 _query_cache = GenericCache(maxsize = config.QUERY_CACHE_MAX_SIZE,
                             expiry = config.QUERY_CACHE_EXPIRY)
 
-from models import SearchHit
-import sesql_config as config
-
 @utils.log_time
 def longquery(query, order = None, limit = None, queryid = None, historize=False):
     """
@@ -67,11 +64,7 @@ def longquery(query, order = None, limit = None, queryid = None, historize=False
         results.queryid = queryid
     
     if historize: # suggest feature hook
-        nb_results = results.count()
-        query_text = query.get_fulltext_query()[2][0]
-        classes = query.get_classes()
-
-        SearchHit(query=query_text, nb_results=nb_results).save()
+        results.historize(query)
 
     return results
     

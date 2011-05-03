@@ -1,4 +1,22 @@
 # -*- coding: utf-8 -*-
+
+# Copyright (c) Pilot Systems and Libération, 2010
+
+# This file is part of SeSQL.
+
+# SeSQL is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+
+# SeSQL is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
+
 from optparse import make_option
 from datetime import datetime
 from datetime import timedelta 
@@ -17,7 +35,7 @@ import sesql_config as config
 
 
 class Command(BaseCommand):
-    help = """Perform a SearchQuery update based on last week searches"""
+    help = """Build SearchQuery index"""
     
     option_list = BaseCommand.option_list + (
         make_option('-e','--erode',
@@ -25,7 +43,7 @@ class Command(BaseCommand):
                     dest='erode',
                     help = 'tell if we must erode result or not'),
             
-        make_option('-f','--filter', #FIXME: not supported
+        make_option('-f','--filter',
                     dest ='filter',
                     type='int',
                     default=config.DEFAULT_FILTER,
@@ -43,9 +61,11 @@ class Command(BaseCommand):
                                                * search_query.pondered_search_nb 
                                                + (1-config.ALPHA)
                                                * search_query.nb_recent_search)
+            search_query.nb_recent_search = 0
+            search_query.save()
         
     def process_hits(self, filter_nb):
-        last_hits = SearchHit.objects.all().order_by('-date')
+        last_hits = SearchHit.objects.all()
 
         processed_hits = []
 
@@ -53,20 +73,21 @@ class Command(BaseCommand):
             query = hit.query
             
             # blacklist
-            if not query in config.BLACKLIST:
+            if query in config.BLACKLIST:
                 continue
 
-            # filter
-            if (SearchHit.objects.all().filter(query=query).count() < filter_nb or
-                SearchQuery.objects.filter(query=query).count() == 0):
-                # "not enough hit" or "not already a QuerySearch"
-                continue 
-
-            # get or create SearchQuery object based on query
+            if hit.nb_results < filter_nb:
+                SearchHitHistoric(query=hit.query,
+                                  nb_results=hit.nb_results,
+                                  date=hit.date).save()
+                hit.delete()
+                continue
+            
+            # manual get_or_create
             try:
                 search_query = SearchQuery.objects.get(query=query)
                 created = False
-            except:
+            except SearchQuery.DoesNotExist:
                 search_query = SearchQuery(query=query)
                 created = True
 
@@ -74,14 +95,14 @@ class Command(BaseCommand):
             if created:
                 search_query.phonex = phonex(query)
 
-                lems = lemmatize(query.split())
-                clean_query = []
-                for lem in lems: # select only strings values 
-                                 # and not empty strings''
-                    if lem:
-                        clean_query.append(lem)
+                # clean the query, the '_' char cause bugy clean_query
+                query = query.replace('_', '')  
 
+                lems = lemmatize(query.split())
+
+                clean_query = [lem for lem in lems if lem]
                 clean_query = ' '.join(clean_query)
+
                 clean_phonex = phonex(clean_query)
 
                 search_query.clean_query = clean_query
@@ -105,7 +126,5 @@ class Command(BaseCommand):
             SearchHitHistoric(query=hit.query,
                               nb_results=hit.nb_results,
                               date=hit.date).save()
-            processed_hits.append(hit)
-    
-        for hit in processed_hits:
+
             hit.delete()
