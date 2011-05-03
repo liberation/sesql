@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -15,6 +15,11 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+This command will index or reindex a single object into SeSQL
+Can be used as a test, or to fix a single problem
+"""
 
 from django.core.management.base import BaseCommand
 from django.core.management import call_command

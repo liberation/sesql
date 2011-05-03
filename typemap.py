@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -18,7 +18,7 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Handle the type map
+Handle the type map, that is, the map between Django models and SQL tables
 """
 
 from django.db import models

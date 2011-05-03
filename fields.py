@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -66,7 +66,8 @@ class Field(object):
         """
         Get the index defintion
         """
-        index = "CREATE INDEX %s_%s_index ON %s " % (tablename, self.name, tablename)
+        index = "CREATE INDEX %s_%s_index ON %s " % (tablename, self.name,
+                                                     tablename)
         if self.indexfunction:
             index += "USING %s " % self.indexfunction
         index = index + "(%s);" % self.index_column
@@ -360,7 +361,8 @@ class FullTextField(Field):
         """
         value = super(FullTextField, self).index(tablename)
         value += """
-ALTER TABLE %s ALTER COLUMN %s SET STATISTICS 10000;""" % (tablename, self.index_column)
+ALTER TABLE %s ALTER COLUMN %s SET STATISTICS 10000;""" % (tablename,
+                                                           self.index_column)
         return value
 
     def get_default(self, value):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -33,7 +33,7 @@ _query_cache = GenericCache(maxsize = config.QUERY_CACHE_MAX_SIZE,
                             expiry = config.QUERY_CACHE_EXPIRY)
 
 @utils.log_time
-def longquery(query, order = None, limit = None, queryid = None, historize=False):
+def longquery(query, order=None, limit=None, queryid=None, historize=False):
     """
     Perform a long query and return a lazy Django result set
 

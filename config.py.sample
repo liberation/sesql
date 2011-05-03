@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -124,13 +124,19 @@ DAEMON_DEFAULT_DELAY=120
 DAEMON_DEFAULT_PID='/var/run/sesql/update.pid'
 
 #
-# Suggest configuration
+# Suggest/history configuration
 #
 
-DEFAULT_FILTER = 5 # default number of hit before including query in db
+HISTORY_DEFAULT_FILTER = 5 # default number of hit before including query in db
 
-ALPHA = 0.95 #erode factor
-BETA = 1.0 #used to compute weight
-GAMMA = 1.0 #user to compute weight
+HISTORY_ALPHA = 0.95 #erode factor
+HISTORY_BETA = 1.0 #used to compute weight
+HISTORY_GAMMA = 1.0 #user to compute weight
 
-BLACKLIST = []
+HISTORY_BLACKLIST = []
+
+
+#
+# Enable sesql searches from Django admin ?
+#
+ENABLE_SESQL_ADMIN = False

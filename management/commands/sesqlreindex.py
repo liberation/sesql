@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -15,6 +15,12 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+This command will massively index or reindex content into SeSQL. It is
+a very useful management command, either when you first install SeSQL
+on an existing database, or when you alter your indexes.
+"""
 
 # Allow "with" with python2.5
 from __future__ import with_statement

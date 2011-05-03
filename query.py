@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -119,7 +119,8 @@ LIMIT %d""" % limit
 
         smartquery = """SELECT classname, id
 FROM  (SELECT * FROM %s WHERE %s ORDER BY %s LIMIT {SESQL_SMART_LIMIT}) subquery
-WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (table, l_pattern, l_order, pattern, o_pattern)
+WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (table, l_pattern, l_order,
+                                                   pattern, o_pattern)
         return smartquery, l_values + values + o_values
         
     def _attempt_short_query(self, size, limit):

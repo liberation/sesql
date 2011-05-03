@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -105,7 +105,8 @@ def log_time(function, message = None):
         with tmr:
             res = function(*args, **kwargs)
         args = ', '.join([ str(a) for a in args ])
-        kwargs = ', '.join([ "%s=%s" % (key, value) for key, value in kwargs.items() ])
+        extra = [ "%s=%s" % (key, value) for key, value in kwargs.items() ]
+        kwargs = ', '.join(extra)
         m = message
         if m is None:
             m = '%s (%s, %s)' % (function.__name__, args, kwargs,)

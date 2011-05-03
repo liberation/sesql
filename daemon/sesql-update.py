@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -35,7 +35,7 @@ from django.db import connection, transaction
 
 
 def version():
-    print "sesql update daemon, v 0.2"
+    print "sesql update daemon, v 0.9"
 
 class UpdateDaemon(UnixDaemon):
     """
@@ -67,7 +67,9 @@ class UpdateDaemon(UnixDaemon):
         Process a chunk
         """
         cursor = connection.cursor()    
-        cursor.execute("SELECT classname, objid FROM sesql_reindex_schedule ORDER BY scheduled_at ASC LIMIT %d" % self.chunk)
+        cursor.execute("""SELECT classname, objid
+                          FROM sesql_reindex_schedule
+                          ORDER BY scheduled_at ASC LIMIT %d""" % self.chunk)
         rows = cursor.fetchall()
         if not rows:
             return
@@ -82,7 +84,8 @@ class UpdateDaemon(UnixDaemon):
                 done.add(row)
                 obj = results.SeSQLResultSet.load(row)
                 index.index(obj)
-                cursor.execute("DELETE FROM sesql_reindex_schedule WHERE classname=%s AND objid=%s", row)
+                cursor.execute("""DELETE FROM sesql_reindex_schedule
+                                  WHERE classname=%s AND objid=%s""", row)
         transaction.commit()
 
 if __name__ == "__main__":

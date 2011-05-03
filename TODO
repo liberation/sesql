@@ -1,0 +1,9 @@
+Here is a short roadmap for SeSQL in the short term :
+
+- finalize the suggest feature ;
+
+- optimize the sesql_admin module ;
+
+- ease the configuration of multiple dictionnaries.
+
+Other ides are welcomed.

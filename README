@@ -2,6 +2,24 @@ SeSQL (Search Engine SQL) is a free software for handling advanced SQL
 search   on   huge  databases   of   documents/articles  from   Django
 applications.
 
+It supports features like :
+
+- full text search ;
+
+- complex queries ;
+
+- stable pagination ;
+
+- extra-fast "short queries" for retrieving a few matching recent items ;
+
+- multiple and composite indexes ;
+
+- semi-automatic dependency tracking ;
+
+- highlighting of results ;
+
+- search history and statistics. 
+
 It  was  written by  Pilot  Systems (http://www.pilotsystems.net)  and
 Libération (http://www.liberation.fr).
 

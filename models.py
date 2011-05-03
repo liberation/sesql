@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2011
 
 # This file is part of SeSQL.
 
@@ -19,6 +19,11 @@
 
 from django.db import models
 
+#
+# Important note : the  core SeSQL tables are created in  raw SQL by a
+# signal handler. Only the  suggest/history feature uses normal Django
+# models.
+#
 
 
 class SearchHit(models.Model):
@@ -36,6 +41,7 @@ class SearchHitHistoric(models.Model):
    
 
 class SearchQuery(models.Model):
+    """A table containing statistics and scores about search queries"""
     query = models.CharField(max_length=500)
     phonex = models.FloatField()
     clean_query = models.CharField(max_length=500)

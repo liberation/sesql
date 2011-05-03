@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -15,6 +15,12 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+This is a variation over the reindex command, which will only reindex
+selected columns. It'll be faster when you've a lot of data and only a
+few columns changed.
+"""
 
 # Allow "with" with python2.5
 from __future__ import with_statement

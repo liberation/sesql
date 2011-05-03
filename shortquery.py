@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -22,7 +22,7 @@ from sesql.query import SeSQLQuery
 from sesql import utils
 
 @utils.log_time
-def shortquery(query, order = None, limit = 50, historize=False):
+def shortquery(query, order=None, limit=50, historize=False):
     """
     Perform a short query and return a lazy Django result set
     """

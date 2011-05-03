@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2011
 
 # This file is part of SeSQL.
 
@@ -16,6 +16,10 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+This should be runned in a cron to process search histories and compute stats
+"""
 
 from optparse import make_option
 from datetime import datetime
@@ -46,7 +50,7 @@ class Command(BaseCommand):
         make_option('-f','--filter',
                     dest ='filter',
                     type='int',
-                    default=config.DEFAULT_FILTER,
+                    default=config.HISTORY_DEFAULT_FILTER,
                     help = 'how many time a search must occur to be treated'))
     
     def handle(self, *apps, **options):
@@ -57,9 +61,9 @@ class Command(BaseCommand):
 
     def erode(self):
         for search_query in SearchQuery.objects.all():
-            search_query.pondered_search_nb = (config.ALPHA 
+            search_query.pondered_search_nb = (config.HISTORY_ALPHA 
                                                * search_query.pondered_search_nb 
-                                               + (1-config.ALPHA)
+                                               + (1-config.HISTORY_ALPHA)
                                                * search_query.nb_recent_search)
             search_query.nb_recent_search = 0
             search_query.save()
@@ -73,7 +77,7 @@ class Command(BaseCommand):
             query = hit.query
             
             # blacklist
-            if query in config.BLACKLIST:
+            if query in config.HISTORY_BLACKLIST:
                 continue
 
             if hit.nb_results < filter_nb:
@@ -118,8 +122,9 @@ class Command(BaseCommand):
             search_query.pondered_search_nb += 1
             search_query.nb_recent_search += 1 
 
-            search_query.weight = (search_query.pondered_search_nb * config.BETA + 
-                                   search_query.nb_results * config.GAMMA)
+            weight = (search_query.pondered_search_nb * config.HISTORY_BETA + 
+                      search_query.nb_results * config.HISTORY_GAMMA)
+            search_query.weight = weight
             search_query.save()
 
             # we can now create SearchHitHistoric 

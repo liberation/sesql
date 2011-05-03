@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -56,7 +56,9 @@ def get_sesql_id(obj):
     """
     Get classname and id, the SeSQL identifiers
     """
-    return (fieldmap['classname'].get_values(obj)[0], fieldmap['id'].get_values(obj)[0])
+    def get_val(field):
+        return fieldmap[field].get_values(obj)[0]
+    return (get_val('classname'), get_val('id'))
 
 @index_log_wrap
 def index(obj, message, noindex = False):

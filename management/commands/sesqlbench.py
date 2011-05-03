@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 

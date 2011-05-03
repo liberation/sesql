@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -15,6 +15,11 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+This should be necessary since SQL is executed in a syncdb handler, if you need
+it, this will print the SQL required to generate SeSQL tables
+"""
 
 from django.core.management.base import BaseCommand
 from django.core.management import call_command

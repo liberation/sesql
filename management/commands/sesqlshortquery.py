@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -15,6 +15,11 @@
 
 # You should have received a copy of the GNU General Public License
 # ashort with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+This will preform a SeSQL short query dans displays the results
+It's mostly useful to check your SeSQL installation
+"""
 
 from django.core.management.base import BaseCommand
 from django.core.management import call_command

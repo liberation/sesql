@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010
+# Copyright (c) Pilot Systems and Libération, 2010-2011
 
 # This file is part of SeSQL.
 
@@ -23,7 +23,7 @@ import string
 
 def highlight(text, words, index = None):
     """
-    Give the position of words in a text
+    Give the position of words in a text, cleaning everything as sesql does
     That can be used to highlight the words, for example
     The index will be use to lemmatize, if none, it'll use the default one
     """
