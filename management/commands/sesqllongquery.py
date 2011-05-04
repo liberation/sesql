@@ -17,7 +17,7 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-This will preform a SeSQL long query dans displays the results
+This will preform a SeSQL long query and displays the results
 It's mostly useful to check your SeSQL installation
 """
 

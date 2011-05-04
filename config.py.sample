@@ -137,7 +137,7 @@ HISTORY_BETA = 1.0
 # weight of number of results in the final score
 HISTORY_GAMMA = 1.0 
 
-# queries to ignore in histroy
+# queries to ignore in history
 HISTORY_BLACKLIST = []
 
 

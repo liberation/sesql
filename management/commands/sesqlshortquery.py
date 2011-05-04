@@ -17,7 +17,7 @@
 # ashort with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-This will preform a SeSQL short query dans displays the results
+This will preform a SeSQL short query and displays the results
 It's mostly useful to check your SeSQL installation
 """
 

@@ -32,7 +32,7 @@ must  be named  ``sesql_config.py`` in  the python  path (usually  the
 project).
 
 For a summary  of how to quickly configure SeSQL,  please refer to the
-tutorial.  This document  contain a  detailed list  of all  recognized
+tutorial.  This document  contains a  detailed list  of all  recognized
 options.
 
 Text search configuration
