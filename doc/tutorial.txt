@@ -117,14 +117,12 @@ are.
 For the rest, adjust the fields on  the example to match what you want
 to index. Refer to the datamodel documentation for details.
 
-
 Fine-tune configuration
 .......................
 
 Now, you can adjust other  parameters of the configuration file. Refer
-to the install  documentation for more details on  various options you
+to the install documentation for more details on  various options you
 can tweak.
-
 
 Forth step : reindex your content
 ---------------------------------
@@ -152,5 +150,19 @@ Sixth step : integrate SeSQL with your code
 -------------------------------------------
 
 Now,  you  can  integrate  SeSQL in  your  code,  calling  shortquery,
-longquery or  any other  feature of  SeSQL. Refer to  the rest  of the
-documentation for additional information.
+longquery.
+
+Seventh step : unleash sesql's full potential 
+---------------------------------------------
+
+For more information check out this documents:
+
+- admin: list of commands provided by sesql application
+ 
+- datamodel: fine tune sesql data model to perform more complex queries (fast)
+
+- extra: dive into text highlighting, dependency tracking, search history and benchmark features
+
+- install: complete install and configuration instructions
+
+- query: explains how to build queries and which ones you are able to do based on you data model.

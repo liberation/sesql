@@ -376,7 +376,7 @@ reindex all content within the section. That can be a lot of content.</p>
 get_related_objects_for_indexation
 </pre>
 <p>This  method  doesn't take  any  parameter  (except the  <tt class="docutils literal">self</tt>,  of
-course), and  should return a lit  of related objects to  reindex when
+course), and  should return a list  of related objects to  reindex when
 the <tt class="docutils literal">self</tt> changed.</p>
 <p>The list can either be a list of <tt class="docutils literal">(classname, id)</tt> tuples, or a list
 of Django objects.</p>
@@ -429,9 +429,8 @@ probably a typo or spelling mistake, for example).</p>
 newspaper  site,  <a class="reference external" href="http://www.liberation.fr">http://www.liberation.fr</a>  ,  and  in  the  world  of
 newspapers, freshness is an important issue).</p>
 <p>From  those  three  factors,  a   weight  is  computed,  allowing  web
-developers to build additional features on top of that.
-n
-Please note that all the data are totally anonymized inside SeSQL search
+developers to build additional features on top of that.</p>
+<p>Please note that all the data are totally anonymized inside SeSQL search
 history tables.</p>
 </div>
 <div class="section" id="the-process">
