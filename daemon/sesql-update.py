@@ -72,6 +72,7 @@ class UpdateDaemon(UnixDaemon):
                           ORDER BY scheduled_at ASC LIMIT %d""" % self.chunk)
         rows = cursor.fetchall()
         if not rows:
+            transaction.rollback()
             return
         self.log.info("Found %d row(s) to reindex" % len(rows))
 
@@ -108,6 +109,10 @@ if __name__ == "__main__":
     daemon = UpdateDaemon(cmd["chunk"], cmd["wait"], cmd["pidfile"])
 
     if cmd["debug"]:
+        ch = logging.StreamHandler()
+        logger = logging.getLogger('sesql-update')
+        ch.setLevel(logging.DEBUG)
+        logger.addHandler(ch)
         daemon.run()
     else:
         daemon.start_deamon()
