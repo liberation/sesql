@@ -171,6 +171,12 @@ class IntField(Field):
 
         return pattern, values
 
+class LongIntField(IntField):
+    """
+    This is a bigint field
+    """
+    sqltype = "bigint"
+
 class StrField(Field):
     """
     This is a simple string field, with specified length
