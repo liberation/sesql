@@ -24,11 +24,11 @@ It's not fully optimal yet, but functionnal
 
 from django.db.models.sql import Query
 from django.db.models import Q
-from sesql import longquery
 
 import sesql_config as config
 
 def make_add_filter(original):
+    from sesql import longquery
     def sesql_amdin_query_add_filter(self, filter_expr, *args, **kwargs):
         name, value = filter_expr
         if not name.startswith("sesql:"):
