@@ -54,3 +54,12 @@ class SearchQuery(models.Model):
     pondered_search_nb = models.FloatField()
     
     weight = models.FloatField()
+
+#
+# !!! WARNING !!! : imports of  signals and monkey patchs are moved to
+# models.py to not create conflicts with Django's app loading...
+#
+
+import signals
+import sesql_admin
+

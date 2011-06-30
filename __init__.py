@@ -17,5 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-import signals
-import sesql_admin
+#
+# !!! WARNING !!! : imports of  signals and monkey patchs are moved to
+# models.py to not create conflicts with Django's app loading...
+#
