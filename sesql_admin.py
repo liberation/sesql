@@ -28,8 +28,8 @@ from django.db.models import Q
 import sesql_config as config
 
 def make_add_filter(original):
-    from sesql import longquery
     def sesql_amdin_query_add_filter(self, filter_expr, *args, **kwargs):
+        from sesql import longquery
         name, value = filter_expr
         if not name.startswith("sesql:"):
             return original(self, filter_expr, *args, **kwargs)
