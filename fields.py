@@ -367,7 +367,7 @@ class FullTextField(Field):
         """
         value = super(FullTextField, self).index(tablename)
         value += """
-ALTER TABLE %s ALTER COLUMN %s SET STATISTICS 10000;""" % (tablename,
+ALTER TABLE %s ALTER COLUMN %s SET STATISTICS 1000;""" % (tablename,
                                                            self.index_column)
         return value
 
