@@ -3,4 +3,6 @@ syntax: glob
 *.elc
 *.pyc
 *~
-
+.*.sw?
+build/
+*.egg*
