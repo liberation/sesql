@@ -19,9 +19,6 @@
 
 from typemap import typemap
 import sesql_config as config
-from django.core.exceptions import ObjectDoesNotExist
-
-from models import SearchHit
 
 import logging
 log = logging.getLogger('sesql')
@@ -53,7 +50,7 @@ class SeSQLResultSet(object):
         for obj in self.objs:
             try:
                 yield self.load(obj)
-            except ObjectDoesNotExist:
+            except config.orm.not_found:
                 log.warning("Object %r does not exist ! Broken index ?" % (obj,))
     __iter__ = iterator
     
@@ -86,12 +83,12 @@ class SeSQLResultSet(object):
         objclass = typemap.get_class_by_name(objclass)
         entry = "%s:%s" % (objclass.__name__, objid)
         log.debug("Fetching %s" % entry)
-        return objclass.objects.get(pk = objid)
+        return config.orm.load_object(objclass, objid)
 
     def historize(self, query):
         """save in the database the query for future processing"""
         nb_results = self.count()
         query_text = query.get_fulltext_query()[2][0]
-        SearchHit(query=query_text, nb_results=nb_results).save()
+        config.orm.historize(query=query_text, nb_results=nb_results)
         
         

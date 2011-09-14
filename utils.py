@@ -20,7 +20,6 @@
 # Allow "with" with python2.5
 from __future__ import with_statement
 
-from django.db import connection, utils
 import time
 import logging
 log = logging.getLogger('sesql')
@@ -62,39 +61,6 @@ class Timer(object):
         res = self.get_local()
         self.reset()
         return res
-
-def try_sql(sql, *args, **kwargs):
-    """
-    Try to run a SQL snippet, isolated in a transaction, and return
-    cursor, values or None, None
-    """
-    cursor = connection.cursor()
-    cursor.execute("COMMIT")
-    cursor.execute("BEGIN")
-    try:
-        cursor.execute(sql, *args, **kwargs)
-        # We need to fetch values before the COMMIT
-        values = cursor.fetchall()
-        cursor.execute("COMMIT")
-        return cursor, values
-    except utils.DatabaseError:
-        cursor.execute("ROLLBACK")
-        return None, None
-    except:
-        cursor.execute("ROLLBACK")
-        raise
-    finally:
-        cursor.execute("BEGIN")
-
-def table_exists(table):
-    """
-    Check if the table exists
-    """
-    cursor, values = try_sql("SELECT * FROM %s LIMIT 0" % table)
-    if cursor is None:
-        return False
-
-    return True
 
 def log_time(function, message = None):
     """

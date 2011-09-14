@@ -21,7 +21,6 @@ import sesql_config as config
 from sesql.typemap import typemap
 from sesql.fieldmap import fieldmap
 from sesql import utils
-from django.db import connection
 
 import logging
 log = logging.getLogger('sesql')
@@ -61,11 +60,11 @@ def get_sesql_id(obj):
     return (get_val('classname'), get_val('id'))
 
 @index_log_wrap
-def index(obj, message, noindex = False):
+@config.orm.transactional
+def index(cursor, obj, message, noindex = False):
     """
     Index a Django object into SeSQL, do the real work
     """
-    cursor = connection.cursor()
     log.info("%s : entering" % message)
     classname, objid = get_sesql_id(obj)
 
@@ -114,7 +113,6 @@ def index(obj, message, noindex = False):
         log.error('Exception caught while inserting (%s,%s) into %s' %
                   (classname, objid, table_name))
         raise
-    cursor.close()
 
 @index_log_wrap
 def unindex(obj, message):
@@ -124,7 +122,8 @@ def unindex(obj, message):
     return index(obj, noindex = True)
 
 @index_log_wrap
-def update(obj, message, fields):
+@config.orm.transactional
+def update(cursor, obj, message, fields):
     """
     Update only specific fields of given object
     """
@@ -148,8 +147,6 @@ def update(obj, message, fields):
 
     query = "UPDATE %s SET %s WHERE classname=%%s AND id=%%s" % (table_name,
                                                                  pattern)
-    cursor = connection.cursor()    
     cursor.execute(query, results + [ obj.__class__.__name__, obj.id ])
-    cursor.close()
 
     

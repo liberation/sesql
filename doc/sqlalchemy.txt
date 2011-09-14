@@ -1,0 +1,68 @@
+SeSQL and SQLAlchemy guide
+==========================
+
+.. contents:: :depth: 2
+.. sectnum:: :depth: 2
+
+Introduction
+------------
+
+Since version 0.10, SeSQL can be  used with other ORM than Django, for
+example  SQLAlchemy.   Not  all  features  are   supported,  and  this
+considered beta status.
+
+Design
+------
+
+The SQLAlchemy  version is designed  to work with  different databases
+for core  data and SeSQL data.  It can be two  PostgreSQL database, or
+PostgreSQL for  SeSQL and something  else (was tested with  Sqlite and
+MySQL) for the core data.
+
+How to
+------
+
+To use SQLAlchemy with SeSQL you need to do three things :
+
+1. Configure SeSQL to use SQLAlchemy :
+
+  - use  ``AlchemyOrmAdapter``  from  ``sesql.orm.alchemy``  instead  of
+    ``DjangoOrmAdapter`` from ``sesql.orm.django`` ;
+
+  - provide  the  ``AlchemyOrmAdapter``  with  a  SQLAlchemy  connection
+    string towards your SeSQL database ;
+
+  That will look like :
+
+::
+
+ #
+ # Select the ORM to use
+ #
+ from sesql.orm.alchemy import AlchemyOrmAdapter
+ orm = AlchemyOrmAdapter('postgresql:///sesql')
+
+
+2. Bind  your ``AlchemyOrmAdapter``  with your program  bootstrap code
+(to have  it access your sessionmaker,  and to create SeSQL  tables if
+required), with something like :
+
+::
+
+ Session = sessionmaker(bind=engine)
+ sesql_config.orm.bind(Session)
+ sesql_config.orm.sync_db()
+
+3. Express your queries with the ``Q`` object from ``sesql.orm.alchemy``.
+
+Limitations
+-----------
+
+1. You **need** to manually call ``sync_db`` at a point.
+
+2. The management commands are not supported. 
+
+3. The SearchHistory feature is not supported.
+
+4. SQLAlchemy bulk operations are not supported.
+

@@ -17,14 +17,26 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
+#
+# This is a Django hack, for Django wants a models.py at the root of
+# the application.
+#
+
 from django.db import models
+
+#
+# !!! WARNING !!! : imports of  signals and monkey patchs are moved to
+# models.py to not create conflicts with Django's app loading...
+#
+
+from orm.django import sesql_admin
+from orm.django import signals
 
 #
 # Important note : the  core SeSQL tables are created in  raw SQL by a
 # signal handler. Only the  suggest/history feature uses normal Django
 # models.
 #
-
 
 class SearchHit(models.Model):
     """Used to store queries made to the search engine"""
@@ -54,12 +66,4 @@ class SearchQuery(models.Model):
     pondered_search_nb = models.FloatField()
     
     weight = models.FloatField()
-
-#
-# !!! WARNING !!! : imports of  signals and monkey patchs are moved to
-# models.py to not create conflicts with Django's app loading...
-#
-
-import signals
-import sesql_admin
 

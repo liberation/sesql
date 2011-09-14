@@ -319,26 +319,27 @@ ul.auto-toc {
 <li><a class="reference internal" href="#prerequisite" id="id1">1&nbsp;&nbsp;&nbsp;Prerequisite</a></li>
 <li><a class="reference internal" href="#installation" id="id2">2&nbsp;&nbsp;&nbsp;Installation</a></li>
 <li><a class="reference internal" href="#configuration" id="id3">3&nbsp;&nbsp;&nbsp;Configuration</a><ul class="auto-toc">
-<li><a class="reference internal" href="#text-search-configuration" id="id4">3.1&nbsp;&nbsp;&nbsp;Text search configuration</a></li>
-<li><a class="reference internal" href="#clean-up-filters" id="id5">3.2&nbsp;&nbsp;&nbsp;Clean-up/filters</a></li>
-<li><a class="reference internal" href="#indexes-and-fields" id="id6">3.3&nbsp;&nbsp;&nbsp;Indexes and fields</a></li>
-<li><a class="reference internal" href="#types-and-tables" id="id7">3.4&nbsp;&nbsp;&nbsp;Types and tables</a></li>
-<li><a class="reference internal" href="#query-parameters" id="id8">3.5&nbsp;&nbsp;&nbsp;Query parameters</a></li>
-<li><a class="reference internal" href="#reindexing-daemon" id="id9">3.6&nbsp;&nbsp;&nbsp;Reindexing daemon</a></li>
-<li><a class="reference internal" href="#search-history-and-statistics" id="id10">3.7&nbsp;&nbsp;&nbsp;Search history and statistics</a></li>
-<li><a class="reference internal" href="#additional-features" id="id11">3.8&nbsp;&nbsp;&nbsp;Additional features</a></li>
+<li><a class="reference internal" href="#orm-choice" id="id4">3.1&nbsp;&nbsp;&nbsp;ORM choice</a></li>
+<li><a class="reference internal" href="#text-search-configuration" id="id5">3.2&nbsp;&nbsp;&nbsp;Text search configuration</a></li>
+<li><a class="reference internal" href="#clean-up-filters" id="id6">3.3&nbsp;&nbsp;&nbsp;Clean-up/filters</a></li>
+<li><a class="reference internal" href="#indexes-and-fields" id="id7">3.4&nbsp;&nbsp;&nbsp;Indexes and fields</a></li>
+<li><a class="reference internal" href="#types-and-tables" id="id8">3.5&nbsp;&nbsp;&nbsp;Types and tables</a></li>
+<li><a class="reference internal" href="#query-parameters" id="id9">3.6&nbsp;&nbsp;&nbsp;Query parameters</a></li>
+<li><a class="reference internal" href="#reindexing-daemon" id="id10">3.7&nbsp;&nbsp;&nbsp;Reindexing daemon</a></li>
+<li><a class="reference internal" href="#search-history-and-statistics" id="id11">3.8&nbsp;&nbsp;&nbsp;Search history and statistics</a></li>
+<li><a class="reference internal" href="#additional-features" id="id12">3.9&nbsp;&nbsp;&nbsp;Additional features</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#constraints" id="id12">4&nbsp;&nbsp;&nbsp;Constraints</a></li>
-<li><a class="reference internal" href="#upgrading" id="id13">5&nbsp;&nbsp;&nbsp;Upgrading</a></li>
+<li><a class="reference internal" href="#constraints" id="id13">4&nbsp;&nbsp;&nbsp;Constraints</a></li>
+<li><a class="reference internal" href="#upgrading" id="id14">5&nbsp;&nbsp;&nbsp;Upgrading</a></li>
 </ul>
 </div>
 <div class="section" id="prerequisite">
 <h1><a class="toc-backref" href="#id1">1&nbsp;&nbsp;&nbsp;Prerequisite</a></h1>
 <ul class="simple">
 <li>Python 2.5 or 2.6</li>
-<li>Django 1.2 or 1.3</li>
-<li>PostgreSQL 8.4</li>
+<li>Django 1.2 or 1.3 (or SQLAlchemy, see sqlalchemy.txt)</li>
+<li>PostgreSQL 8.4 or 9.x</li>
 <li>GenericCache from <a class="reference external" href="http://pypi.python.org/pypi/GenericCache/1.0.2">http://pypi.python.org/pypi/GenericCache/1.0.2</a></li>
 </ul>
 <p>SeSQL may  work with  later versions  of those  software, but  was not
@@ -357,8 +358,13 @@ project).</p>
 <p>For a summary  of how to quickly configure SeSQL,  please refer to the
 tutorial.  This document  contains a  detailed list  of all  recognized
 options.</p>
+<div class="section" id="orm-choice">
+<h2><a class="toc-backref" href="#id4">3.1&nbsp;&nbsp;&nbsp;ORM choice</a></h2>
+<p>Since  version  0.10,   SeSQL  can  work  with   non-django  ORM.  See
+sqlalchemy.txt for more informations about it.</p>
+</div>
 <div class="section" id="text-search-configuration">
-<h2><a class="toc-backref" href="#id4">3.1&nbsp;&nbsp;&nbsp;Text search configuration</a></h2>
+<h2><a class="toc-backref" href="#id5">3.2&nbsp;&nbsp;&nbsp;Text search configuration</a></h2>
 <p>PostgreSQL's full text search is based  on the concept of <em>text search
 configuration</em>  (TSC).   Those  configuration   are  detailed  on  the
 PostgreSQL manual, and  allow to control things  like stopwords. SeSQL
@@ -388,7 +394,7 @@ This should be  a list of SQL statements, to  define extra TSCs that
 can be used in specific fields.</blockquote>
 </div>
 <div class="section" id="clean-up-filters">
-<h2><a class="toc-backref" href="#id5">3.2&nbsp;&nbsp;&nbsp;Clean-up/filters</a></h2>
+<h2><a class="toc-backref" href="#id6">3.3&nbsp;&nbsp;&nbsp;Clean-up/filters</a></h2>
 <dl class="docutils">
 <dt>CHARSET</dt>
 <dd>Name  of the  charset to  use. Note  that SeSQL  was only  tested in
@@ -406,7 +412,7 @@ indexed. Useful, for example, to filter on workflow state.</dd>
 </dl>
 </div>
 <div class="section" id="indexes-and-fields">
-<h2><a class="toc-backref" href="#id6">3.3&nbsp;&nbsp;&nbsp;Indexes and fields</a></h2>
+<h2><a class="toc-backref" href="#id7">3.4&nbsp;&nbsp;&nbsp;Indexes and fields</a></h2>
 <dl class="docutils">
 <dt>FIELDS</dt>
 <dd>A  list or  tuple of  fields (see  <tt class="docutils literal">datamodel.txt</tt>), including  at
@@ -418,7 +424,7 @@ worth creating depend of the kind of queries you do frequently.</dd>
 </dl>
 </div>
 <div class="section" id="types-and-tables">
-<h2><a class="toc-backref" href="#id7">3.4&nbsp;&nbsp;&nbsp;Types and tables</a></h2>
+<h2><a class="toc-backref" href="#id8">3.5&nbsp;&nbsp;&nbsp;Types and tables</a></h2>
 <dl class="docutils">
 <dt>MASTER_TABLE_NAME</dt>
 <dd>The  name  of   the  master  table,  from  which   all  others  will
@@ -432,7 +438,7 @@ sent to the same table of the superclass.</dd>
 </dl>
 </div>
 <div class="section" id="query-parameters">
-<h2><a class="toc-backref" href="#id8">3.5&nbsp;&nbsp;&nbsp;Query parameters</a></h2>
+<h2><a class="toc-backref" href="#id9">3.6&nbsp;&nbsp;&nbsp;Query parameters</a></h2>
 <dl class="docutils">
 <dt>DEFAULT_ORDER</dt>
 <dd>Default   sort  order   for  queries,   when  sort   order  is   not
@@ -452,7 +458,7 @@ page.</dd>
 </dl>
 </div>
 <div class="section" id="reindexing-daemon">
-<h2><a class="toc-backref" href="#id9">3.6&nbsp;&nbsp;&nbsp;Reindexing daemon</a></h2>
+<h2><a class="toc-backref" href="#id10">3.7&nbsp;&nbsp;&nbsp;Reindexing daemon</a></h2>
 <dl class="docutils">
 <dt>DAEMON_DEFAULT_CHUNK</dt>
 <dd>Number of elements to proceed on each iteration of the reindex daemon.</dd>
@@ -464,7 +470,7 @@ must have write permission to it, and the directory must exists.</dd>
 </dl>
 </div>
 <div class="section" id="search-history-and-statistics">
-<h2><a class="toc-backref" href="#id10">3.7&nbsp;&nbsp;&nbsp;Search history and statistics</a></h2>
+<h2><a class="toc-backref" href="#id11">3.8&nbsp;&nbsp;&nbsp;Search history and statistics</a></h2>
 <dl class="docutils">
 <dt>HISTORY_DEFAULT_FILTER</dt>
 <dd>Queries giving less  than this amount of results will  be ignored in
@@ -484,7 +490,7 @@ compared to the HISTORY_GAMMA parameter.</dd>
 </dl>
 </div>
 <div class="section" id="additional-features">
-<h2><a class="toc-backref" href="#id11">3.8&nbsp;&nbsp;&nbsp;Additional features</a></h2>
+<h2><a class="toc-backref" href="#id12">3.9&nbsp;&nbsp;&nbsp;Additional features</a></h2>
 <dl class="docutils">
 <dt>ENABLE_SESQL_ADMIN</dt>
 <dd>If set to  yes, you'll be able to use  <tt class="docutils literal"><span class="pre">sesql:&lt;fieldname&gt;</span></tt> in your
@@ -495,7 +501,7 @@ core Django code, and is therefore disabled by default.</dd>
 </div>
 </div>
 <div class="section" id="constraints">
-<h1><a class="toc-backref" href="#id12">4&nbsp;&nbsp;&nbsp;Constraints</a></h1>
+<h1><a class="toc-backref" href="#id13">4&nbsp;&nbsp;&nbsp;Constraints</a></h1>
 <p>Current version of SeSQL has a few constraints :</p>
 <ul class="simple">
 <li>it  requires to  have a  <tt class="docutils literal">ClassField</tt> called  <tt class="docutils literal">classname</tt>  and a
@@ -506,7 +512,7 @@ script. Patches are welcomed to handle that.</li>
 </ul>
 </div>
 <div class="section" id="upgrading">
-<h1><a class="toc-backref" href="#id13">5&nbsp;&nbsp;&nbsp;Upgrading</a></h1>
+<h1><a class="toc-backref" href="#id14">5&nbsp;&nbsp;&nbsp;Upgrading</a></h1>
 <p>If you need to rebuild all SeSQL indexes (because you changed them too
 heavily for example) you can do :</p>
 <pre class="literal-block">

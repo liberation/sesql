@@ -21,7 +21,6 @@
 Handle the type map, that is, the map between Django models and SQL tables
 """
 
-from django.db import models
 import sesql_config as config
 
 class TypeMap(object):

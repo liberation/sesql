@@ -17,12 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.db.models import Q
 from sesql.typemap import typemap
 from sesql.fieldmap import fieldmap
 import sesql_config as config
-
-from django.db import connection
 
 import logging
 log = logging.getLogger('sesql')
@@ -65,7 +62,7 @@ class SeSQLQuery(object):
         """
         Execute and log query
         """
-        cursor = connection.cursor()
+        cursor = config.orm.cursor()
         log.debug("Query %r with values %r" % (query, values))
         cursor.execute(query, values)
         return cursor
@@ -110,7 +107,7 @@ LIMIT %d""" % limit
         l_pattern, l_values = fieldmap.get_field("classname").get_in(classes)
         l_order, _ = self.get_order(limit = 1)
 
-        cursor = connection.cursor()
+        cursor = config.orm.cursor()
 
         #
         # We need to do some query optimization, since postgresql will not
@@ -214,7 +211,7 @@ WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (table, l_pattern, l_order,
         """
         Find a node for field 'field' starting from node 'node'
         """
-        if isinstance(node, Q):
+        if isinstance(node, config.orm.node_class):
             if node.negated:
                 log.debug("Found a negated node, stop looking for %s" % field)
                 return None
@@ -242,7 +239,7 @@ WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (table, l_pattern, l_order,
         """
         Get the SQL pattern of the query, as tuple (pattern, values)
         """
-        if isinstance(node, Q):
+        if isinstance(node, config.orm.node_class):
             if node.negated:
                 node.negated = False
                 pattern, values = self.get_pattern_for(node)

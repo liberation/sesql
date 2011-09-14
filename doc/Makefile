@@ -19,7 +19,7 @@
 
 
 SOURCES = tutorial.txt install.txt datamodel.txt query.txt admin.txt\
-	  extra.txt
+	  extra.txt sqlalchemy.txt
 
 PDF = $(SOURCES:.txt=.pdf)
 HTML = $(SOURCES:.txt=.html)

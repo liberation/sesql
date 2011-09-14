@@ -37,6 +37,13 @@ from django.db.models import Q
 from libe import models, constants
 
 #
+# Select the ORM to use
+#
+from sesql.orm.django import DjangoOrmAdapter
+orm = DjangoOrmAdapter()
+
+
+#
 # Fields and tables configuration
 #
 

@@ -21,7 +21,6 @@
 Handle the field map
 """
 
-from django.db import models
 import sesql_config as config
 
 class FieldMap(object):

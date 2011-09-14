@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
+import sesql_config as config
 from sesql.fieldmap import fieldmap
-from django.db import connection
 
 # Use GenericCache for now, but will probably be moved to memcached later
 from GenericCache import GenericCache
@@ -42,7 +42,7 @@ def lemmatize_for(words, dictionnary):
         pattern = "plainto_tsquery('%s', %%s)" % dictionnary
         patterns = [ pattern for word in remaining ]
 
-        cursor = connection.cursor()
+        cursor = config.orm.cursor()
         cursor.execute('SELECT %s;' % (','.join(patterns)), remaining)
         row = cursor.fetchone()
         for word, value in zip(remaining, row):

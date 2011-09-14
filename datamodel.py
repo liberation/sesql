@@ -19,15 +19,12 @@
 
 import sesql_config as config
 from sesql.typemap import typemap
-from django.db import connection, transaction
-
-from sesql.utils import table_exists
 
 def sql_function(func):
     """
     Decorator to execute or print SQL statements
     """
-    def sql_function_inner(execute = False, verbosity = True,
+    def sql_function_inner(cursor, execute = False, verbosity = True,
                            include_drop = False,
                            **kwargs):
         sql = func(**kwargs)
@@ -39,7 +36,6 @@ def sql_function(func):
                 print row + ";"
             print
         if execute:
-            cursor = connection.cursor()
             for row in sql:
                 cursor.execute(row)
     return sql_function_inner
@@ -119,25 +115,21 @@ def create_schedule_table():
     ]
 
 
-def sync_db(verbosity = 0, interactive = False, signal = None, **kwargs):
-    if hasattr(signal, "_sesql_syncdb_done"):
-        return
-    signal._sesql_syncdb_done = True
-
-    if not table_exists(config.MASTER_TABLE_NAME):
-        create_dictionnary(execute = True, verbosity = verbosity, include_drop = True)
-        create_master_table(execute = True, verbosity = verbosity, include_drop = True)
+@config.orm.transactional
+def sync_db(cursor, verbosity = 0):
+    if not config.orm.table_exists(cursor, config.MASTER_TABLE_NAME):
+        create_dictionnary(cursor, execute = True, verbosity = verbosity, include_drop = True)
+        create_master_table(cursor, execute = True, verbosity = verbosity, include_drop = True)
     elif verbosity:
         print "SeSQL : Table %s already existed, skipped." % config.MASTER_TABLE_NAME
         
     for table in typemap.all_tables():
-        if not table_exists(table):
-            create_table(table = table, execute = True, verbosity = verbosity)
+        if not config.orm.table_exists(cursor, table):
+            create_table(cursor, table = table, execute = True, verbosity = verbosity)
         elif verbosity:
             print "SeSQL : Table %s already existed, skipped." % table
 
-    if not table_exists("sesql_reindex_schedule"):
-        create_schedule_table(execute = True, verbosity = verbosity, include_drop = True)
+    if not config.orm.table_exists(cursor, "sesql_reindex_schedule"):
+        create_schedule_table(cursor, execute = True, verbosity = verbosity, include_drop = True)
     elif verbosity:
         print "SeSQL : Table %s already existed, skipped." % 'sesql_reindex_schedule'
-    

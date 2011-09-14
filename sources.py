@@ -23,7 +23,6 @@ Contain the various kind of field aggregators/fetchers/...
 """
 
 import sesql_config as config
-from django.core.exceptions import ObjectDoesNotExist
 
 # Automatic dispatcher
 def guess_source(what):
@@ -93,7 +92,7 @@ class SimpleField(AbstractSource):
         """
         try:
             return getattr(obj, self.name, None)
-        except ObjectDoesNotExist:
+        except config.orm.not_found:
             return None
 
 class MethodCaller(SimpleField):

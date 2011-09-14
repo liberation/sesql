@@ -20,13 +20,15 @@
 
 from django.db.models import signals
 from django.db import transaction
-from django.conf import settings
+from django.conf import settings       
 
 if 'sesql' in settings.INSTALLED_APPS:
-    def sync_db(*args, **kwargs):
-        # Trick to defer import
+    def sync_db(verbosity = 0, interactive = False, signal = None, **kwargs):
+        if hasattr(signal, "_sesql_syncdb_done"):
+            return
+        signal._sesql_syncdb_done = True
         from sesql.datamodel import sync_db
-        return sync_db(*args, **kwargs)
+        return sync_db(verbosity)
     signals.post_syncdb.connect(sync_db)
 
     @transaction.commit_on_success
