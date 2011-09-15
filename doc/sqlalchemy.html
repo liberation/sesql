@@ -339,34 +339,25 @@ MySQL) for the core data.</p>
 <h1><a class="toc-backref" href="#id3">3&nbsp;&nbsp;&nbsp;How to</a></h1>
 <p>To use SQLAlchemy with SeSQL you need to do three things :</p>
 <ol class="arabic simple">
-<li>Configure SeSQL to use SQLAlchemy :</li>
+<li>Configure SeSQL to use SQLAlchemy, rhat will look like :</li>
 </ol>
-<blockquote>
-<ul class="simple">
-<li>use  <tt class="docutils literal">AlchemyOrmAdapter</tt>  from  <tt class="docutils literal">sesql.orm.alchemy</tt>  instead  of
-<tt class="docutils literal">DjangoOrmAdapter</tt> from <tt class="docutils literal">sesql.orm.django</tt> ;</li>
-<li>provide  the  <tt class="docutils literal">AlchemyOrmAdapter</tt>  with  a  SQLAlchemy  connection
-string towards your SeSQL database ;</li>
-</ul>
-<p>That will look like :</p>
-</blockquote>
 <pre class="literal-block">
 #
 # Select the ORM to use
 #
 from sesql.orm.alchemy import AlchemyOrmAdapter
-orm = AlchemyOrmAdapter('postgresql:///sesql')
+orm = AlchemyOrmAdapter()
 </pre>
 <p>2. Bind  your <tt class="docutils literal">AlchemyOrmAdapter</tt>  with your program  bootstrap code
-(to have  it access your sessionmaker,  and to create SeSQL  tables if
-required), with something like :</p>
+(to have it access its  database, your sessionmaker for &quot;normal data&quot;,
+and to create SeSQL tables if required), with something like :</p>
 <pre class="literal-block">
 Session = sessionmaker(bind=engine)
-sesql_config.orm.bind(Session)
+sesql_config.orm.bind('postgresql:///sesql', Session)
 sesql_config.orm.sync_db()
 </pre>
 <ol class="arabic simple" start="3">
-<li>Express your queries with the Q object from <tt class="docutils literal">sesql.orm.alchemy</tt>.</li>
+<li>Express your queries with the <tt class="docutils literal">Q</tt> object from <tt class="docutils literal">sesql.orm.alchemy</tt>.</li>
 </ol>
 </div>
 <div class="section" id="limitations">

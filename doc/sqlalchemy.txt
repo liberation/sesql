@@ -24,15 +24,7 @@ How to
 
 To use SQLAlchemy with SeSQL you need to do three things :
 
-1. Configure SeSQL to use SQLAlchemy :
-
-  - use  ``AlchemyOrmAdapter``  from  ``sesql.orm.alchemy``  instead  of
-    ``DjangoOrmAdapter`` from ``sesql.orm.django`` ;
-
-  - provide  the  ``AlchemyOrmAdapter``  with  a  SQLAlchemy  connection
-    string towards your SeSQL database ;
-
-  That will look like :
+1. Configure SeSQL to use SQLAlchemy, rhat will look like :
 
 ::
 
@@ -40,17 +32,17 @@ To use SQLAlchemy with SeSQL you need to do three things :
  # Select the ORM to use
  #
  from sesql.orm.alchemy import AlchemyOrmAdapter
- orm = AlchemyOrmAdapter('postgresql:///sesql')
+ orm = AlchemyOrmAdapter()
 
 
 2. Bind  your ``AlchemyOrmAdapter``  with your program  bootstrap code
-(to have  it access your sessionmaker,  and to create SeSQL  tables if
-required), with something like :
+(to have it access its  database, your sessionmaker for "normal data",
+and to create SeSQL tables if required), with something like :
 
 ::
 
  Session = sessionmaker(bind=engine)
- sesql_config.orm.bind(Session)
+ sesql_config.orm.bind('postgresql:///sesql', Session)
  sesql_config.orm.sync_db()
 
 3. Express your queries with the ``Q`` object from ``sesql.orm.alchemy``.

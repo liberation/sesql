@@ -33,20 +33,20 @@ class AlchemyOrmAdapter(OrmAdapter):
     not_found = NoResultFound
     node_class = Q
 
-    def __init__(self, connection):
+    def __init__(self):
         """
         Constructor
         """
-        self.engine = create_engine(connection, convert_unicode=True,
-                                    encoding = 'utf-8')
         self.bind_signals()
 
-    def bind(self, source_maker):
+    def bind(self, connection, source_maker):
         """
         Bind to a source session maker - this is mandatory to search,
         not to index
         """
         self.source_maker = source_maker        
+        self.engine = create_engine(connection, convert_unicode=True,
+                                    encoding = 'utf-8')
 
     def load_object(self, klass, oid):
         """
