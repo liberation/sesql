@@ -20,14 +20,20 @@
 from sesql.fieldmap import fieldmap
 from django.db import connection
 
+# Maximal number of words to lemmatize at once
+MAX_WORDS = 1000
+
 # Use GenericCache for now, but will probably be moved to memcached later
 from GenericCache import GenericCache
-_word_cache = GenericCache(maxsize = 10000, expiry = 86400)
+_word_cache = GenericCache(maxsize = 50000, expiry = 86400)
 
 def lemmatize_for(words, dictionnary):
     """
     Lemmatize a word with given dictionnary
     """
+    if len(words) > MAX_WORDS:
+        return lemmatize_for(words[:MAX_WORDS], dictionnary) + lemmatize_for(words[MAX_WORDS:], dictionnary)
+    
     values = {}
     remaining = []
 
