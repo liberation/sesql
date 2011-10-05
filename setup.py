@@ -3,6 +3,7 @@
 import sesql
 
 from setuptools import setup, find_packages
+import glob
 
 install_requires = ['GenericCache == 1.0.2', ]
 
@@ -14,13 +15,13 @@ setup(
     description='SeSQL (Search Engine SQL) handle advanced SQL search on huge databases of documents/articles from Django applications',
     long_description=long_description,
     author='Pilot Systems',
-    author_email='contact@pilotsystems.net',
+    author_email='gael@pilotsystems.net',
     url='https://bitbucket.org/liberation/sesql/',
-    license='BSD',
+    license='GPL v2+',
     keywords="sql search postgresql django",
     platforms=["any"],
     packages=find_packages(),
-    include_package_data=False,
+    include_package_data=True,
     install_requires=install_requires,
     zip_safe=False,
     classifiers=[
