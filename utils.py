@@ -17,9 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-# Allow "with" with python2.5
-from __future__ import with_statement
-
 import time
 import logging
 log = logging.getLogger('sesql')
@@ -68,8 +65,11 @@ def log_time(function, message = None):
     """
     tmr = Timer()
     def log_time_inner(*args, **kwargs):
-        with tmr:
+        tmr.__enter__()
+        try:
             res = function(*args, **kwargs)
+        finally:
+            tmr.__exit__()
         args = ', '.join([ str(a) for a in args ])
         extra = [ "%s=%s" % (key, value) for key, value in kwargs.items() ]
         kwargs = ', '.join(extra)

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import with_statement
-
 import string, random
 from GenericCache import GenericCache
 
@@ -43,16 +41,20 @@ def longquery(query, order=None, limit=None, queryid=None, historize=False):
     Be careful, if the query is redone, results may have changed.
     """
     if queryid:
-        with _query_cache.lock:
+        _query_cache.lock.acquire()
+        try:
             results = _query_cache[queryid]
             if results:
                 return results
             log.warning('Cached query id %r expired, re-querying.' % queryid)
+        finally:
+            _query_cache.lock.release()
             
     query = SeSQLQuery(query, order)
     results = query.longquery(limit)
     
-    with _query_cache.lock:
+    _query_cache.lock.acquire()
+    try:
         # Generate a new query id, ensuring it's unique
         if not queryid:
             while True:
@@ -62,6 +64,8 @@ def longquery(query, order=None, limit=None, queryid=None, historize=False):
                     break
         _query_cache[queryid] = results
         results.queryid = queryid
+    finally:
+        _query_cache.lock.release()
     
     if historize: # suggest feature hook
         results.historize(query)

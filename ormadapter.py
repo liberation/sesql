@@ -78,6 +78,7 @@ class OrmAdapter(object):
                 return res
             except:
                 self.rollback(cursor)
+                raise
         inner.__name__ = function.__name__
         return inner
 
