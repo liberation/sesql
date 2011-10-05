@@ -1,0 +1,26 @@
+Source: sesql
+Maintainer: Pilot Systems <gael@pilotsystems.net>
+Section: python
+Priority: optional
+Build-Depends: python-setuptools (>= 0.6b3), debhelper (>= 7), python-support (>= 0.8.4)
+X-Python-Version: >= 2.4
+Standards-Version: 3.9.1
+
+Package: python-sesql
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, python-genericcache (>= 1.0.2), python-psycopg2, python-django (>= 1.2) | python-sqlalchemy (>= 0.7.0)
+Provides: ${python:Provides}
+Description: SeSQL (Search Engine SQL) handle advanced SQL search on huge
+ SeSQL (Search Engine SQL) is a free software for handling advanced SQL
+ search   on   huge  databases   of   documents/articles  from   Django
+ applications.
+ .
+ It supports features like :
+ - full text search ;
+ - complex queries ;
+ - stable pagination ;
+ - extra-fast "short queries" for retrieving a few matching recent items ;
+ - multiple and composite indexes ;
+ - semi-automatic dependency tracking ;
+ - highlighting of results ;
+ .
