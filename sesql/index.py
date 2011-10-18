@@ -109,9 +109,9 @@ def index(cursor, obj, message, noindex = False):
                                                  ",".join(placeholders))
     try:
         cursor.execute(query, results)
-    except:
-        log.error('Exception caught while inserting (%s,%s) into %s' %
-                  (classname, objid, table_name))
+    except Exception, e:
+        log.exception('Exception %s caught while inserting (%s,%s) into %s' %
+                      (e, classname, objid, table_name))
         raise
 
 @index_log_wrap

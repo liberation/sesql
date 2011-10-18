@@ -1,3 +1,9 @@
+sesql (0.10.2-1) unstable; urgency=low
+
+  * more detailed log on insertion error
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Tue, 18 Oct 2011 10:16:20 +0200
+
 sesql (0.10.1-1) unstable; urgency=low
 
   * source package automatically created by stdeb 0.6.0
