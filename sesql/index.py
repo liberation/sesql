@@ -89,21 +89,23 @@ def index(cursor, obj, message, noindex = False):
         log.info("%s: no table found, skipping" % message)
         return
 
+    cursor.execute('LOCK %s IN EXCLUSIVE MODE' % table_name)
+
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
     cursor.execute(query, (objid, classname))
 
     if noindex:
         log.info("%s : running in 'noindex' mode, only deleteing" % message)
         return
-    
+
     if config.SKIP_CONDITION and config.SKIP_CONDITION(obj):
         log.info("%s : not indexing because of skip_condition" % message)
         return
-    
+
     log.info("%s : indexing entry in table %s" % (message, table_name))
 
     keys, placeholders, results = get_values(obj, config.FIELDS)
-    
+
     query = "INSERT INTO %s (%s) VALUES (%s)" % (table_name,
                                                  ",".join(keys),
                                                  ",".join(placeholders))
@@ -113,6 +115,7 @@ def index(cursor, obj, message, noindex = False):
         log.exception('Exception %s caught while inserting (%s,%s) into %s' %
                       (e, classname, objid, table_name))
         raise
+        
 
 @index_log_wrap
 def unindex(obj, message):

@@ -43,7 +43,10 @@ class Command(BaseCommand):
             sys.exit(1)
         
         obj = SeSQLResultSet.load(apps)
-        index(obj)
-        
-        transaction.commit()
+        try:
+            index(obj)        
+            transaction.commit()
+        except:
+            transaction.rollback()
+            raise
         

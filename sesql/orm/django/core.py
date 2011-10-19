@@ -18,7 +18,7 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 from sesql.ormadapter import OrmAdapter
-from django.db import connection
+from django.db import connection, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
@@ -55,6 +55,7 @@ class DjangoOrmAdapter(OrmAdapter):
         Let Django handle transactions
         """
         cursor = self.cursor()
+        transaction.set_dirty()
         return cursor
 
     def commit(self, cursor):
@@ -62,12 +63,12 @@ class DjangoOrmAdapter(OrmAdapter):
         Commit transaction on cursor
         Let Django handle transactions
         """
-        pass
+        transaction.commit_unless_managed()
 
     def rollback(self, cursor):
         """
         Rollback transaction on cursor
         Let Django handle transactions
         """
-        pass
+        transaction.rollback_unless_managed()
 
