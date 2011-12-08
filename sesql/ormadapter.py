@@ -70,7 +70,7 @@ class OrmAdapter(object):
         """
         Wrap a function to have a transaction-bound cursor
         """
-        def inner(*args, **kwargs):
+        def transactional_inner(*args, **kwargs):
             cursor = self.begin()
             try:
                 res = function(cursor, *args, **kwargs)
@@ -79,8 +79,8 @@ class OrmAdapter(object):
             except:
                 self.rollback(cursor)
                 raise
-        inner.__name__ = function.__name__
-        return inner
+        transactional_inner.__name__ = function.__name__
+        return transactional_inner
 
 
     #

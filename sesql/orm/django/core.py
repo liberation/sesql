@@ -55,7 +55,8 @@ class DjangoOrmAdapter(OrmAdapter):
         Let Django handle transactions
         """
         cursor = self.cursor()
-        transaction.set_dirty()
+        if transaction.is_managed():
+            transaction.set_dirty()
         return cursor
 
     def commit(self, cursor):

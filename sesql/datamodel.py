@@ -24,7 +24,7 @@ def sql_function(func):
     """
     Decorator to execute or print SQL statements
     """
-    def sql_function_inner(cursor, execute = False, verbosity = True,
+    def sql_function_inner(cursor = None, execute = False, verbosity = True,
                            include_drop = False,
                            **kwargs):
         sql = func(**kwargs)
@@ -35,7 +35,7 @@ def sql_function(func):
             for row in sql:
                 print row + ";"
             print
-        if execute:
+        if execute and cursor:
             for row in sql:
                 cursor.execute(row)
     return sql_function_inner
