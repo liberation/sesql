@@ -1,3 +1,9 @@
+sesql (0.11.0-1) unstable; urgency=low
+
+  * Added an asynchronous indexing mode
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Wed, 25 Jan 2012 14:33:20 +0100
+
 sesql (0.10.4-1) unstable; urgency=low
 
   * Minor fixes related to table creation and transaction handling
