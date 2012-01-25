@@ -81,6 +81,8 @@ class SeSQLResultSet(object):
         """
         objclass, objid = obj
         objclass = typemap.get_class_by_name(objclass)
+        if not objclass:
+            return config.orm.not_found
         entry = "%s:%s" % (objclass.__name__, objid)
         log.debug("Fetching %s" % entry)
         return config.orm.load_object(objclass, objid)

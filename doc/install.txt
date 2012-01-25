@@ -155,6 +155,16 @@ DAEMON_DEFAULT_PID
   Pid file to use for the  reindex daemon. The user running the daemon
   must have write permission to it, and the directory must exists.
 
+ASYNCHRONOUS_INDEXING
+  If set  to True, all  indexing will be  forwarded to the  daemon for
+  asynchronous   indexing.  Locking   will   then  not   be  used   in
+  indexation.  This  is  recommended  behavior if  you  have  frequent
+  changes in  your database, and can  tolerate a few minutes  of delay
+  between modification of the database and the results being reflected
+  in SeSQL.
+
+  This is only supported with Django ORM for now.
+
 Search history and statistics
 .............................
 

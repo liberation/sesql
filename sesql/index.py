@@ -55,9 +55,27 @@ def get_sesql_id(obj):
     """
     Get classname and id, the SeSQL identifiers
     """
+    if isinstance(obj, (tuple, list)) and len(obj) == 2:
+        return tuple(obj)
+    
     def get_val(field):
         return fieldmap[field].get_values(obj)[0]
     return (get_val('classname'), get_val('id'))
+
+@config.orm.transactional
+def schedule_reindex(cursor, item):
+    if hasattr(item, "id"):
+        # Django object ? fecth class and id
+        item = get_sesql_id(item)
+
+    classname, objid = item
+    table_name = typemap.get_table_for(classname)
+    if not table_name:
+        log.info("%s: no table found, skipping" % classname)
+        return
+
+    cursor.execute("SELECT nextval('sesql_reindex_id_seq')")
+    cursor.execute("INSERT INTO sesql_reindex_schedule (rowid, classname, objid) SELECT currval('sesql_reindex_id_seq'), %s, %s", item)
 
 @index_log_wrap
 @config.orm.transactional
@@ -74,11 +92,7 @@ def index(cursor, obj, message, noindex = False):
         related = gro()
         nbrelated = len(related)
         for item in related:
-            if hasattr(item, "id"):
-                # Django object ? fecth class and id
-                item = get_sesql_id(obj)
-            cursor.execute("SELECT nextval('sesql_reindex_id_seq')")
-            cursor.execute("INSERT INTO sesql_reindex_schedule (rowid, classname, objid) SELECT currval('sesql_reindex_id_seq'), %s, %s", item)
+            schedule_reindex(item)
     else:
         nbrelated = 0        
 
@@ -89,7 +103,8 @@ def index(cursor, obj, message, noindex = False):
         log.info("%s: no table found, skipping" % message)
         return
 
-    cursor.execute('LOCK %s IN EXCLUSIVE MODE' % table_name)
+    if not getattr(config, 'ASYNCHRONOUS_INDEXING', False):
+        cursor.execute('LOCK %s IN EXCLUSIVE MODE' % table_name)
 
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
     cursor.execute(query, (objid, classname))

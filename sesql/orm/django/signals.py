@@ -34,14 +34,22 @@ if 'sesql' in settings.INSTALLED_APPS:
     @transaction.commit_on_success
     def index_cb(sender, instance, *args, **kwargs):
         # Trick to defer import
-        from sesql.index import index    
-        return index(instance)    
+        from sesql.index import index, schedule_reindex
+        import sesql_config
+        if getattr(sesql_config, 'ASYNCHRONOUS_INDEXING', False):
+            return schedule_reindex(instance)
+        else:        
+            return index(instance)    
     signals.post_save.connect(index_cb)
 
 
     @transaction.commit_on_success
     def unindex_cb(sender, instance, *args, **kwargs):
         # Trick to defer import
-        from sesql.index import unindex
-        return unindex(instance)
+        from sesql.index import unindex, schedule_reindex
+        import sesql_config
+        if getattr(sesql_config, 'ASYNCHRONOUS_INDEXING', False):
+            return schedule_reindex(instance)
+        else:        
+            return unindex(instance)
     signals.pre_delete.connect(unindex_cb)

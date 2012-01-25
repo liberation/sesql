@@ -32,10 +32,11 @@ from sesql_config import *
 from sesql import index, results
 
 from django.db import connection, transaction
+import sesql_config as config
 
 
 def version():
-    print "sesql update daemon, v 0.9"
+    print "sesql update daemon, v 0.11.0"
 
 class UpdateDaemon(UnixDaemon):
     """
@@ -79,14 +80,24 @@ class UpdateDaemon(UnixDaemon):
         done = set()
         
         for row in rows:
-            row = tuple(row)
-            if not row in done:
-                self.log.info("Reindexing %s:%d" % row)
-                done.add(row)
-                obj = results.SeSQLResultSet.load(row)
-                index.index(obj)
-                cursor.execute("""DELETE FROM sesql_reindex_schedule
-                                  WHERE classname=%s AND objid=%s""", row)
+            try:
+                row = tuple(row)
+                if not row in done:
+                    self.log.info("Reindexing %s:%d" % row)
+                    done.add(row)
+                    try:
+                        obj = results.SeSQLResultSet.load(row)
+                        index.index(obj)
+                    except config.orm.not_found:
+                        self.log.info("%s:%d doesn't exist anymore, undexing" % row)
+                        index.unindex(row)
+                    cursor.execute("""DELETE FROM sesql_reindex_schedule
+                                      WHERE classname=%s AND objid=%s""", row)
+            except Exception, e:
+                self.log.error('Error in row %s:%s : %s' % (row[0], row[1], e))
+                if cmd["debug"]:
+                    import pdb
+                    pdb.post_mortem()
         transaction.commit()
 
 if __name__ == "__main__":

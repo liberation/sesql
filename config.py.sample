@@ -152,3 +152,9 @@ HISTORY_BLACKLIST = []
 # Enable sesql searches from Django admin ?
 #
 ENABLE_SESQL_ADMIN = False
+
+#
+# Enable to force all updates to be processed asynchronously by the daemon
+#
+
+ASYNCHRONOUS_INDEXING = False
