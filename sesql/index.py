@@ -64,9 +64,7 @@ def get_sesql_id(obj):
 
 @config.orm.transactional
 def schedule_reindex(cursor, item):
-    if hasattr(item, "id"):
-        # Django object ? fecth class and id
-        item = get_sesql_id(item)
+    item = get_sesql_id(item)
 
     classname, objid = item
     table_name = typemap.get_table_for(classname)
