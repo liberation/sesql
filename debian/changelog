@@ -1,3 +1,9 @@
+sesql (0.11.3-1) unstable; urgency=low
+
+  * Something weird happened on 0.11.2, don't use it !
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Thu, 09 Feb 2012 11:45:07 +0100
+
 sesql (0.11.2-1) unstable; urgency=low
 
   * More robust handling of breaking database connections in
