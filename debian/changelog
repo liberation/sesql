@@ -1,6 +1,14 @@
+sesql (0.11.2-1) unstable; urgency=low
+
+  * More robust handling of breaking database connections in
+    sesql-update daemon
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Thu, 09 Feb 2012 10:22:58 +0100
+
 sesql (0.11.1-1) unstable; urgency=low
 
-  * Fixed a bug when trying to asynchronously index something which has no id
+  * Fixed a bug when trying to asynchronously index something which
+    has no id
 
  -- Gael Le Mignot <gael@pilotsystems.net>  Thu, 26 Jan 2012 12:00:36 +0100
 

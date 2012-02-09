@@ -29,14 +29,14 @@ from sesql.daemon.cmdline import CmdLine
 
 from sesql_config import *
 
-from sesql import index, results
+from sesql import index, results, __version__
 
 from django.db import connection, transaction
 import sesql_config as config
 
 
 def version():
-    print "sesql update daemon, v 0.11.0"
+    print "sesql update daemon, v " + __version__
 
 class UpdateDaemon(UnixDaemon):
     """
@@ -59,6 +59,8 @@ class UpdateDaemon(UnixDaemon):
                 type, value, tb = sys.exc_info()        
                 error = traceback.format_exception_only(type, value)[0]
                 print >> sys.stderr, error
+                self.log.error(error)
+            connection.close()
             self.log.debug("Sleeping for %.2f second(s)" % self.delay)
             time.sleep(self.delay)
 
