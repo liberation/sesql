@@ -21,5 +21,5 @@
 # !!! WARNING !!! : imports of  signals and monkey patchs are moved to
 # models.py to not create conflicts with Django's app loading...
 #
-VERSION = (0, 11, 3)
+VERSION = (0, 12, 0)
 __version__ = ".".join(map(str, VERSION))

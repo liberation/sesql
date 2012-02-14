@@ -1,3 +1,9 @@
+sesql (0.12.0-1) unstable; urgency=low
+
+  * Added an option to dereference porxy models in Django.
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Tue, 14 Feb 2012 09:47:55 +0100
+
 sesql (0.11.3-1) unstable; urgency=low
 
   * Something weird happened on 0.11.2, don't use it !

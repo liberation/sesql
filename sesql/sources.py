@@ -69,11 +69,24 @@ class ClassSource(AbstractSource):
     """
     Get the class of the object
     """
+    def __init__(self, dereference_proxy = False):
+        """
+        Constructor 
+        If dereference_proxy is set to True, proxy models will be
+        considered as their base classe - this is only for Django ORM
+        """        
+        self.dereference_proxy = dereference_proxy
+
     def load_data(self, obj):
         """
         Load data from a Django object
         """
-        return obj.__class__.__name__
+        klass = obj.__class__
+        if self.dereference_proxy:
+            if hasattr(obj, '_meta'):
+                if getattr(obj._meta, 'proxy', False):
+                    klass = getattr(obj._meta, 'proxy_for_model', klass)
+        return klass.__name__
     
 
 class SimpleField(AbstractSource):

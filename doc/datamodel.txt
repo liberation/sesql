@@ -46,7 +46,12 @@ StrField
   Normal string field, up to 255 characters wide,``size`` can be specified.
 
 ClassField
-  Handle the class of the object.
+  Handle the  class of the  object. This  is a mandatory  field. 
+  Since    version   0.12    it   accepts    an   optional    argument
+  ``dereference_proxy``  which will  make SeSQL  index Django's  proxy
+  models  if they  were the  underlying class.  This only  affects the
+  class name,  the various methods will  still be called on  the proxy
+  model.
 
 DateField
   Date field, without time.

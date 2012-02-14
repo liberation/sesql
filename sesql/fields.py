@@ -196,12 +196,12 @@ class ClassField(Field):
     """
     sqltype = "varchar(255)"
     
-    def __init__(self, name):
+    def __init__(self, name, dereference_proxy = False):
         """
         Constructor
         """
         super(ClassField, self).__init__(name, None)
-        self.source = ClassSource()
+        self.source = ClassSource(dereference_proxy = dereference_proxy)
 
     def marshall(self, value):
         """
