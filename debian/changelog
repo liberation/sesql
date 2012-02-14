@@ -1,6 +1,6 @@
 sesql (0.12.0-1) unstable; urgency=low
 
-  * Added an option to dereference porxy models in Django.
+  * Added an option to dereference proxy models in Django.
 
  -- Gael Le Mignot <gael@pilotsystems.net>  Tue, 14 Feb 2012 09:47:55 +0100
 
