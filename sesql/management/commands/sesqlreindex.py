@@ -105,7 +105,8 @@ class Command(BaseCommand):
             sys.stdout.flush()
             full_tmr.start()
 
-        for i, oid in enumerate(missing):            
+        for i, oid in enumerate(missing):
+            obj = None
             try:
                 obj = SeSQLResultSet.load((classname, oid))
                 index(obj)
