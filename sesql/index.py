@@ -101,7 +101,7 @@ def index(cursor, obj, message, noindex = False):
         log.info("%s: no table found, skipping" % message)
         return
 
-    cursor.execute('LOCK %s IN EXCLUSIVE MODE' % table_name)
+    cursor.execute('SAVEPOINT sesql_index_savepoint')
 
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
     cursor.execute(query, (objid, classname))
@@ -121,12 +121,7 @@ def index(cursor, obj, message, noindex = False):
     query = "INSERT INTO %s (%s) VALUES (%s)" % (table_name,
                                                  ",".join(keys),
                                                  ",".join(placeholders))
-    try:
-        cursor.execute(query, results)
-    except Exception, e:
-        log.exception('Exception %s caught while inserting (%s,%s) into %s' %
-                      (e, classname, objid, table_name))
-        raise
+    cursor.execute(query, results)
         
 
 @index_log_wrap

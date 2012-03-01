@@ -48,28 +48,3 @@ class DjangoOrmAdapter(OrmAdapter):
         """
         from models import SearchHit
         SearchHit(**kwargs).save()
-
-    def begin(self):
-        """
-        Get a cursor with an open transaction
-        Let Django handle transactions
-        """
-        cursor = self.cursor()
-        if transaction.is_managed():
-            transaction.set_dirty()
-        return cursor
-
-    def commit(self, cursor):
-        """
-        Commit transaction on cursor
-        Let Django handle transactions
-        """
-        transaction.commit_unless_managed()
-
-    def rollback(self, cursor):
-        """
-        Rollback transaction on cursor
-        Let Django handle transactions
-        """
-        transaction.rollback_unless_managed()
-

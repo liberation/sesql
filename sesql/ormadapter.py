@@ -28,6 +28,9 @@ responsible of cathing signals and hooking itself to call the
 index/delete functions as required
 """
 
+import logging
+log = logging.getLogger('sesql')
+
 class OrmAdapter(object):
     """
     Abstract class for SeSQL ORM adapaters
@@ -36,7 +39,9 @@ class OrmAdapter(object):
     not_found = Exception # Give a more specific exception for Not Found
     node_class = None # Give a Q-compatible tree implementation
 
-    #
+    NB_TRIES = 3
+
+    #    
     # Cursor/transaction API
     #
 
@@ -48,37 +53,46 @@ class OrmAdapter(object):
 
     def begin(self):
         """
-        Get a cursor with an open transaction
+        Get a cursor with an open sub-transaction
         """
         cursor = self.cursor()
-        cursor.execute('BEGIN')
+        cursor.execute('SAVEPOINT sesql_savepoint')
         return cursor
 
     def commit(self, cursor):
         """
-        Commit transaction on cursor
+        Commit sub-transaction on cursor
         """
-        cursor.execute('COMMIT')
+        cursor.execute('RELEASE SAVEPOINT sesql_savepoint')
 
     def rollback(self, cursor):
         """
-        Rollback transaction on cursor
+        Rollback sub-transaction on cursor
         """
-        cursor.execute('ROLLBACK')
+        cursor.execute('ROLLBACK TO SAVEPOINT sesql_savepoint')
 
     def transactional(self, function):
         """
-        Wrap a function to have a transaction-bound cursor
+        Wrap a function to have a sub-transaction-bound cursor
         """
         def transactional_inner(*args, **kwargs):
-            cursor = self.begin()
-            try:
-                res = function(cursor, *args, **kwargs)
-                self.commit(cursor)
-                return res
-            except:
-                self.rollback(cursor)
-                raise
+            nb_tries = 0
+            while nb_tries < self.NB_TRIES:
+                cursor = self.begin()
+                try:
+                    res = function(cursor, *args, **kwargs)
+                    self.commit(cursor)
+                    return res
+                except Exception, e:
+                    self.rollback(cursor)
+                    nb_tries += 1
+                    if nb_tries != self.NB_TRIES:
+                        log.warning('function %s(%r, %r) failed with %s, re-attempting (#%d)'
+                                    % (function.__name__, args, kwargs, e, nb_tries))
+                    else:
+                        log.error('function %s(%r, %r) failed with %s, giving up'
+                                    % (function.__name__, args, kwargs, e))
+                        raise
         transactional_inner.__name__ = function.__name__
         return transactional_inner
 

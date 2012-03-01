@@ -230,6 +230,16 @@ and 1 thread doing regular, but not continuous, reindexation :
    --index-type=Article
 
 
+Concurrency handling
+++++++++++++++++++++
 
+Since  version  0.13  SeSQL  uses  savepoints  to  support  concurrent
+indexing. You  can use SeSQL  from a multithreaded program,  and index
+the same  object from several threads  at once, SeSQL will  detect the
+conflicts and retry them (default is 3 retries).
 
-
+If  you have  very heavy  concurrency, you  may prefer  to handle  the
+indexing  asynchronously,  in a  separate  daemon  that'll handle  the
+indexing sequentially. The  same daemon than the  one for dependencies
+tracking   can    be   used    for   that,    if   you    enable   the
+``ASYNCHRONOUS_INDEXING`` in the configuration file.

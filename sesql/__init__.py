@@ -17,9 +17,5 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-#
-# !!! WARNING !!! : imports of  signals and monkey patchs are moved to
-# models.py to not create conflicts with Django's app loading...
-#
-VERSION = (0, 12, 0)
+VERSION = (0, 13, 0)
 __version__ = ".".join(map(str, VERSION))

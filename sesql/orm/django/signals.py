@@ -31,7 +31,6 @@ if 'sesql' in settings.INSTALLED_APPS:
         return sync_db(verbosity)
     signals.post_syncdb.connect(sync_db)
 
-    @transaction.commit_on_success
     def index_cb(sender, instance, *args, **kwargs):
         # Trick to defer import
         from sesql.index import index, schedule_reindex
@@ -43,7 +42,6 @@ if 'sesql' in settings.INSTALLED_APPS:
     signals.post_save.connect(index_cb)
 
 
-    @transaction.commit_on_success
     def unindex_cb(sender, instance, *args, **kwargs):
         # Trick to defer import
         from sesql.index import unindex, schedule_reindex
