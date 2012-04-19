@@ -82,3 +82,37 @@ def log_time(function, message = None):
     return log_time_inner
 
                  
+def strip_ligatures(value):
+    """
+    Convert the ligatures (œ, æ, ß, ...) into their compound value (oe, ae, ss)
+    Take **unicode** as input and output, not string
+    """
+    charmap = {
+        u'\N{Latin capital letter AE}': 'AE',
+        u'\N{Latin small letter ae}': 'ae',
+        u'\N{Latin capital letter Eth}': 'Dh',
+        u'\N{Latin small letter eth}': 'dh',
+        u'\N{Latin capital letter O with stroke}': 'Oe',
+        u'\N{Latin small letter o with stroke}': 'oe',
+        u'\N{Latin capital letter Thorn}': 'Th',
+        u'\N{Latin small letter thorn}': 'th',
+        u'\N{Latin small letter sharp s}': 'ss',
+        u'\N{Latin capital letter D with stroke}': 'Dj',
+        u'\N{Latin small letter d with stroke}': 'dj',
+        u'\N{Latin capital letter H with stroke}': 'H',
+        u'\N{Latin small letter h with stroke}': 'h',
+        u'\N{Latin small letter dotless i}': 'i',
+        u'\N{Latin small letter kra}': 'q',
+        u'\N{Latin capital letter L with stroke}': 'L',
+        u'\N{Latin small letter l with stroke}': 'l',
+        u'\N{Latin capital letter Eng}': 'Ng',
+        u'\N{Latin small letter eng}': 'ng',
+        u'\N{Latin capital ligature OE}': 'Oe',
+        u'\N{Latin small ligature oe}': 'oe',
+        u'\N{Latin capital letter T with stroke}': 'Th',
+        u'\N{Latin small letter t with stroke}': 'th',
+    }
+
+    value = ''.join([ charmap.get(c,c) for c in value ])    
+    return value
+    

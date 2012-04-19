@@ -1,3 +1,9 @@
+sesql (0.13.1-1) unstable; urgency=low
+
+  * Better handling of ligatures (oe, ae, ...)
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Thu, 19 Apr 2012 16:58:47 +0100
+
 sesql (0.13.0-1) unstable; urgency=low
 
   * Using savepoints for handling transactions in a smarter way.

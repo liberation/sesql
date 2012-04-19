@@ -24,6 +24,7 @@ We cannot reuse Django types because what we need is too specific
 
 import unicodedata, locale
 from sources import guess_source, ClassSource
+import utils
 import sesql_config as config
 
 import logging
@@ -342,6 +343,9 @@ class FullTextField(Field):
                 value = value.decode(config.CHARSET)
             except UnicodeDecodeError:
                 raise ValueError, "Can't parse %s in %s" % (value, config.CHARSET)
+
+        # Remove ligatures (oe, ae, ...)
+        value = utils.strip_ligatures(value)
 
         # Replace non-standard character by spaces
         def isletter(c):
