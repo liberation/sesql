@@ -1,8 +1,14 @@
+sesql (0.13.2-1) unstable; urgency=low
+
+  * Not binding signals in SQLAlchemy until we have an engine
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Fri, 04 May 2012 15:05:39 +0200
+
 sesql (0.13.1-1) unstable; urgency=low
 
   * Better handling of ligatures (oe, ae, ...)
 
- -- Gael Le Mignot <gael@pilotsystems.net>  Thu, 19 Apr 2012 16:58:47 +0100
+ -- Gael Le Mignot <gael@pilotsystems.net>  Thu, 19 Apr 2012 16:58:47 +0200
 
 sesql (0.13.0-1) unstable; urgency=low
 

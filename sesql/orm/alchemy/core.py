@@ -23,6 +23,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import event
 from sqlalchemy.orm import sessionmaker, mapper
 
+import logging
+log = logging.getLogger('sesql')
+
 from django_q import Q
 
 class AlchemyOrmAdapter(OrmAdapter):
@@ -37,7 +40,7 @@ class AlchemyOrmAdapter(OrmAdapter):
         """
         Constructor
         """
-        self.bind_signals()
+        self.engine = None
 
     def bind(self, connection, source_maker):
         """
@@ -47,6 +50,7 @@ class AlchemyOrmAdapter(OrmAdapter):
         self.source_maker = source_maker        
         self.engine = create_engine(connection, convert_unicode=True,
                                     encoding = 'utf-8')
+        self.bind_signals()
 
     def load_object(self, klass, oid):
         """
