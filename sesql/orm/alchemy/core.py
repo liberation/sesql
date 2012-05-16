@@ -49,7 +49,7 @@ class AlchemyOrmAdapter(OrmAdapter):
         """
         self.source_maker = source_maker        
         self.engine = create_engine(connection, convert_unicode=True,
-                                    encoding = 'utf-8')
+                                    encoding = 'utf-8', echo = True)
         self.bind_signals()
 
     def load_object(self, klass, oid):
@@ -99,3 +99,23 @@ class AlchemyOrmAdapter(OrmAdapter):
         """
         return self.engine.raw_connection().cursor()
         
+    def begin(self):
+        """
+        Get a cursor with an open sub-transaction
+        """
+        cursor = self.cursor()
+        cursor.execute('BEGIN')
+        return cursor
+
+    def commit(self, cursor):
+        """
+        Commit sub-transaction on cursor
+        """
+        cursor.execute('COMMIT')
+
+    def rollback(self, cursor):
+        """
+        Rollback sub-transaction on cursor
+        """
+        cursor.execute('ROLLBACK')
+

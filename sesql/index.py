@@ -30,8 +30,11 @@ def index_log_wrap(function):
     Log wrap the method, giving it a name and logging its time
     """
     def inner(obj, *args, **kwargs):
-        classname, objid = get_sesql_id(obj)
-        message = "%s (%s:%s)" % (function.__name__, classname, objid)
+        try:
+            classname, objid = get_sesql_id(obj)
+            message = "%s (%s:%s)" % (function.__name__, classname, objid)
+        except (TypeError, AttributeError, ValueError):
+            message = "%s (invalid object %r)" % (function.__name__, obj)
         return utils.log_time(function, message)(obj, message, *args, **kwargs)
     inner.__name__ = function.__name__
     return inner
@@ -64,8 +67,12 @@ def get_sesql_id(obj):
 
 @config.orm.transactional
 def schedule_reindex(cursor, item):
-    item = get_sesql_id(item)
-
+    try:
+        item = get_sesql_id(item)
+    except (TypeError, AttributeError, ValueError):
+        log.info("%r: can't get classname/id, skipping" % item)
+        return
+        
     classname, objid = item
     table_name = typemap.get_table_for(classname)
     if not table_name:
@@ -82,7 +89,11 @@ def index(cursor, obj, message, noindex = False):
     Index a Django object into SeSQL, do the real work
     """
     log.info("%s : entering" % message)
-    classname, objid = get_sesql_id(obj)
+    try:
+        classname, objid = get_sesql_id(obj)
+    except (TypeError, AttributeError, ValueError):
+        log.info("%r: can't get classname/id, skipping" % obj)
+        return
 
     # Handle dependancies
     gro = getattr(obj, "get_related_objects_for_indexation", None)

@@ -1,3 +1,12 @@
+sesql (0.13.3-1) unstable; urgency=low
+
+  * More graceful failing when attempting to index invalid object
+
+  * Not using subtransactions in Alchemy mode, since in Alchemy mode we
+    maintain our own connection to the database
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Wed, 16 May 2012 10:36:04 +0200
+
 sesql (0.13.2-1) unstable; urgency=low
 
   * Not binding signals in SQLAlchemy until we have an engine
