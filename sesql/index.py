@@ -18,9 +18,7 @@
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
 import sesql_config as config
-from sesql.typemap import typemap
-from sesql.fieldmap import fieldmap
-from sesql import utils
+from sesql import typemap, fieldmap, utils
 
 import logging
 log = logging.getLogger('sesql')
@@ -47,7 +45,7 @@ def get_values(obj, fields):
     placeholders = [ ]
     results = [ ]
 
-    for field in config.FIELDS:
+    for field in fields:
         keys.extend(field.index_columns)
         placeholders.extend(field.index_placeholders)
         results.extend(field.get_values(obj))
@@ -60,9 +58,10 @@ def get_sesql_id(obj):
     """
     if isinstance(obj, (tuple, list)) and len(obj) == 2:
         return tuple(obj)
-    
+
     def get_val(field):
-        return fieldmap[field].get_values(obj)[0]
+        vals = fieldmap.fieldmap[field].get_values(obj)
+        return vals and vals[0] or None
     return (get_val('classname'), get_val('id'))
 
 @config.orm.transactional
@@ -74,7 +73,7 @@ def schedule_reindex(cursor, item):
         return
         
     classname, objid = item
-    table_name = typemap.get_table_for(classname)
+    table_name = typemap.typemap.get_table_for(classname)
     if not table_name:
         log.info("%s: no table found, skipping" % classname)
         return
@@ -84,7 +83,7 @@ def schedule_reindex(cursor, item):
 
 @index_log_wrap
 @config.orm.transactional
-def index(cursor, obj, message, noindex = False):
+def index(cursor, obj, message, noindex = False, index_related = True):
     """
     Index a Django object into SeSQL, do the real work
     """
@@ -97,8 +96,8 @@ def index(cursor, obj, message, noindex = False):
 
     # Handle dependancies
     gro = getattr(obj, "get_related_objects_for_indexation", None)
-    if gro:
-        related = gro()
+    if index_related and gro:
+        index_related = gro()
         nbrelated = len(related)
         for item in related:
             schedule_reindex(item)
@@ -107,7 +106,7 @@ def index(cursor, obj, message, noindex = False):
 
     log.info("%s : %d dependancies found" % (message, nbrelated))
 
-    table_name = typemap.get_table_for(classname)
+    table_name = typemap.typemap.get_table_for(classname)
     if not table_name:
         log.info("%s: no table found, skipping" % message)
         return
@@ -150,12 +149,12 @@ def update(cursor, obj, message, fields):
     """
     log.info("%s : entering for fields %s" % (message, ','.join(fields)))
 
-    table_name = typemap.get_table_for(obj.__class__)
+    table_name = typemap.typemap.get_table_for(obj.__class__)
     if not table_name:
         log.info("%s : not table, skipping" % message)
         return
 
-    fields = [ fieldmap.get_field(field) for field in fields ]
+    fields = [ fieldmap.fieldmap.get_field(field) for field in fields ]
     keys, placeholders, results = get_values(obj, fields)
 
     pattern = [ '%s=%s' % (k,p) for k,p in zip(keys, placeholders) ]

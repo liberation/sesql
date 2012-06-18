@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.8.1: http://docutils.sourceforge.net/" />
 <title>SeSQL data model guide</title>
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 6253 2010-03-02 00:24:53Z milde $
+:Id: $Id: html4css1.css 7056 2011-06-17 10:50:48Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -46,6 +46,10 @@ blockquote.epigraph {
 
 dl.docutils dd {
   margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
 
 /* Uncomment (and remove this text!) to get bold-faced definition list terms
 dl.docutils dt {
@@ -185,7 +189,7 @@ img.align-center, .figure.align-center, object.align-center {
 
 /* reset inner alignment in figures */
 div.align-right {
-  text-align: left }
+  text-align: inherit }
 
 /* div.align-center * { */
 /*   text-align: left } */
@@ -245,7 +249,7 @@ pre.address {
   margin-top: 0 ;
   font: inherit }
 
-pre.literal-block, pre.doctest-block {
+pre.literal-block, pre.doctest-block, pre.math {
   margin-left: 2em ;
   margin-right: 2em }
 
@@ -319,12 +323,13 @@ ul.auto-toc {
 <li><a class="reference internal" href="#general" id="id1">1&nbsp;&nbsp;&nbsp;General</a></li>
 <li><a class="reference internal" href="#concepts" id="id2">2&nbsp;&nbsp;&nbsp;Concepts</a></li>
 <li><a class="reference internal" href="#fields" id="id3">3&nbsp;&nbsp;&nbsp;Fields</a></li>
-<li><a class="reference internal" href="#sources" id="id4">4&nbsp;&nbsp;&nbsp;Sources</a></li>
-<li><a class="reference internal" href="#easy-writing-of-sources" id="id5">5&nbsp;&nbsp;&nbsp;Easy writing of sources</a></li>
-<li><a class="reference internal" href="#type-map" id="id6">6&nbsp;&nbsp;&nbsp;Type map</a></li>
-<li><a class="reference internal" href="#dependency-tracking" id="id7">7&nbsp;&nbsp;&nbsp;Dependency tracking</a></li>
-<li><a class="reference internal" href="#cleanup-in-text-fields" id="id8">8&nbsp;&nbsp;&nbsp;Cleanup in text fields</a></li>
-<li><a class="reference internal" href="#additional-text-search-configurations" id="id9">9&nbsp;&nbsp;&nbsp;Additional text search configurations</a></li>
+<li><a class="reference internal" href="#mandatory-fields" id="id4">4&nbsp;&nbsp;&nbsp;Mandatory fields</a></li>
+<li><a class="reference internal" href="#sources" id="id5">5&nbsp;&nbsp;&nbsp;Sources</a></li>
+<li><a class="reference internal" href="#easy-writing-of-sources" id="id6">6&nbsp;&nbsp;&nbsp;Easy writing of sources</a></li>
+<li><a class="reference internal" href="#type-map" id="id7">7&nbsp;&nbsp;&nbsp;Type map</a></li>
+<li><a class="reference internal" href="#dependency-tracking" id="id8">8&nbsp;&nbsp;&nbsp;Dependency tracking</a></li>
+<li><a class="reference internal" href="#cleanup-in-text-fields" id="id9">9&nbsp;&nbsp;&nbsp;Cleanup in text fields</a></li>
+<li><a class="reference internal" href="#additional-text-search-configurations" id="id10">10&nbsp;&nbsp;&nbsp;Additional text search configurations</a></li>
 </ul>
 </div>
 <div class="section" id="general">
@@ -360,7 +365,12 @@ dependant options.</p>
 <dt>StrField</dt>
 <dd>Normal string field, up to 255 characters wide,``size`` can be specified.</dd>
 <dt>ClassField</dt>
-<dd>Handle the class of the object.</dd>
+<dd>Handle the  class of the  object. This  is a mandatory  field.
+Since    version   0.12    it   accepts    an   optional    argument
+<tt class="docutils literal">dereference_proxy</tt>  which will  make SeSQL  index Django's  proxy
+models  if they  were the  underlying class.  This only  affects the
+class name,  the various methods will  still be called on  the proxy
+model.</dd>
 <dt>DateField</dt>
 <dd>Date field, without time.</dd>
 <dt>DateTimeField</dt>
@@ -374,8 +384,21 @@ You  can specify  a  different text  search  configuration than  the
 default on a given FullTextField with the <tt class="docutils literal">dictionnary</tt> parameter.</dd>
 </dl>
 </div>
+<div class="section" id="mandatory-fields">
+<h1><a class="toc-backref" href="#id4">4&nbsp;&nbsp;&nbsp;Mandatory fields</a></h1>
+<p>In current SeSQL version, it is mandatory to have at least :</p>
+<ul class="simple">
+<li>a <tt class="docutils literal">ClassField</tt> named <tt class="docutils literal">classname</tt> ;</li>
+<li>an <tt class="docutils literal">IntField</tt> named <tt class="docutils literal">id</tt> that is unique for a given <tt class="docutils literal">classname</tt>.</li>
+</ul>
+<p>It is  also strongly  recommended to  have <tt class="docutils literal">DateTimeField</tt>  with the
+date of indexation, defined like :</p>
+<pre class="literal-block">
+DateTimeField('indexed_at', sql_default = 'NOW()')
+</pre>
+</div>
 <div class="section" id="sources">
-<h1><a class="toc-backref" href="#id4">4&nbsp;&nbsp;&nbsp;Sources</a></h1>
+<h1><a class="toc-backref" href="#id5">5&nbsp;&nbsp;&nbsp;Sources</a></h1>
 <p>Each field requires a 'source'. The source can be one of the following
 classes :</p>
 <dl class="docutils">
@@ -400,7 +423,7 @@ some models and <tt class="docutils literal">created_on</tt> on others).</dd>
 </dl>
 </div>
 <div class="section" id="easy-writing-of-sources">
-<h1><a class="toc-backref" href="#id5">5&nbsp;&nbsp;&nbsp;Easy writing of sources</a></h1>
+<h1><a class="toc-backref" href="#id6">6&nbsp;&nbsp;&nbsp;Easy writing of sources</a></h1>
 <p>Source can also be given in a more friendly way :</p>
 <ul class="simple">
 <li>as a normal string for a <tt class="docutils literal">SimpleField</tt> (ie, <tt class="docutils literal">workflow_state</tt>) ;</li>
@@ -414,7 +437,7 @@ some models and <tt class="docutils literal">created_on</tt> on others).</dd>
 name that the index.</p>
 </div>
 <div class="section" id="type-map">
-<h1><a class="toc-backref" href="#id6">6&nbsp;&nbsp;&nbsp;Type map</a></h1>
+<h1><a class="toc-backref" href="#id7">7&nbsp;&nbsp;&nbsp;Type map</a></h1>
 <p>The  type  map   is  a  list  (or  tuple)   of  <tt class="docutils literal">(class,&nbsp; table_name,
 recursive)</tt>. All  Django objects of  this class will be  indexed into
 the given table.  All objects of a subclass  too, unless the recursive
@@ -432,7 +455,7 @@ TYPE_MAP = ((models.Photo, &quot;sesql_photo&quot;, False),
 </pre>
 </div>
 <div class="section" id="dependency-tracking">
-<h1><a class="toc-backref" href="#id7">7&nbsp;&nbsp;&nbsp;Dependency tracking</a></h1>
+<h1><a class="toc-backref" href="#id8">8&nbsp;&nbsp;&nbsp;Dependency tracking</a></h1>
 <p>SeSQL provides  semi-automatic dependency tracking. This  works in two
 steps.</p>
 <p>1. By implementing  a method <tt class="docutils literal">get_related_objects_for_indexation</tt> on
@@ -444,7 +467,7 @@ table, called <tt class="docutils literal">sesql_reindex_schedule</tt>.</p>
 reindex objects.</p>
 </div>
 <div class="section" id="cleanup-in-text-fields">
-<h1><a class="toc-backref" href="#id8">8&nbsp;&nbsp;&nbsp;Cleanup in text fields</a></h1>
+<h1><a class="toc-backref" href="#id9">9&nbsp;&nbsp;&nbsp;Cleanup in text fields</a></h1>
 <p>Before indexing text  fields, cleanup has to be  performed.  In SeSQL,
 the cleanup is a two-phase process.</p>
 <p>The first phase is user-configurable. It  should strip the text of all
@@ -462,7 +485,7 @@ similar function.</p>
 <tt class="docutils literal">cleanup</tt> parameter was not specified, or set to None.</p>
 </div>
 <div class="section" id="additional-text-search-configurations">
-<h1><a class="toc-backref" href="#id9">9&nbsp;&nbsp;&nbsp;Additional text search configurations</a></h1>
+<h1><a class="toc-backref" href="#id10">10&nbsp;&nbsp;&nbsp;Additional text search configurations</a></h1>
 <p>If you want  additional text search configurations to  be created when
 SeSQL  tables   are  created,  you  can   add  the  SQL  lines   in  a
 ADDITIONAL_TS_CONFIG variable  in the config file.  Refer to PosgreSQL

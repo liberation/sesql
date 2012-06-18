@@ -46,6 +46,14 @@ interrupt it and restart it  later on, it'll continue where it stopped
 (objects are reindexed by groups  of 1000, only the current group will
 be restarted).
 
+sesqlasyncreindex
+.................
+
+This command will  reindex all your content into a  new set of tables,
+allowing  for  configuration  change.  It is  devised  to  not  impact
+significantly your production. It is  slightly delicate to use, and is
+fully documented in its own documentation file.
+
 sesqlupdate
 ...........
 

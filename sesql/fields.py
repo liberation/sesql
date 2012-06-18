@@ -113,12 +113,14 @@ class Field(object):
         """
         Get the placeholders to use at indexation time
         """
-        return [ self.placeholder ]
+        return [ self.sql_default or self.placeholder ]
 
     def get_values(self, obj):
         """
         Get value(s) of this field for the object
         """
+        if self.sql_default:
+            return []
         return [ self.marshall(self.source.load_data(obj)) ]
 
 class IntField(Field):

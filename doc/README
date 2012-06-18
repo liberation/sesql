@@ -22,3 +22,4 @@ Here is a list of the contained documentations :
 - extra.txt :  a guide on  extra features like  sesql_admin, highlight,
   benchmarking, dependency tracking and search history.
 
+- asyncreindex.txt : a guide on the asynchronous reindex feature.

@@ -68,6 +68,22 @@ FullTextField
   You  can specify  a  different text  search  configuration than  the
   default on a given FullTextField with the ``dictionnary`` parameter.
 
+Mandatory fields
+----------------
+
+In current SeSQL version, it is mandatory to have at least :
+
+- a ``ClassField`` named ``classname`` ;
+
+- an ``IntField`` named ``id`` that is unique for a given ``classname``.
+
+It is  also strongly  recommended to  have ``DateTimeField``  with the
+date of indexation, defined like :
+
+::
+
+          DateTimeField('indexed_at', sql_default = 'NOW()')
+
 Sources
 -------
 

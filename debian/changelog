@@ -1,3 +1,9 @@
+sesql (0.14.0-1) unstable; urgency=low
+
+  * Added a asynchronous reindex command
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Mon, 18 Jun 2012 16:34:28 +0200
+
 sesql (0.13.3-1) unstable; urgency=low
 
   * More graceful failing when attempting to index invalid object

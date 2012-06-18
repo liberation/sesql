@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.8.1: http://docutils.sourceforge.net/" />
 <title>SeSQL administration guide</title>
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 6253 2010-03-02 00:24:53Z milde $
+:Id: $Id: html4css1.css 7056 2011-06-17 10:50:48Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -46,6 +46,10 @@ blockquote.epigraph {
 
 dl.docutils dd {
   margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
 
 /* Uncomment (and remove this text!) to get bold-faced definition list terms
 dl.docutils dt {
@@ -185,7 +189,7 @@ img.align-center, .figure.align-center, object.align-center {
 
 /* reset inner alignment in figures */
 div.align-right {
-  text-align: left }
+  text-align: inherit }
 
 /* div.align-center * { */
 /*   text-align: left } */
@@ -245,7 +249,7 @@ pre.address {
   margin-top: 0 ;
   font: inherit }
 
-pre.literal-block, pre.doctest-block {
+pre.literal-block, pre.doctest-block, pre.math {
   margin-left: 2em ;
   margin-right: 2em }
 
@@ -321,12 +325,13 @@ ul.auto-toc {
 <li><a class="reference internal" href="#createsqltables" id="id3">1.2&nbsp;&nbsp;&nbsp;createsqltables</a></li>
 <li><a class="reference internal" href="#sesqlindex" id="id4">1.3&nbsp;&nbsp;&nbsp;sesqlindex</a></li>
 <li><a class="reference internal" href="#sesqlreindex" id="id5">1.4&nbsp;&nbsp;&nbsp;sesqlreindex</a></li>
-<li><a class="reference internal" href="#sesqlupdate" id="id6">1.5&nbsp;&nbsp;&nbsp;sesqlupdate</a></li>
-<li><a class="reference internal" href="#sesqlshortquery" id="id7">1.6&nbsp;&nbsp;&nbsp;sesqlshortquery</a></li>
-<li><a class="reference internal" href="#sesqllongquery" id="id8">1.7&nbsp;&nbsp;&nbsp;sesqllongquery</a></li>
+<li><a class="reference internal" href="#sesqlasyncreindex" id="id6">1.5&nbsp;&nbsp;&nbsp;sesqlasyncreindex</a></li>
+<li><a class="reference internal" href="#sesqlupdate" id="id7">1.6&nbsp;&nbsp;&nbsp;sesqlupdate</a></li>
+<li><a class="reference internal" href="#sesqlshortquery" id="id8">1.7&nbsp;&nbsp;&nbsp;sesqlshortquery</a></li>
+<li><a class="reference internal" href="#sesqllongquery" id="id9">1.8&nbsp;&nbsp;&nbsp;sesqllongquery</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#sql-level-administration" id="id9">2&nbsp;&nbsp;&nbsp;SQL level administration</a></li>
+<li><a class="reference internal" href="#sql-level-administration" id="id10">2&nbsp;&nbsp;&nbsp;SQL level administration</a></li>
 </ul>
 </div>
 <div class="section" id="django-administration-commands">
@@ -363,14 +368,21 @@ interrupt it and restart it  later on, it'll continue where it stopped
 (objects are reindexed by groups  of 1000, only the current group will
 be restarted).</p>
 </div>
+<div class="section" id="sesqlasyncreindex">
+<h2><a class="toc-backref" href="#id6">1.5&nbsp;&nbsp;&nbsp;sesqlasyncreindex</a></h2>
+<p>This command will  reindex all your content into a  new set of tables,
+allowing  for  configuration  change.  It is  devised  to  not  impact
+significantly your production. It is  slightly delicate to use, and is
+fully documented in its own documentation file.</p>
+</div>
 <div class="section" id="sesqlupdate">
-<h2><a class="toc-backref" href="#id6">1.5&nbsp;&nbsp;&nbsp;sesqlupdate</a></h2>
+<h2><a class="toc-backref" href="#id7">1.6&nbsp;&nbsp;&nbsp;sesqlupdate</a></h2>
 <p>This  command  will  massively  reindex  a  single  (or  a  coupe  of)
 column. It  will not index any new  object. Typical use is  when a new
 column was added.</p>
 </div>
 <div class="section" id="sesqlshortquery">
-<h2><a class="toc-backref" href="#id7">1.6&nbsp;&nbsp;&nbsp;sesqlshortquery</a></h2>
+<h2><a class="toc-backref" href="#id8">1.7&nbsp;&nbsp;&nbsp;sesqlshortquery</a></h2>
 <p>Perform  a short  query. The  first parameter  is a  Python expression
 describing  a  Q object,  the  second,  optional  parameter, a  Python
 expression specifying the sort order to use.</p>
@@ -379,12 +391,12 @@ expressions,  it is  therefore unsafe,  and  should only  be used  for
 testing purpose. Never expose this command to untrusted input.</p>
 </div>
 <div class="section" id="sesqllongquery">
-<h2><a class="toc-backref" href="#id8">1.7&nbsp;&nbsp;&nbsp;sesqllongquery</a></h2>
+<h2><a class="toc-backref" href="#id9">1.8&nbsp;&nbsp;&nbsp;sesqllongquery</a></h2>
 <p>Like the previous command, but performing a long query.</p>
 </div>
 </div>
 <div class="section" id="sql-level-administration">
-<h1><a class="toc-backref" href="#id9">2&nbsp;&nbsp;&nbsp;SQL level administration</a></h1>
+<h1><a class="toc-backref" href="#id10">2&nbsp;&nbsp;&nbsp;SQL level administration</a></h1>
 <p>SeSQL contains three kinds of tables :</p>
 <ul class="simple">
 <li>The <em>master table</em> : this  table doesn't contain any actual content,
