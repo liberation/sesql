@@ -97,7 +97,7 @@ def index(cursor, obj, message, noindex = False, index_related = True):
     # Handle dependancies
     gro = getattr(obj, "get_related_objects_for_indexation", None)
     if index_related and gro:
-        index_related = gro()
+        related = gro()
         nbrelated = len(related)
         for item in related:
             schedule_reindex(item)
