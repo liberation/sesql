@@ -1,3 +1,9 @@
+sesql (0.14.1-1) unstable; urgency=low
+
+  * Fixed a bug in related items handling (typo introduced in previous commit)
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Mon, 25 Jun 2012 10:41:45 +0200
+
 sesql (0.14.0-1) unstable; urgency=low
 
   * Added a asynchronous reindex command
