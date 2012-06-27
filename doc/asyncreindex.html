@@ -422,9 +422,10 @@ the classical <tt class="docutils literal">sesqlreindex</tt> command.</p>
 <li><p class="first">Since it uses dates to detect content to reindex, if the chunk size
 is  too   small,  it  may   loop  endlessly  reindexing   the  same
 contents. The chunk size should be  big enough to ensure that there
-is never more items that have  the exactly same indexation date (to
-the second) than  the chunk size. You can check  that with a manual
-SQL command like :</p>
+is never more items that have the exactly same indexation date than
+the chunk size. With a high precision (to the millisecond) DateTime
+field, it  should be a  problem in most  cases. You can  check that
+with a manual SQL command like :</p>
 </li>
 </ol>
 <pre class="literal-block">

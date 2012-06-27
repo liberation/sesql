@@ -329,9 +329,10 @@ ul.auto-toc {
 <li><a class="reference internal" href="#sesqlupdate" id="id7">1.6&nbsp;&nbsp;&nbsp;sesqlupdate</a></li>
 <li><a class="reference internal" href="#sesqlshortquery" id="id8">1.7&nbsp;&nbsp;&nbsp;sesqlshortquery</a></li>
 <li><a class="reference internal" href="#sesqllongquery" id="id9">1.8&nbsp;&nbsp;&nbsp;sesqllongquery</a></li>
+<li><a class="reference internal" href="#sesqlfixatedate" id="id10">1.9&nbsp;&nbsp;&nbsp;sesqlfixatedate</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#sql-level-administration" id="id10">2&nbsp;&nbsp;&nbsp;SQL level administration</a></li>
+<li><a class="reference internal" href="#sql-level-administration" id="id11">2&nbsp;&nbsp;&nbsp;SQL level administration</a></li>
 </ul>
 </div>
 <div class="section" id="django-administration-commands">
@@ -394,9 +395,15 @@ testing purpose. Never expose this command to untrusted input.</p>
 <h2><a class="toc-backref" href="#id9">1.8&nbsp;&nbsp;&nbsp;sesqllongquery</a></h2>
 <p>Like the previous command, but performing a long query.</p>
 </div>
+<div class="section" id="sesqlfixatedate">
+<h2><a class="toc-backref" href="#id10">1.9&nbsp;&nbsp;&nbsp;sesqlfixatedate</a></h2>
+<p>A  tool  to  recopy a  field  to  another  field  when the  target  is
+NULL. Useful when a  date is only existing in some  rows, and you want
+it to default to another date field, in a one-shot operation.</p>
+</div>
 </div>
 <div class="section" id="sql-level-administration">
-<h1><a class="toc-backref" href="#id10">2&nbsp;&nbsp;&nbsp;SQL level administration</a></h1>
+<h1><a class="toc-backref" href="#id11">2&nbsp;&nbsp;&nbsp;SQL level administration</a></h1>
 <p>SeSQL contains three kinds of tables :</p>
 <ul class="simple">
 <li>The <em>master table</em> : this  table doesn't contain any actual content,

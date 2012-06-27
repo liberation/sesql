@@ -77,6 +77,12 @@ sesqllongquery
 
 Like the previous command, but performing a long query.
 
+sesqlfixatedate
+...............
+
+A  tool  to  recopy a  field  to  another  field  when the  target  is
+NULL. Useful when a  date is only existing in some  rows, and you want
+it to default to another date field, in a one-shot operation.
 
 SQL level administration
 ------------------------
