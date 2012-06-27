@@ -115,4 +115,51 @@ def strip_ligatures(value):
 
     value = ''.join([ charmap.get(c,c) for c in value ])    
     return value
+
+def format_time(timedelta, keep = 3):
+    """
+    Pretty format a timedelta
+    """
+    units = [ 'ms', 's', 'm', 'h', 'd' ]
+    factors = [ 1000, 60, 60, 24, None ]
+    formats = [ '%03d', '%02d', '%02d', '%02d', '%d' ]
+
+    res = []
+    value = int(timedelta * factors[0])
+    for factor, unit, fmt in zip(factors, units, formats):
+        if factor:
+            nextval = value / float(factor)
+            val = nextval - int(nextval)
+            val = int(val * factor)
+            value = int(nextval)
+        else:
+            val = value
+        res.append((val, fmt, unit))
+
+    while res and res[-1][0] == 0:
+        res.pop()
+
+    res = res[-3:]
+    res = [ r for r in res if r[0] ]
+    res = res[::-1]
+    if res:
+        res = ', '.join([ fmt % val + ' ' + unit for val, fmt, unit in res ])
+    else:
+        res = '0'
+
+    res = '%.2f seconds (%s)' % (timedelta, res)
+    return res
+        
     
+def print_eta(percent, timedelta):
+    """
+    Print an ETA line, given we did percent of total in timedelta
+    """
+    if percent == 100.0 or percent == 0.0:
+        eta = 0
+    else:
+        eta = timedelta / percent * (100.0 - percent)
+
+    print "%05.2f %% done in %s; ETA : %s" % (percent,
+                                              format_time(timedelta),
+                                              format_time(eta))

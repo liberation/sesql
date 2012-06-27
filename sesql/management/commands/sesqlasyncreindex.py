@@ -211,13 +211,9 @@ class Command(BaseCommand):
         done = self.state['done']
         percent = total and (done * 100.0 / total) or 100.0
         cumulated = self.state['cumulated']
-        if percent == 100.0 or percent == 0.0:
-            eta = 0
-        else:
-            eta = cumulated / percent * (100.0 - percent)
 
-        print "%.2f %% done in %.2f seconds; ETA : %.2f seconds" % (percent, cumulated, eta)
-        
+        utils.print_eta(percent, cumulated)
+
         if drift:
             print " -> %d done, drift rate : %.2f, estimated total: %d, actual remaining: %d, estimated remaining: %d" % (done, drift_rate, total, remaining, drift_estimated)
                                                                              
@@ -308,11 +304,11 @@ class Command(BaseCommand):
         while True:
             self.state['start_time'] = time.time()
             nb = self.iteration()
+            time.sleep(self.options['delay'])
             self.state['end_time'] = time.time()
             self.display_status()
             if self.options['state']:
                 cPickle.dump(self.state, open(self.options['state'], 'w'), 0)
-            time.sleep(self.options['delay'])
             if nb < (self.options['step'] - 1) and not self.options['forever']:
                 break
             
