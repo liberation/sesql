@@ -108,6 +108,7 @@ class Command(BaseCommand):
         self.target = self.options['target']
 
         for table in typemap.typemap.tables.keys():
-            self.process_table(table)
+            if table:
+                self.process_table(table)
 
         
