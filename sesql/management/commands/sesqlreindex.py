@@ -40,7 +40,7 @@ from optparse import make_option
 STEP = 1000
 
 class Command(BaseCommand):
-    help = "Reindex missing objects into SeSQL"
+    help = "Reindex missing objects into SeSQL. You can specify class names as additional parameters."
 
     option_list = BaseCommand.option_list + (
         make_option('--reindex',
@@ -123,17 +123,17 @@ class Command(BaseCommand):
         transaction.commit()
         
     
-    def handle(self, *apps, **options):
+    def handle(self, *classes, **options):
         """
         Handle the command
         """
         self.options = options
         
-        if not apps:
-            apps = typemap.all_class_names()
+        if not classes:
+            classes = typemap.all_class_names()
 
-        for app in apps:
-            self.reindex(app, options['reindex'])            
+        for klass in classes:
+            self.reindex(klass, options['reindex'])            
 
         
         
