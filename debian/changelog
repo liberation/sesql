@@ -1,3 +1,9 @@
+sesql (0.14.4-1) unstable; urgency=low
+
+  * Minor fixes
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Tue, 11 Sept 2012 10:54:05 +0200
+
 sesql (0.14.3-1) unstable; urgency=low
 
   * Fixed handling of "None" mappings for sesqlfixatedate

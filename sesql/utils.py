@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010-2011
+# Copyright (c) Pilot Systems and Libération, 2010-2012
 
 # This file is part of SeSQL.
 
@@ -59,6 +59,18 @@ class Timer(object):
         self.reset()
         return res
 
+def safe_str(what):
+    """
+    Gives a safe string form of what, never failing
+    """
+    try:
+        return str(what)
+    except:
+        try:
+            return repr(what)
+        except:
+            return '<Broken object>'
+
 def log_time(function, message = None):
     """
     Decorator to log function call and execution time
@@ -70,7 +82,7 @@ def log_time(function, message = None):
             res = function(*args, **kwargs)
         finally:
             tmr.__exit__()
-        args = ', '.join([ str(a) for a in args ])
+        args = ', '.join([ safe_str(a) for a in args ])
         extra = [ "%s=%s" % (key, value) for key, value in kwargs.items() ]
         kwargs = ', '.join(extra)
         m = message
