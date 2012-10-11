@@ -25,19 +25,21 @@ on an existing database, or when you alter your indexes.
 # Allow "with" with python2.5
 from __future__ import with_statement
 
+import sys
+
+from optparse import make_option
+
 from django.core.management.base import BaseCommand
-from django.core.management import call_command
 from django.db import connection, transaction
-import settings
+
 from sesql.results import SeSQLResultSet
 from sesql.index import index
 from sesql.typemap import typemap
 from sesql import utils
 import sesql_config as config
-import sys, time
-from optparse import make_option
 
 STEP = 1000
+
 
 class Command(BaseCommand):
     help = "Reindex missing objects into SeSQL. You can specify class names as additional parameters."
@@ -55,7 +57,7 @@ class Command(BaseCommand):
         )
 
     @transaction.commit_manually
-    def reindex(self, classname, reindex = False):
+    def reindex(self, classname, reindex=False):
         """
         Reindex a single class
         """
@@ -69,15 +71,15 @@ class Command(BaseCommand):
         objs = klass.objects.values('id')
         if self.options["order"]:
             objs = objs.order_by(self.options["order"])
-        allids = [ int(a['id']) for a in objs ]
+        allids = [int(a['id']) for a in objs]
 
         cursor = connection.cursor()
         cursor.execute("SELECT id FROM %s WHERE classname=%%s" % config.MASTER_TABLE_NAME,
                        (classname,))
-        already = set([ int(c[0]) for c in cursor ])
+        already = set([int(c[0]) for c in cursor])
 
         if not reindex:
-            missing = [ oid for oid in allids if not oid in already ]
+            missing = [oid for oid in allids if not oid in already]
         else:
             missing = allids
 
@@ -99,7 +101,7 @@ class Command(BaseCommand):
             done = float(i + 1) / float(nb)
             eta = elapsed / done * (1 - done)
             print "**SeSQL reindex step stats**"
-            print " - %d objects in %.2f s, rate %.2f" % (STEP, elapsed_last,STEP / elapsed_last)
+            print " - %d objects in %.2f s, rate %.2f" % (STEP, elapsed_last, STEP / elapsed_last)
             print "**SeSQL global reindex on %s stats**" % classname
             print " - %d / %d ( %04.1f %% ) in %.2f s, rate %.2f, ETA %.2f s" % (i + 1, nb, 100 * done, elapsed, i / elapsed, eta)
             sys.stdout.flush()
@@ -121,20 +123,15 @@ class Command(BaseCommand):
 
         disp_stats()
         transaction.commit()
-        
-    
+
     def handle(self, *classes, **options):
         """
         Handle the command
         """
         self.options = options
-        
+
         if not classes:
             classes = typemap.all_class_names()
 
         for klass in classes:
-            self.reindex(klass, options['reindex'])            
-
-        
-        
-        
+            self.reindex(klass, options['reindex'])
