@@ -50,6 +50,11 @@ class Command(BaseCommand):
                     dest='reindex',
                     default=False,
                     help='Reindex already indexed content'),
+        make_option('--flush',
+                    action='store_true',
+                    dest='flush',
+                    default=False,
+                    help='Flush already indexed content'),
         make_option('-o', '--order',
                     dest='order',
                     default=None,
@@ -57,7 +62,7 @@ class Command(BaseCommand):
         )
 
     @transaction.commit_manually
-    def reindex(self, classname, reindex=False):
+    def reindex(self, classname, reindex=False, flush=False):
         """
         Reindex a single class
         """
@@ -74,6 +79,12 @@ class Command(BaseCommand):
         allids = [int(a['id']) for a in objs]
 
         cursor = connection.cursor()
+
+        if flush:
+            print "Flushing all already indexed objects for class %s" % classname
+            cursor.execute("DELETE FROM %s WHERE classname=%%s" % config.MASTER_TABLE_NAME,
+                       (classname,))
+
         cursor.execute("SELECT id FROM %s WHERE classname=%%s" % config.MASTER_TABLE_NAME,
                        (classname,))
         already = set([int(c[0]) for c in cursor])
@@ -134,4 +145,8 @@ class Command(BaseCommand):
             classes = typemap.all_class_names()
 
         for klass in classes:
-            self.reindex(klass, options['reindex'])
+            self.reindex(
+                klass,
+                reindex=options['reindex'],
+                flush=options['flush']
+            )
