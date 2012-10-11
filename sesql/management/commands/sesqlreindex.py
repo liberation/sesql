@@ -55,6 +55,11 @@ class Command(BaseCommand):
                     dest='flush',
                     default=False,
                     help='Flush already indexed content'),
+        make_option('--dry-run',
+                    action='store_true',
+                    dest='dry_run',
+                    default=False,
+                    help='Show the stats and exit.'),
         make_option('-o', '--order',
                     dest='order',
                     default=None,
@@ -62,7 +67,7 @@ class Command(BaseCommand):
         )
 
     @transaction.commit_manually
-    def reindex(self, classname, reindex=False, flush=False):
+    def reindex(self, classname, reindex=False, flush=False, dry_run=False):
         """
         Reindex a single class
         """
@@ -71,6 +76,8 @@ class Command(BaseCommand):
             return
 
         print "=> Starting reindexing for %s" % classname
+        if dry_run:
+            print "Dry-run mode."
         sys.stdout.flush()
 
         objs = klass.objects.values('id')
@@ -97,6 +104,12 @@ class Command(BaseCommand):
         print "%s : %d object(s), %d already indexed, reindexing %d" % (classname, len(allids),
                                                                    len(already),
                                                                    len(missing))
+
+        if dry_run:
+            print "Dry-run: don't proceed. Rollback."
+            transaction.rollback()
+            return
+
         sys.stdout.flush()
 
         nb = len(missing)
@@ -148,5 +161,6 @@ class Command(BaseCommand):
             self.reindex(
                 klass,
                 reindex=options['reindex'],
-                flush=options['flush']
+                flush=options['flush'],
+                dry_run=options['dry_run']
             )
