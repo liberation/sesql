@@ -82,11 +82,11 @@ def log_time(function, message = None):
             res = function(*args, **kwargs)
         finally:
             tmr.__exit__()
-        args = ', '.join([ safe_str(a) for a in args ])
-        extra = [ "%s=%s" % (key, value) for key, value in kwargs.items() ]
-        kwargs = ', '.join(extra)
         m = message
         if m is None:
+            args = ', '.join([ safe_str(a) for a in args ])
+            extra = [ "%s=%s" % (key, value) for key, value in kwargs.items() ]
+            kwargs = ', '.join(extra)
             m = '%s (%s, %s)' % (function.__name__, args, kwargs,)
         log.info('%s : %.2f second(s)' % (m, tmr.peek()))
         return res
