@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010-2011
+# Copyright (c) Pilot Systems and Libération, 2010-2012
 
 # This file is part of SeSQL.
 
@@ -48,3 +48,10 @@ class DjangoOrmAdapter(OrmAdapter):
         """
         from models import SearchHit
         SearchHit(**kwargs).save()
+
+    def commit(self, cursor):
+        """
+        Commit sub-transaction on cursor
+        """
+        super(DjangoOrmAdapter, self).commit(cursor)    
+        transaction.commit_unless_managed()

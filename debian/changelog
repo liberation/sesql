@@ -1,3 +1,10 @@
+sesql (0.14.6-1) unstable; urgency=low
+
+  * Fix a transaction issue with Django non-managed transactions
+  * Minor improvement in logging
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Mon, 26 Nov 2012 17:28:32 +0200
+
 sesql (0.14.5-1) unstable; urgency=low
 
   * Merged additional options from Yohan Boniface to sesql-reindex
