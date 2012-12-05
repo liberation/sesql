@@ -49,9 +49,54 @@ class DjangoOrmAdapter(OrmAdapter):
         from models import SearchHit
         SearchHit(**kwargs).save()
 
+    def get_txlvl(self):
+        """
+        Get current subtransaction level
+        """
+        return getattr(connection, '_sesql_subtransaction_level', 0)
+
+    def inc_txlvl(self):
+        """
+        Increment the subtransaction level, return the new one
+        """
+        txlvl = self.get_txlvl() + 1
+        connection._sesql_subtransaction_level = txlvl
+        return txlvl
+
+    def dec_txlvl(self):
+        """
+        Decrement the subtransaction level, return the previous one
+        """
+        txlvl = self.get_txlvl()
+        if txlvl:
+            connection._sesql_subtransaction_level = txlvl - 1
+        return txlvl
+
+    def begin(self):
+        """
+        Get a cursor with an open sub-transaction
+        """
+        cursor = self.cursor()
+        txlvl = self.inc_txlvl()
+        cursor.execute('SAVEPOINT sesql_savepoint_%d' % txlvl)
+        return cursor
+
     def commit(self, cursor):
         """
         Commit sub-transaction on cursor
         """
-        super(DjangoOrmAdapter, self).commit(cursor)    
-        transaction.commit_unless_managed()
+        txlvl = self.dec_txlvl()
+        if txlvl:
+            cursor.execute('RELEASE SAVEPOINT sesql_savepoint_%d' % txlvl)
+        if txlvl == 1:
+            # Last subtransaction level ? Commit
+            transaction.commit_unless_managed()            
+
+    def rollback(self, cursor):
+        """
+        Rollback sub-transaction on cursor
+        """
+        txlvl = self.dec_txlvl()
+        if txlvl:
+            cursor.execute('ROLLBACK TO SAVEPOINT sesql_savepoint_%d' % txlvl)
+

@@ -111,8 +111,6 @@ def index(cursor, obj, message, noindex = False, index_related = True):
         log.info("%s: no table found, skipping" % message)
         return
 
-    cursor.execute('SAVEPOINT sesql_index_savepoint')
-
     query = "DELETE FROM %s WHERE id=%%s AND classname=%%s" % table_name
     cursor.execute(query, (objid, classname))
 
