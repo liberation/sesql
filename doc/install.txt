@@ -9,9 +9,9 @@ Prerequisite
 
 - Python 2.5 or 2.6
 
-- Django 1.2 or 1.3 (or SQLAlchemy, see sqlalchemy.txt)
+- Django >= 1.2 (or SQLAlchemy, see sqlalchemy.txt)
 
-- PostgreSQL 8.4 or 9.x
+- PostgreSQL >= 8.4
 
 - GenericCache from http://pypi.python.org/pypi/GenericCache/1.0.2
 
@@ -23,6 +23,61 @@ Installation
 
 SeSQL is a standard Django application.  Just drop it in the ``apps/``
 directory, and add it to enabled applications into ``settings.py`` .
+
+Generating stop word files
+--------------------------
+
+What is this about ?
+....................
+
+SeSQL needs to be able to filter out stop words from the indexed text,
+for performances reasons.  Stop words  are words like "a", "the", "is"
+in  English, or  "il",  "le", "les"  in French,  which  will occur  in
+(almost) every text and does not carry any significant information.
+
+PostgreSQL provides stop  words files for common  languages, but those
+files can contain accentuated characters,  like "été" in French. Since
+SeSQL strips all  accentuated characters from indexed  text, they will
+not work directly.
+
+You need to use one of the following three methods.
+
+Automatic conversion
+....................
+
+A script is now included with SeSQL, in the ``scripts/`` directory, to
+automatically convert all the stop words files provided by PostgreSQL. 
+
+Please note that  this script has to be executed  as root, since it'll
+have to write in PostgreSQL data directory.
+
+Just run, as root, ``scripts/generate_stop.sh``. It'll ask you for the
+directories  to   handle  (by  default,  it'll   handle  all  standard
+PostgreSQL installations)  and languages to handle  (by default, it'll
+handle all of them).
+
+Generated files will be named ``ascii_<language>.stop``.
+
+Manual conversion
+.................
+
+Alternatively,  you  can convert  one  (or  more) stop  words  file(s)
+manually, with a command (as root)  like (for the French language, and
+PostgreSQL 8.4) :
+
+::
+
+   LC_ALL=fr_FR.UTF-8 iconv -f utf-8 -t ascii//TRANSLIT \
+   /usr/share/postgresql/8.4/tsearch_data/french.stop > \
+   /usr/share/postgresql/8.4/tsearch_data/ascii_french.stop
+
+Provide a manual file
+.....................
+
+If your language isn't  included, or if you want to  use a custom stop
+words list, you can  provide any text file, with a  word on each line,
+as long  as it  is in  the appropriate  directory and  doesn't contain
+accentuated or other kind of special characters.
 
 Configuration
 -------------
@@ -59,16 +114,10 @@ TS_CONFIG_NAME
   is not specified.
 
 STOPWORDS_FILE
-  Name of the  stopwords file. This file **must**  be where PostgreSQL
-  will  look   for  (``/usr/share/postgresql/8.4/tsearch_data/``)  and
-  **must** only contain plain ascii  characters. An example command to
-  generate the file for the french language is :
-
-::
-
-   LC_ALL=fr_FR.UTF-8 iconv -f utf-8 -t ascii//TRANSLIT \
-   /usr/share/postgresql/8.4/tsearch_data/french.stop > \
-   /usr/share/postgresql/8.4/tsearch_data/ascii_french.stop
+  Name of the stopwords file. This file **must** be where PostgreSQL
+  will look for (``/usr/share/postgresql/8.4/tsearch_data/``) and
+  **must** only contain plain ascii characters. See above for how to
+  generate them.
 
 ADDITIONAL_TS_CONFIG
 
