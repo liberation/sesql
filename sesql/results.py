@@ -29,12 +29,20 @@ class SeSQLResultSet(object):
     It mimicks a bit the Django QuerySet, but doesn't work the same way,
     and doesn't provide exactly the same methods
     """
-    def __init__(self, objs):
+    def __init__(self, objs, fields):
         """
         Constructor
-        Objs must be a list of (class, id)
+        Objs must be a list of (class, id) with optionally extra fields
         """
         self.objs = objs
+        self.fields = fields
+
+    def brains(self):
+        """
+        Get the raw objects from SeSQL index, aka the "brains", as dictionnaries
+        """
+        for obj in self.objs:
+            yield dict(zip(self.fields, obj))
 
     def count(self):
         """
@@ -79,7 +87,7 @@ class SeSQLResultSet(object):
         """
         Get a given object
         """
-        objclass, objid = obj
+        objclass, objid = obj[:2]
         objclass = typemap.get_class_by_name(objclass)
         if not objclass:
             return config.orm.not_found

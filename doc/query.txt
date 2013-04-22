@@ -165,3 +165,21 @@ Default order
  The default search order is taken from the ``DEFAULT_ORDER`` varibale
  in ``config.py``.
 
+Brains
+------
+
+Since  version 0.15,  SeSQL  can, instead  of  returning full  objects
+constructed through the ORM, expose "brains" (the term comes from Zope
+catalog). Brains  are taken  directly from SeSQL  table, and  are much
+faster to retrieve, and usually take much less memory.
+
+To get brains, you need :
+
+1.  To specify  the  name  of fields  (sesql  indexes, postfixed  with
+``_text``  for  the  full-text  fields)  you want  to  fetch,  in  the
+constructor of the ``SeSQLQuery`` object, or as a keyword parameter of
+the ``shortquery`` and ``longquery`` functions.
+
+2. On the resulting ``SeSQLResultSet``, call the ``brains()`` methods,
+which will return an iterator of dictionaries.
+

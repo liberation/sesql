@@ -48,7 +48,7 @@ class SeSQLQuery(object):
     """
     SeSQL Query handler
     """
-    def __init__(self, query, order):
+    def __init__(self, query, order, fields = ()):
         """
         Constructor
         """
@@ -57,6 +57,7 @@ class SeSQLQuery(object):
         if isinstance(order, (str, unicode)):
             order = order.split(',')
         self.order = order
+        self.fields = ('classname', 'id') + tuple(fields)
 
     def execute(self, query, values):
         """
@@ -74,7 +75,7 @@ class SeSQLQuery(object):
         query = self._do_longquery(limit)
         if limit:
             query = query.fetchmany(limit)
-        return SeSQLResultSet(list(query))
+        return SeSQLResultSet(list(query), self.fields)
 
     def _do_longquery(self, limit = None):
         """
@@ -84,10 +85,10 @@ class SeSQLQuery(object):
         pattern, values = self.get_pattern()
         o_pattern, o_values = self.get_order()
 
-        query = """SELECT classname, id
+        query = """SELECT %s
 FROM %s
 WHERE %s
-ORDER BY %s""" % (table, pattern, o_pattern)
+ORDER BY %s""" % (', '.join(self.fields), table, pattern, o_pattern)
         if limit:
             query += """
 LIMIT %d""" % limit
@@ -114,9 +115,10 @@ LIMIT %d""" % limit
         # handle well the cases of many matches
         #
 
-        smartquery = """SELECT classname, id
+        smartquery = """SELECT %s
 FROM  (SELECT * FROM %s WHERE %s ORDER BY %s LIMIT {SESQL_SMART_LIMIT}) subquery
-WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (table, l_pattern, l_order,
+WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (', '.join(self.fields),
+                                                   table, l_pattern, l_order,
                                                    pattern, o_pattern)
         return smartquery, l_values + values + o_values
         
@@ -175,7 +177,7 @@ WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (table, l_pattern, l_order,
         log.debug("Trying short query for %s" % self.query)
 
         cursor = self._do_smart_query(limit)
-        return SeSQLResultSet(list(cursor))
+        return SeSQLResultSet(list(cursor), self.fields)
 
     @cached
     def get_table_name(self):

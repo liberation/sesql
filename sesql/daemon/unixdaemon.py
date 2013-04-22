@@ -163,7 +163,7 @@ class UnixServiceManager(object):
 
     def run(self):
         """Run the service, override that"""
-        raise "Not implemented"""
+        raise NotImplementedError
 
 class UnixDaemon (UnixServiceManager):
     """

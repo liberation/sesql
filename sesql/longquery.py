@@ -31,14 +31,16 @@ _query_cache = GenericCache(maxsize = config.QUERY_CACHE_MAX_SIZE,
                             expiry = config.QUERY_CACHE_EXPIRY)
 
 @utils.log_time
-def longquery(query, order=None, limit=None, queryid=None, historize=False):
+def longquery(query, order=None, limit=None, queryid=None, historize=False,
+              fields = ()):
     """
     Perform a long query and return a lazy Django result set
 
     If queryid is provided, then the query will be loaded from the
-    cache if possible, and redone else.
+    cache if possible, and redone else. Be careful, if the query is
+    redone, results may have changed.
 
-    Be careful, if the query is redone, results may have changed.
+    If fields are specified, will fetch those fields from the index
     """
     if queryid:
         _query_cache.lock.acquire()
@@ -50,7 +52,7 @@ def longquery(query, order=None, limit=None, queryid=None, historize=False):
         finally:
             _query_cache.lock.release()
             
-    query = SeSQLQuery(query, order)
+    query = SeSQLQuery(query, order, fields)
     results = query.longquery(limit)
     
     _query_cache.lock.acquire()

@@ -1,3 +1,9 @@
+sesql (0.15.0-1) unstable; urgency=low
+
+  * Added useful methods for potential extensions/plugins.
+
+ -- Gael Le Mignot <gael@pilotsystems.net>  Mon, 22 Apr 2013 16:51:26 +0200
+
 sesql (0.14.7-1) unstable; urgency=low
 
   * More robust code for subtransaction handling

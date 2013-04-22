@@ -22,11 +22,13 @@ from sesql.query import SeSQLQuery
 from sesql import utils
 
 @utils.log_time
-def shortquery(query, order=None, limit=50, historize=False):
+def shortquery(query, order=None, limit=50, historize=False, fields = ()):
     """
     Perform a short query and return a lazy Django result set
+
+    If fields are specified, will fetch those fields from the index
     """
-    query = SeSQLQuery(query, order)
+    query = SeSQLQuery(query, order, fields)
     results = query.shortquery(limit)
 
     if historize: #suggest feature hook
