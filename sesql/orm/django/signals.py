@@ -31,23 +31,23 @@ if 'sesql' in settings.INSTALLED_APPS:
         return sync_db(verbosity)
     signals.post_syncdb.connect(sync_db)
 
-    def index_cb(sender, instance, *args, **kwargs):
+    def handle_index(instance, isunindex = False):
         # Trick to defer import
-        from sesql.index import index, schedule_reindex
+        from sesql.index import unindex, index, schedule_reindex
         import sesql_config
         if getattr(sesql_config, 'ASYNCHRONOUS_INDEXING', False):
             return schedule_reindex(instance)
-        else:        
-            return index(instance)    
-    signals.post_save.connect(index_cb)
+        else:      
+            if isunindex:
+                return unindex(instance)
+            else:
+                return index(instance)    
 
+    def index_cb(sender, instance, *args, **kwargs):
+        handle_index(instance)
+    signals.post_save.connect(index_cb)
+    signals.m2m_changed.connect(index_cb)
 
     def unindex_cb(sender, instance, *args, **kwargs):
-        # Trick to defer import
-        from sesql.index import unindex, schedule_reindex
-        import sesql_config
-        if getattr(sesql_config, 'ASYNCHRONOUS_INDEXING', False):
-            return schedule_reindex(instance)
-        else:        
-            return unindex(instance)
+        handle_index(instance, True)
     signals.pre_delete.connect(unindex_cb)
