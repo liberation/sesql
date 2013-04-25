@@ -16,11 +16,8 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
-
+from django.conf import settings
 from django.db.models import signals
-from django.db import transaction
-from django.conf import settings       
 
 if 'sesql' in settings.INSTALLED_APPS:
     def sync_db(verbosity = 0, interactive = False, signal = None, **kwargs):
@@ -33,15 +30,15 @@ if 'sesql' in settings.INSTALLED_APPS:
 
     def handle_index(instance, isunindex = False):
         # Trick to defer import
+        from sesql import config
         from sesql.index import unindex, index, schedule_reindex
-        import sesql_config
-        if getattr(sesql_config, 'ASYNCHRONOUS_INDEXING', False):
+        if getattr(config, 'ASYNCHRONOUS_INDEXING', False):
             return schedule_reindex(instance)
-        else:      
+        else:
             if isunindex:
                 return unindex(instance)
             else:
-                return index(instance)    
+                return index(instance)
 
     def index_cb(sender, instance, *args, **kwargs):
         handle_index(instance)

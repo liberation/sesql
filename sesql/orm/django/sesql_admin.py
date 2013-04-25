@@ -16,16 +16,15 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 This monkey patch will enable to use sesql in the Django admin
 It's not fully optimal yet, but functionnal
 """
-
 from django.db.models.sql import Query
 from django.db.models import Q
 
-import sesql_config as config
+from sesql import config
+
 
 def make_add_filter(original):
     def sesql_amdin_query_add_filter(self, filter_expr, *args, **kwargs):
@@ -43,10 +42,10 @@ def make_add_filter(original):
                                     Q(**{ name: value }))
         ids = [ oid for klass, oid in query.objs ]
         return original(self, ('id__in', ids), *args, **kwargs)
-            
+
     return sesql_amdin_query_add_filter
 
 if getattr(config, 'ENABLE_SESQL_ADMIN', False):
-    if not getattr(Query, "_sesql_admin_patch_applied", None):    
+    if not getattr(Query, "_sesql_admin_patch_applied", None):
         Query._sesql_admin_patch_applied = True
         Query.add_filter = make_add_filter(Query.add_filter)

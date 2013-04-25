@@ -15,32 +15,26 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 This is a variation over the reindex command, which will only reindex
 selected columns. It'll be faster when you've a lot of data and only a
 few columns changed.
 """
-
 # Allow "with" with python2.5
 from __future__ import with_statement
 
-from django.core.management.base import BaseCommand
-from django.core.management import call_command
-from django.db import connection, transaction
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
+import sys
+from optparse import make_option
 
-import settings
-from sesql.results import SeSQLResultSet
+from django.db.models import Q
+from django.db import transaction
+from django.core.management.base import BaseCommand
+from django.core.exceptions import ObjectDoesNotExist
+
+from sesql.utils import Timer
 from sesql.index import update
 from sesql.typemap import typemap
 from sesql.longquery import longquery
-from sesql import utils
-import sesql_config as config
-
-import sys, time
-from optparse import make_option
 
 STEP = 1000
 
@@ -65,11 +59,11 @@ class Command(BaseCommand):
         print "=> We got %d objects." % nb
         sys.stdout.flush()
 
-        full_tmr = utils.Timer()
-        load_tmr = utils.Timer()
-        index_tmr = utils.Timer()
+        full_tmr = Timer()
+        load_tmr = Timer()
+        index_tmr = Timer()
         broken = 0
-        
+
 
         def disp_stats():
             with index_tmr:
@@ -115,7 +109,7 @@ class Command(BaseCommand):
                     update(obj, fields)
                 except:
                     transaction.rollback()
-                    raise                    
+                    raise
 
             if i % STEP == STEP - 1:
                 disp_stats()
@@ -123,7 +117,7 @@ class Command(BaseCommand):
             del obj
 
         disp_stats()
-    
+
     def handle(self, *fields, **options):
         """
         Handle the command
@@ -132,13 +126,13 @@ class Command(BaseCommand):
             print "Syntax : manage.py sesqlupdate [--class <classes>] <columns>"
             print "  - classes is a comma-separated list of object classes"
             print "  - columns is a (space-seperated) list of columns to reindex"
-        
+
         if not options['class']:
             classes = typemap.all_class_names()
         else:
             classes = options['class'].split(',')
 
-        self.update(classes, fields)            
+        self.update(classes, fields)
 
-        
-        
+
+

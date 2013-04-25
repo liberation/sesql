@@ -23,9 +23,7 @@ a new set of tables, and then you can switch the tables.
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
-import settings
-from sesql import utils, index, typemap, fieldmap, fields, datamodel, results
-import sesql_config as config
+from sesql import utils, index, typemap, fieldmap, fields, datamodel, results, config
 import sys, time, cPickle, imp, os, datetime
 from collections import defaultdict
 from optparse import make_option
@@ -74,7 +72,7 @@ class Command(BaseCommand):
                     dest='verbose',
                     default=False,
                     action="store_true",
-                    help='Be very verbose'),        
+                    help='Be very verbose'),
         make_option('-r', '--reverse',
                     dest='reverse',
                     default=False,
@@ -94,10 +92,10 @@ class Command(BaseCommand):
         """
         self.switch_to_old()
         cursor = config.orm.cursor()
-        
+
         opts = (self.options['datefield'], config.MASTER_TABLE_NAME)
         query = 'SELECT classname, id, %s FROM %s WHERE true' % opts
-        
+
         vals = ()
         if self.state['since']:
             query += ' AND %s >= %%s' % (self.options['datefield'],)
@@ -105,7 +103,7 @@ class Command(BaseCommand):
         if self.state['last']:
             query += ' AND (classname != %s OR id != %s)'
             vals += self.state['last']
-            
+
         query += ' ORDER BY %s ASC LIMIT %d' % (self.options['datefield'],
                                                 self.options['step'])
         if self.options['verbose']:
@@ -186,15 +184,15 @@ class Command(BaseCommand):
         self.state['remaining'] -= self.state['nb']
         if cur != last:
             old = self.state['remaining']
-            self.state['remaining'] = self.count(self.state['since']) 
+            self.state['remaining'] = self.count(self.state['since'])
             self.state['drift'] = self.state['remaining'] - old
             self.state['cumulated_drift'] += self.state['drift']
-            
+
         remaining = self.state['remaining']
         drift = self.state['cumulated_drift']
         if not drift:
             total = self.state['initial']
-        else:            
+        else:
             drift_rate = float(drift) / self.state['done']
             if drift_rate > 1.0:
                 print "!!WARNING!! Drift rate is >1.0. Operation will never finish."
@@ -207,7 +205,7 @@ class Command(BaseCommand):
             cumulated_drift_rate = 1/(1-drift_rate)
             total = self.state['initial'] * cumulated_drift_rate
             drift_estimated = remaining * cumulated_drift_rate
-            
+
         done = self.state['done']
         percent = total and (done * 100.0 / total) or 100.0
         cumulated = self.state['cumulated']
@@ -216,7 +214,7 @@ class Command(BaseCommand):
 
         if drift:
             print " -> %d done, drift rate : %.2f, estimated total: %d, actual remaining: %d, estimated remaining: %d" % (done, drift_rate, total, remaining, drift_estimated)
-                                                                             
+
 
     @transaction.commit_on_success
     def create_tables(self):
@@ -224,7 +222,7 @@ class Command(BaseCommand):
         Create the new tables, if needed
         """
         cursor = config.orm.cursor()
-        datamodel.sync_db(cursor)        
+        datamodel.sync_db(cursor)
 
     def handle(self, **options):
         """
@@ -238,7 +236,7 @@ class Command(BaseCommand):
             else:
                 print "Interruped - no state file in use, you'll have to restart manually."
             sys.exit(0)
-            
+
     def work(self, **options):
         """
         Really handle the command
@@ -255,7 +253,7 @@ class Command(BaseCommand):
         if not os.path.exists(self.options['config']):
             print "Configuration file %s doesn't exist" % self.options['config']
             sys.exit(1)
-    
+
         # Ensure we provide a valid datefield
         if not self.options["datefield"]:
             print "--datefield is mandatory"
@@ -263,7 +261,7 @@ class Command(BaseCommand):
         field = fieldmap.fieldmap[self.options["datefield"]]
         if not isinstance(field, fields.DateTimeField):
             print "--datefield argument must be a pre-existing DateTimeField"
-            sys.exit(1)            
+            sys.exit(1)
 
         # Open state file if any
         self.state = defaultdict(make_zero)
@@ -280,7 +278,7 @@ class Command(BaseCommand):
                 self.state['since'] = since
 
         if not 'initial' in self.state:
-            self.state['initial'] = self.count(self.state['since']) 
+            self.state['initial'] = self.count(self.state['since'])
             self.state['remaining'] = self.state['initial']
 
         # Ensure new config file is ok
@@ -311,4 +309,4 @@ class Command(BaseCommand):
                 cPickle.dump(self.state, open(self.options['state'], 'w'), 0)
             if nb < (self.options['step'] - 1) and not self.options['forever']:
                 break
-            
+

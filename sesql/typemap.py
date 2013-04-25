@@ -20,8 +20,7 @@
 """
 Handle the type map, that is, the map between Django models and SQL tables
 """
-
-import sesql_config as config
+from sesql import config
 
 class TypeMap(object):
     """
@@ -76,9 +75,9 @@ class TypeMap(object):
         done.add(klass)
         for sc in klass.__subclasses__():
             res += TypeMap.all_subclasses(sc, done)
-            
+
         return res
-        
+
     def all_tables(self):
         """
         List all tables

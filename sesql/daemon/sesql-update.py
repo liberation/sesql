@@ -21,18 +21,19 @@
 """
 Update the scheduled updates
 """
+import sys
+import time
+import traceback
+import logging
 
-import sys, time, traceback, os, logging
-
-from sesql.daemon.unixdaemon import UnixDaemon
+from sesql import index
+from sesql import config
+from sesql import results
+from sesql import __version__
 from sesql.daemon.cmdline import CmdLine
-
-from sesql_config import *
-
-from sesql import index, results, __version__
+from sesql.daemon.unixdaemon import UnixDaemon
 
 from django.db import connection, transaction
-import sesql_config as config
 
 
 def version():
@@ -56,7 +57,7 @@ class UpdateDaemon(UnixDaemon):
             try:
                 self.process_chunk()
             except:
-                type, value, tb = sys.exc_info()        
+                type, value, tb = sys.exc_info()
                 error = traceback.format_exception_only(type, value)[0]
                 print >> sys.stderr, error
                 self.log.error(error)
@@ -69,7 +70,7 @@ class UpdateDaemon(UnixDaemon):
         """
         Process a chunk
         """
-        cursor = connection.cursor()    
+        cursor = connection.cursor()
         cursor.execute("""SELECT classname, objid
                           FROM sesql_reindex_schedule
                           ORDER BY scheduled_at ASC LIMIT %d""" % self.chunk)
@@ -80,7 +81,7 @@ class UpdateDaemon(UnixDaemon):
         self.log.info("Found %d row(s) to reindex" % len(rows))
 
         done = set()
-        
+
         for row in rows:
             try:
                 row = tuple(row)
@@ -105,12 +106,12 @@ class UpdateDaemon(UnixDaemon):
 if __name__ == "__main__":
     cmd = CmdLine(sys.argv)
     cmd.add_opt('debug', 'd', None, "Run in debug mode (don't daemonize)")
-    cmd.add_opt('chunk', 'c', str(DAEMON_DEFAULT_CHUNK), "Chunk size")
-    cmd.add_opt('wait', 'w', str(DAEMON_DEFAULT_DELAY),
+    cmd.add_opt('chunk', 'c', str(config.DAEMON_DEFAULT_CHUNK), "Chunk size")
+    cmd.add_opt('wait', 'w', str(config.DAEMON_DEFAULT_DELAY),
                 "Wait between each chunk")
-    cmd.add_opt('pidfile', 'p', str(DAEMON_DEFAULT_PID), "Pidfile to use")
+    cmd.add_opt('pidfile', 'p', str(config.DAEMON_DEFAULT_PID), "Pidfile to use")
     cmd.parse_opt()
-      
+
     if cmd["help"]:
         cmd.show_help()
         sys.exit(0)

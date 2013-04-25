@@ -16,12 +16,10 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
-import sesql_config as config
+from sesql.utils import log_time
 from sesql.query import SeSQLQuery
-from sesql import utils
 
-@utils.log_time
+@log_time
 def shortquery(query, order=None, limit=50, historize=False, fields = ()):
     """
     Perform a short query and return a lazy Django result set

@@ -16,12 +16,13 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
-from typemap import typemap
-import sesql_config as config
-
 import logging
+
+from sesql import config
+from sesql.typemap import typemap
+
 log = logging.getLogger('sesql')
+
 
 class SeSQLResultSet(object):
     """
@@ -61,7 +62,7 @@ class SeSQLResultSet(object):
             except config.orm.not_found:
                 log.warning("Object %r does not exist ! Broken index ?" % (obj,))
     __iter__ = iterator
-    
+
     def all(self):
         """
         Get all the results as a list
@@ -100,5 +101,5 @@ class SeSQLResultSet(object):
         nb_results = self.count()
         query_text = query.get_fulltext_query()[2][0]
         config.orm.historize(query=query_text, nb_results=nb_results)
-        
-        
+
+
