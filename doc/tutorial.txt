@@ -48,6 +48,12 @@ To create it, the best is to copy the ``config.py.sample`` file (which
 is  provided  with  SeSQL)   as  ``sesql_config.py``  on  your  chosen
 location.
 
+If you are in Django project, you can define an alternative module from
+where to load the ``sesql_config``, useful when you cannot alter your
+``PYTHONPATH``, with this setting in your project configuration: ::
+
+  SESQL_CONFIG_PATH = 'my_app.sesql_configuration'
+
 Adjust the text search configuration
 ....................................
 
@@ -102,7 +108,7 @@ The simplest type map possible would look like:
 
  from django.db import models
  TYPE_MAP = ((models.Model, "sesql_default"),)
- 
+
 Define your fields
 ..................
 
@@ -152,13 +158,13 @@ Sixth step : integrate SeSQL with your code
 Now,  you  can  integrate  SeSQL in  your  code,  calling  shortquery,
 longquery.
 
-Seventh step : unleash sesql's full potential 
+Seventh step : unleash sesql's full potential
 ---------------------------------------------
 
 For more information check out this documents:
 
 - admin: list of commands provided by sesql application
- 
+
 - datamodel: fine tune sesql data model to perform more complex queries (fast)
 
 - extra: dive into text highlighting, dependency tracking, search history and benchmark features
