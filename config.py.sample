@@ -34,7 +34,7 @@ CHARSET = "utf-8"
 from sesql.fields import *
 from sesql.sources import *
 from django.db.models import Q
-from libe import models, constants
+from my_app import models
 
 #
 # Select the ORM to use
@@ -61,7 +61,7 @@ FIELDS = (ClassField("classname"),
                                    condition = ~Q(workflowState = 'deleted'))
                           ]
                         ),
-          
+
           FullTextField("fulltext",
                         [ 'title', 'getDescription()',
                           SubField("authors", [ "firstname", "lastname" ],
@@ -100,7 +100,7 @@ ADDITIONAL_CLEANUP_FUNCTION = lambda value: saxutils.unescape(value, html_entiti
 # General condition to skip indexing content
 SKIP_CONDITION = None
 
-# Default sort order for queries 
+# Default sort order for queries
 DEFAULT_ORDER = ('modifiedAt',)
 
 # Default LIMIT in short queries
@@ -110,7 +110,7 @@ DEFAULT_LIMIT = 50
 SMART_QUERY_INITIAL = 2500
 # Then, if we have at least SMART_QUERY_THRESOLD of our limit, we go on
 SMART_QUERY_THRESOLD = 0.35
-# If we have a second query, we do * (wanted/result) * SMART_QUERY_RATIO 
+# If we have a second query, we do * (wanted/result) * SMART_QUERY_RATIO
 SMART_QUERY_RATIO = 3.0
 
 #
@@ -135,14 +135,14 @@ DAEMON_DEFAULT_PID='/var/run/sesql/update.pid'
 #
 
 # default number of hit before including query in db
-HISTORY_DEFAULT_FILTER = 5 
+HISTORY_DEFAULT_FILTER = 5
 
 # erode factor for time-based decay of recent searches score
 HISTORY_ALPHA = 0.95
 # weight of frequency of the search in the final score
 HISTORY_BETA = 1.0
 # weight of number of results in the final score
-HISTORY_GAMMA = 1.0 
+HISTORY_GAMMA = 1.0
 
 # queries to ignore in history
 HISTORY_BLACKLIST = []
