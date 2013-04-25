@@ -46,6 +46,13 @@ interrupt it and restart it  later on, it'll continue where it stopped
 (objects are reindexed by groups  of 1000, only the current group will
 be restarted).
 
+Note :  sesqlreindex will not  consider the ``SKIP_CONDITION``  in its
+stats, so you may be in a situation where sesqlreindex will constantly
+claim that it  needs to reindex objects, but not  change anything when
+executed. The  ``SKIP_CONDITION`` is  only checked when  an individual
+object is being indexed (whatever  the source of indexation), not when
+stats are calculated.
+
 sesqlasyncreindex
 .................
 

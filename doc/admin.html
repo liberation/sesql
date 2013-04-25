@@ -368,6 +368,12 @@ existing database.</p>
 interrupt it and restart it  later on, it'll continue where it stopped
 (objects are reindexed by groups  of 1000, only the current group will
 be restarted).</p>
+<p>Note :  sesqlreindex will not  consider the <tt class="docutils literal">SKIP_CONDITION</tt>  in its
+stats, so you may be in a situation where sesqlreindex will constantly
+claim that it  needs to reindex objects, but not  change anything when
+executed. The  <tt class="docutils literal">SKIP_CONDITION</tt> is  only checked when  an individual
+object is being indexed (whatever  the source of indexation), not when
+stats are calculated.</p>
 </div>
 <div class="section" id="sesqlasyncreindex">
 <h2><a class="toc-backref" href="#id6">1.5&nbsp;&nbsp;&nbsp;sesqlasyncreindex</a></h2>
