@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Pilot Systems and Libération, 2010-2011
+# Copyright (c) Pilot Systems and Libération, 2010-2013
 
 # This file is part of SeSQL.
 
@@ -17,5 +17,5 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-VERSION = (0, 15, 0)
+VERSION = (0, 15, 1)
 __version__ = ".".join(map(str, VERSION))
