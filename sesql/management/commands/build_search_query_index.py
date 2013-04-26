@@ -16,58 +16,51 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 This should be runned in a cron to process search histories and compute stats
 """
-
 from optparse import make_option
-from datetime import datetime
-from datetime import timedelta 
 
 from django.core.management.base import BaseCommand
 
-import settings
-
+from sesql import config
 from sesql.lemmatize import lemmatize
 from sesql.models import SearchHit
 from sesql.models import SearchQuery
 from sesql.models import SearchHitHistoric
 from sesql.suggest import phonex
 
-import sesql_config as config
-
 
 class Command(BaseCommand):
     help = """Build SearchQuery index"""
-    
+
     option_list = BaseCommand.option_list + (
         make_option('-e','--erode',
                     action='store_true',
                     dest='erode',
                     help = 'tell if we must erode result or not'),
-            
+
         make_option('-f','--filter',
                     dest ='filter',
                     type='int',
                     default=config.HISTORY_DEFAULT_FILTER,
                     help = 'how many time a search must occur to be treated'))
-    
+
     def handle(self, *apps, **options):
         self.process_hits(options['filter'])
-        
+
         if options['erode']:
             self.erode()
 
     def erode(self):
         for search_query in SearchQuery.objects.all():
-            search_query.pondered_search_nb = (config.HISTORY_ALPHA 
-                                               * search_query.pondered_search_nb 
+            search_query.pondered_search_nb = (config.HISTORY_ALPHA
+                                               * search_query.pondered_search_nb
                                                + (1-config.HISTORY_ALPHA)
                                                * search_query.nb_recent_search)
             search_query.nb_recent_search = 0
             search_query.save()
-        
+
     def process_hits(self, filter_nb):
         last_hits = SearchHit.objects.all()
 
@@ -75,7 +68,7 @@ class Command(BaseCommand):
 
         for hit in last_hits:
             query = hit.query
-            
+
             # blacklist
             if query in config.HISTORY_BLACKLIST:
                 continue
@@ -86,7 +79,7 @@ class Command(BaseCommand):
                                   date=hit.date).save()
                 hit.delete()
                 continue
-            
+
             # manual get_or_create
             try:
                 search_query = SearchQuery.objects.get(query=query)
@@ -100,7 +93,7 @@ class Command(BaseCommand):
                 search_query.phonex = phonex(query)
 
                 # clean the query, the '_' char cause bugy clean_query
-                query = query.replace('_', '')  
+                query = query.replace('_', '')
 
                 lems = lemmatize(query.split())
 
@@ -120,14 +113,14 @@ class Command(BaseCommand):
             search_query.nb_total_search += 1
 
             search_query.pondered_search_nb += 1
-            search_query.nb_recent_search += 1 
+            search_query.nb_recent_search += 1
 
-            weight = (search_query.pondered_search_nb * config.HISTORY_BETA + 
+            weight = (search_query.pondered_search_nb * config.HISTORY_BETA +
                       search_query.nb_results * config.HISTORY_GAMMA)
             search_query.weight = weight
             search_query.save()
 
-            # we can now create SearchHitHistoric 
+            # we can now create SearchHitHistoric
             SearchHitHistoric(query=hit.query,
                               nb_results=hit.nb_results,
                               date=hit.date).save()

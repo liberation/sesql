@@ -16,15 +16,14 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
+import logging
 
+from sesql import config
 from sesql.typemap import typemap
 from sesql.fieldmap import fieldmap
-import sesql_config as config
-
-import logging
-log = logging.getLogger('sesql')
-
 from sesql.results import SeSQLResultSet
+
+log = logging.getLogger('sesql')
 
 def cached(method):
     """
@@ -35,7 +34,7 @@ def cached(method):
     def cached_inner(self, *args, **kwargs):
         if args or kwargs:
             return method(self, *args, **kwargs)
-        
+
         if not hasattr(self, cache_name):
             value = method(self)
             setattr(self, cache_name, value)
@@ -121,7 +120,7 @@ WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (', '.join(self.fields),
                                                    table, l_pattern, l_order,
                                                    pattern, o_pattern)
         return smartquery, l_values + values + o_values
-        
+
     def _attempt_short_query(self, size, limit):
         """
         Attempt a short query of given size
@@ -257,10 +256,10 @@ WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (', '.join(self.fields),
                 patterns.append(pattern)
 
             connector = ') %s (' % node.connector
-                
+
             pattern = '(' + connector.join(patterns) + ')'
             return pattern, values
-                
+
         query, value = node
         if "__" in query:
             field, method = query.split("__", 1)
@@ -268,10 +267,10 @@ WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (', '.join(self.fields),
             field = query
             method = "default"
 
-        field = fieldmap.get_field(field)        
+        field = fieldmap.get_field(field)
         method = getattr(field, "get_" + method)
         return method(value)
-    
+
     @cached
     def get_order(self, limit = None):
         """
@@ -281,10 +280,10 @@ WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (', '.join(self.fields),
         if limit:
             order = self.order[:limit]
         else:
-            order = self.order            
+            order = self.order
 
         values = []
-            
+
         for o in order:
             if o[0] == '-':
                 o = o[1:]
@@ -300,10 +299,10 @@ WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (', '.join(self.fields),
                 field, what, value = query
                 o = "ts_rank_cd(%s, %s)" % (field, what)
                 values.extend(value)
-                
+
             res.append(o + " " + direction)
         return ','.join(res), values
-    
+
     @cached
     def get_fulltext_query(self):
         """
@@ -327,4 +326,4 @@ WHERE %s ORDER BY %s LIMIT {SESQL_THE_LIMIT}""" % (', '.join(self.fields),
 
         method = getattr(field, "rank_" + method)
         return method(value)
-    
+

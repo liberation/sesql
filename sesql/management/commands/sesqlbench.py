@@ -19,27 +19,23 @@
 """
 This is a SeSQL simple benchmarking tool.
 """
-
 # Allow "with" with python2.5
 from __future__ import with_statement
 
-import settings
-import sesql_config as config
-
-import sys, time, threading, random
+import sys
+import time
+import random
+import threading
+from optparse import make_option
 
 from sesql.index import index
+from sesql.utils  import Timer
 from sesql.shortquery import shortquery
 from sesql.longquery import longquery
 from sesql.results import SeSQLResultSet
-from sesql import utils
 from sesql.typemap import typemap
 
 from django.core.management.base import BaseCommand
-from django.core.management import call_command
-from optparse import make_option
-from django.db.models import Q
-
 
 
 class Command(BaseCommand):
@@ -157,7 +153,7 @@ class Command(BaseCommand):
 
         # Display results
         self.display_results()
-                       
+
     def start_threads(self, nb, callback, store, delay):
         """
         Start nb threads for this activity
@@ -174,7 +170,7 @@ class Command(BaseCommand):
         """
         self.lock.acquire()
         self.lock.release()
-        timer = utils.Timer()
+        timer = Timer()
         while self.running:
             with timer:
                 name = callback()
@@ -252,4 +248,4 @@ class Command(BaseCommand):
         res = longquery(query[1], limit = self.options["long-limit"],
                         order = self.options["long-order"])
         return query[0] + " : %d results" % len(res)
-        
+

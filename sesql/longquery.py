@@ -20,9 +20,9 @@
 import string, random
 from GenericCache import GenericCache
 
-import sesql_config as config
-from sesql.query import SeSQLQuery
+from sesql import config
 from sesql import utils
+from sesql.query import SeSQLQuery
 
 import logging
 log = logging.getLogger('sesql')
@@ -51,10 +51,10 @@ def longquery(query, order=None, limit=None, queryid=None, historize=False,
             log.warning('Cached query id %r expired, re-querying.' % queryid)
         finally:
             _query_cache.lock.release()
-            
+
     query = SeSQLQuery(query, order, fields)
     results = query.longquery(limit)
-    
+
     _query_cache.lock.acquire()
     try:
         # Generate a new query id, ensuring it's unique
@@ -68,9 +68,9 @@ def longquery(query, order=None, limit=None, queryid=None, historize=False,
         results.queryid = queryid
     finally:
         _query_cache.lock.release()
-    
+
     if historize: # suggest feature hook
         results.historize(query)
 
     return results
-    
+

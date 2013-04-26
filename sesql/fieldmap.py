@@ -16,12 +16,11 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 Handle the field map
 """
+from sesql import config
 
-import sesql_config as config
 
 class FieldMap(object):
     """

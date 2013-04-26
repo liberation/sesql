@@ -16,8 +16,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
-import sesql_config as config
+from sesql import config
 from sesql.typemap import typemap
 
 def sql_function(func):
@@ -64,7 +63,7 @@ def create_master_table():
     will inherit
     """
     schema = "\n  ".join([ field.schema() for field in config.FIELDS ])
-    
+
     return [
         "DROP TABLE IF EXISTS %s CASCADE" % config.MASTER_TABLE_NAME,
         """CREATE TABLE %s (
@@ -80,19 +79,19 @@ def create_table(table = None):
     """
     if table is None:
         return []
-    
+
     condition = typemap.get_class_names_for(table)
     condition = ' OR '.join([ "classname = '%s'" % cls for cls in condition ])
     res = [ "CREATE TABLE %s (CHECK (%s), PRIMARY KEY (classname, id)) INHERITS (%s)" % (table, condition, config.MASTER_TABLE_NAME) ]
 
     for field in config.FIELDS:
         res.append(field.index(table))
-        
+
     for cross in config.CROSS_INDEXES:
         res.append("CREATE INDEX %s_%s_index ON %s (%s);" % (table, "_".join(cross), table, ",".join(cross)))
 
     return res
-    
+
 @sql_function
 def create_schedule_table():
     """
@@ -122,7 +121,7 @@ def sync_db(cursor, verbosity = 0):
         create_master_table(cursor, execute = True, verbosity = verbosity, include_drop = True)
     elif verbosity:
         print "SeSQL : Table %s already existed, skipped." % config.MASTER_TABLE_NAME
-        
+
     for table in typemap.all_tables():
         if not config.orm.table_exists(cursor, table):
             create_table(cursor, table = table, execute = True, verbosity = verbosity)

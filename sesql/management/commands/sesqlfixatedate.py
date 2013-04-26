@@ -15,20 +15,21 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 This command will gradually reindex, using a new sesql_config file, to
 a new set of tables, and then you can switch the tables.
 """
-
-from django.core.management.base import BaseCommand
-from django.db import transaction
-import settings
-from sesql import typemap, utils
-import sesql_config as config
-import sys, time, os, datetime
-from collections import defaultdict
+import sys
+import time
 from optparse import make_option
+
+from django.db import transaction
+from django.core.management.base import BaseCommand
+
+from sesql import config
+from sesql import typemap
+from sesql.utils import print_eta
+
 
 class Command(BaseCommand):
     help = "Fixate a date field by copying empty values from another"
@@ -72,7 +73,7 @@ class Command(BaseCommand):
         """
         Process on given table
         """
-        
+
         cursor = config.orm.cursor()
         query = 'SELECT min(id), max(id) FROM %s WHERE %s IS NULL' % (table,
                                                                       self.target)
@@ -89,10 +90,10 @@ class Command(BaseCommand):
                 time.sleep(self.options['delay'])
                 timedelta = time.time() - start_time
                 percent = float(start - idmin - 1) / float(idmax - idmin) * 100.0
-                utils.print_eta(percent, timedelta)
+                print_eta(percent, timedelta)
         else:
             print "Table %s is good, nothing to do" % table
-            
+
     def handle(self, **options):
         """
         Really handle the command
@@ -111,4 +112,4 @@ class Command(BaseCommand):
             if table:
                 self.process_table(table)
 
-        
+

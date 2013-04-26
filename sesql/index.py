@@ -16,11 +16,13 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
-import sesql_config as config
-from sesql import typemap, fieldmap, utils
-
 import logging
+
+from sesql import utils
+from sesql import config
+from sesql import typemap
+from sesql import fieldmap
+
 log = logging.getLogger('sesql')
 
 def index_log_wrap(function):
@@ -71,7 +73,7 @@ def schedule_reindex(cursor, item):
     except (TypeError, AttributeError, ValueError):
         log.info("%r: can't get classname/id, skipping" % item)
         return
-        
+
     classname, objid = item
     table_name = typemap.typemap.get_table_for(classname)
     if not table_name:
@@ -102,7 +104,7 @@ def index(cursor, obj, message, noindex = False, index_related = True):
         for item in related:
             schedule_reindex(item)
     else:
-        nbrelated = 0        
+        nbrelated = 0
 
     log.info("%s : %d dependancies found" % (message, nbrelated))
 
@@ -130,7 +132,7 @@ def index(cursor, obj, message, noindex = False, index_related = True):
                                                  ",".join(keys),
                                                  ",".join(placeholders))
     cursor.execute(query, results)
-        
+
 
 @index_log_wrap
 def unindex(obj, message):
@@ -167,4 +169,4 @@ def update(cursor, obj, message, fields):
                                                                  pattern)
     cursor.execute(query, results + [ obj.__class__.__name__, obj.id ])
 
-    
+

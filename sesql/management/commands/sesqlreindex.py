@@ -15,28 +15,25 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 This command will massively index or reindex content into SeSQL. It is
 a very useful management command, either when you first install SeSQL
 on an existing database, or when you alter your indexes.
 """
-
 # Allow "with" with python2.5
 from __future__ import with_statement
 
 import sys
-
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 
-from sesql.results import SeSQLResultSet
+from sesql import config
 from sesql.index import index
+from sesql.utils import Timer
 from sesql.typemap import typemap
-from sesql import utils
-import sesql_config as config
+from sesql.results import SeSQLResultSet
 
 STEP = 1000
 
@@ -113,7 +110,7 @@ class Command(BaseCommand):
         sys.stdout.flush()
 
         nb = len(missing)
-        full_tmr = utils.Timer()
+        full_tmr = Timer()
 
         def disp_stats():
             if not nb:

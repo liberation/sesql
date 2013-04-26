@@ -16,13 +16,10 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
-
 """
 Contain the various kind of field aggregators/fetchers/...
 """
 
-import sesql_config as config
 
 # Automatic dispatcher
 def guess_source(what):
@@ -71,10 +68,10 @@ class ClassSource(AbstractSource):
     """
     def __init__(self, dereference_proxy = False):
         """
-        Constructor 
+        Constructor
         If dereference_proxy is set to True, proxy models will be
         considered as their base classe - this is only for Django ORM
-        """        
+        """
         self.dereference_proxy = dereference_proxy
 
     def load_data(self, obj):
@@ -87,7 +84,7 @@ class ClassSource(AbstractSource):
                 if getattr(obj._meta, 'proxy', False):
                     klass = getattr(obj._meta, 'proxy_for_model', klass)
         return klass.__name__
-    
+
 
 class SimpleField(AbstractSource):
     """
@@ -98,11 +95,12 @@ class SimpleField(AbstractSource):
         Constructor
         """
         self.name = name
-    
+
     def load_data(self, obj):
         """
         Get the data directly
         """
+        from sesql import config
         try:
             return getattr(obj, self.name, None)
         except config.orm.not_found:
@@ -141,13 +139,13 @@ class SubField(AbstractSource):
         what = self.child.load_data(obj)
 
         if callable(getattr(what, "all", None)):
-            # We have a "all" method ? Consider it's many ?        
+            # We have a "all" method ? Consider it's many ?
             try:
                 if self.condition:
                     what = what.filter(self.condition)
                 what = what.all()
             except Exception, e:
-                what = []                
+                what = []
 
             res = []
             for w in what:
@@ -160,7 +158,7 @@ class SubField(AbstractSource):
         else:
             # One ?
             return self.getter(what)
-    
+
 # Aggregate
 
 class TextAggregate(AbstractSource):
@@ -172,7 +170,7 @@ class TextAggregate(AbstractSource):
         Constructor
         """
         self.sources = [ guess_source(s) for s in sources ]
-    
+
     def load_data(self, obj):
         """
         Get the data directly
@@ -185,11 +183,13 @@ class TextAggregate(AbstractSource):
         """
         Collapse recursively lists or tuples into string
         """
+        from sesql import config
+
         if not values:
             return u""
         if isinstance(values, unicode):
             return values
-        if not isinstance(values, (list, tuple)):        
+        if not isinstance(values, (list, tuple)):
             return unicode(str(values), config.CHARSET)
         values = [ TextAggregate.collapse(v) for v in values ]
         values = [ v for v in values if v ]
@@ -214,7 +214,7 @@ class WeightedAggregate(TextAggregate):
         if not weight:
             values = [ source.load_data(obj) for source in self.sources.values() ]
             return self.collapse(values)
-            
+
         source = self.sources.get(weight, None)
         if source is None:
             return u""
@@ -229,14 +229,14 @@ class FirstOf(AbstractSource):
         Constructor
         """
         self.sources = [ guess_source(s) for s in sources ]
-    
+
     def load_data(self, obj):
         """
-        Get the data directly        
+        Get the data directly
         """
         for source in self.sources:
             data = source.load_data(obj)
             if data is not None:
                 return data
-            
-    
+
+

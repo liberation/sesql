@@ -16,18 +16,17 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 Contain the field types for SeSQL
 We cannot reuse Django types because what we need is too specific
 """
-
-import unicodedata, locale
-from sources import guess_source, ClassSource
-import utils
-import sesql_config as config
-
 import logging
+import unicodedata
+
+from sesql.utils import strip_ligatures
+from sesql.sources import guess_source, ClassSource
+
+
 log = logging.getLogger('sesql')
 
 
@@ -39,7 +38,7 @@ class Field(object):
     slqtype = None
     indexfunction = ""
     placeholder = "%s"
-    
+
     def __init__(self, name, source = None, sql_default = None):
         """
         Constructor
@@ -81,6 +80,7 @@ class Field(object):
         if not value:
             return None
         if isinstance(value, unicode):
+            from sesql import config
             return value.encode(config.CHARSET, 'ignore')
         return str(value)
 
@@ -198,7 +198,7 @@ class ClassField(Field):
     This is a field storing the class of the object
     """
     sqltype = "varchar(255)"
-    
+
     def __init__(self, name, dereference_proxy = False):
         """
         Constructor
@@ -277,7 +277,7 @@ class IntArrayField(Field):
         Get the default pattern
         """
         return self.operator("@>", [ value ])
-    
+
     def get_in(self, value):
         """
         Get the pattern for __in operator
@@ -292,7 +292,7 @@ class IntArrayField(Field):
             raise ValueError, "__all requires a list or tuple"
 
         return self.operator("@>", value)
-    
+
     def get_any(self, value):
         """
         Get the pattern for __any operator
@@ -308,7 +308,7 @@ class FullTextField(Field):
     This is a full text field
     """
     indexfunction = "GIN"
-    dictionnary = "public.%s" % config.TS_CONFIG_NAME
+    _dictionnary = None
 
     def __init__(self, name, source = None, primary = False,
                  dictionnary = None, cleanup = None):
@@ -320,15 +320,27 @@ class FullTextField(Field):
         self.data_column = name + "_text"
         self.primary = primary
         self.cleanup = cleanup
-        
+
         # If dictionnary is specified, overrides default
         if dictionnary:
             self.dictionnary = dictionnary
+
+    def set_dictionnary(self, value):
+        self._dictionnary = value
+
+    def get_dictionnary(self):
+        if self._dictionnary is None:
+            from sesql import config
+            self._dictionnary = "public.%s" % config.TS_CONFIG_NAME
+        return self._dictionnary
+
+    dictionnary = property(get_dictionnary, set_dictionnary)
 
     def marshall(self, value, extra_letters = "", use_cleanup = True):
         """
         Strip accents, escape html_entities, handle unicode, ...
         """
+        from sesql import config
         if not value:
             return u""
 
@@ -347,7 +359,7 @@ class FullTextField(Field):
                 raise ValueError, "Can't parse %s in %s" % (value, config.CHARSET)
 
         # Remove ligatures (oe, ae, ...)
-        value = utils.strip_ligatures(value)
+        value = strip_ligatures(value)
 
         # Replace non-standard character by spaces
         def isletter(c):
@@ -382,7 +394,7 @@ ALTER TABLE %s ALTER COLUMN %s SET STATISTICS 1000;""" % (tablename,
         Get the default pattern
         """
         raise ValueError, " = not supported for FullTextField"
-    
+
     def get_in(self, value):
         """
         Get the pattern for __in operator
@@ -416,7 +428,7 @@ ALTER TABLE %s ALTER COLUMN %s SET STATISTICS 1000;""" % (tablename,
         column, pattern, values = self.pattern_contains(value)
         pattern = "%s @@ %s" % (column, pattern)
         return pattern, values
-    
+
     def get_containsexact(self, value):
         """
         Get the pattern for __containsexact operator - can be slow.
@@ -448,7 +460,7 @@ ALTER TABLE %s ALTER COLUMN %s SET STATISTICS 1000;""" % (tablename,
         Get the ranking pattern for __containswords operator
         """
         return self.pattern_contains(value)
-    
+
     def rank_containsexact(self, value):
         """
         Get the ranking pattern for __containsexact operator - can be slow.

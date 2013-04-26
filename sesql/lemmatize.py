@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with SeSQL.  If not, see <http://www.gnu.org/licenses/>.
 
-import sesql_config as config
+from sesql import config
 from sesql.fieldmap import fieldmap
 
 # Maximal number of words to lemmatize at once
@@ -33,7 +33,7 @@ def lemmatize_for(words, dictionnary):
     """
     if len(words) > MAX_WORDS:
         return lemmatize_for(words[:MAX_WORDS], dictionnary) + lemmatize_for(words[MAX_WORDS:], dictionnary)
-    
+
     values = {}
     remaining = []
 
@@ -55,13 +55,13 @@ def lemmatize_for(words, dictionnary):
             value = value.strip("'")
             values[word] = value
             _word_cache[(word, dictionnary)] = value
-    
-    return [ values[word] for word in words ]    
+
+    return [ values[word] for word in words ]
 
 def lemmatize(words, index = None):
     """
     Give a lemmatized version of those words
-    
+
     Use the configuration for the given index, or the default one if
     index is None
     """
